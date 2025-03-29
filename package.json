@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
+    "dev:test": "npm run migrate:test && APP_ENV=test npm run dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:app": "best --behaviors './behaviors/app/**/*.behavior.ts'",
-    "test:domain": "best --behaviors './behaviors/domain/**/*.behavior.ts'"
+    "migrate:test": "DATABASE_URL='file:./test.db' prisma migrate reset --skip-seed --force",
+    "test:app": "APP_ENV=test best --behaviors './behaviors/app/**/*.behavior.ts'",
+    "test:domain": "APP_ENV=test best --behaviors './behaviors/domain/**/*.behavior.ts'"
   },
   "keywords": [],
   "author": "",
@@ -24,14 +26,20 @@
     "great-expectations": "^1.9.2",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.17",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "next": "^15.2.4",
+    "prisma": "^6.5.0",
     "pure-rand": "^7.0.1",
     "react": "^19.1.0",
     "react-aria-components": "^1.7.1",
     "react-dom": "^19.1.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

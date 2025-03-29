@@ -1,6 +1,6 @@
 import { behavior, effect, example, fact } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
-import { expect, is, resolvesTo, stringContaining } from "great-expectations";
+import { expect, resolvesTo, stringContaining } from "great-expectations";
 
 export default behavior("welcome", [
 
@@ -14,7 +14,7 @@ export default behavior("welcome", [
       ],
       observe: [
         effect("the welcome page is displayed", async (context) => {
-          await expect(context.page.locator("h1").innerText(),
+          await expect(context.page.locator("h1").innerText({ timeout: 5000 }),
             resolvesTo(stringContaining("Welcome"))
           )
         })

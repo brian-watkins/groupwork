@@ -1,3 +1,5 @@
+import { Course } from "@/domain/course"
+import { prisma } from "@/lib/prisma"
 import { Context, useWithContext } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
 import { Page } from "playwright"
@@ -25,6 +27,22 @@ class AppServer {
   urlForPath(path: string): string {
     return `${this.host}${path}`
   }
+
+  async seedCourses(courses: Array<Course>) {
+    await prisma.course.deleteMany({})
+    for (const course of courses) {
+      await prisma.course.create({
+        data: {
+          name: course.name,
+          students: {
+            create: course.students.map(student => {
+              return { name: student.name }
+            })
+          }
+        }
+      })
+    }
+  }
 }
 
 const useServer = useWithContext({
@@ -33,16 +51,26 @@ const useServer = useWithContext({
 })
 
 export const testableApp: Context<TestApp> = useServer({
-  init({server, browser}) {
+  init({ server, browser }) {
     return new TestApp(server, browser)
   },
 })
 
 class TestApp {
+  private courses: Array<Course> | undefined
+
   constructor(private server: AppServer, private browser: BrowserTestInstrument) { }
 
-  async loadApp() {
-    await this.browser.page.goto(this.server.urlForPath("/"))
+  withCourses(courses: Array<Course>): TestApp {
+    this.courses = courses
+    return this
+  }
+
+  async loadApp(path = "/") {
+    if (this.courses !== undefined) {
+      await this.server.seedCourses(this.courses)
+    }
+    await this.browser.page.goto(this.server.urlForPath(path))
   }
 
   get page(): Page {

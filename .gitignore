@@ -1,4 +1,10 @@
+.env
+
 node_modules
 
 .next
 next-env.d.ts
+
+prisma/dev.db
+prisma/dev.db-journal
+prisma/test.db
