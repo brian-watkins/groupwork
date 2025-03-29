@@ -1,0 +1,21 @@
+{
+  "name": "groupwork",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "best --behaviors './behaviors/**/*.behavior.ts'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "best-behavior": "^0.15.2",
+    "great-expectations": "^1.9.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "pure-rand": "^7.0.1"
+  }
+}
