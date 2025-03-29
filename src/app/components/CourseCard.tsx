@@ -24,6 +24,7 @@ export function CourseCard({ course }: CourseCardProps) {
           <Link 
             href={`/courses/${course.id}`} 
             className="text-sky-600 hover:text-sky-800 text-sm font-medium"
+            data-course-details
           >
             View details →
           </Link>

@@ -9,7 +9,7 @@ export default behavior("welcome", [
     .script({
       suppose: [
         fact("the app is loaded", async (context) => {
-          await context.loadApp()
+          await context.load()
         })
       ],
       observe: [

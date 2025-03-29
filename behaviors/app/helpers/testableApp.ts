@@ -66,11 +66,11 @@ class TestApp {
     return this
   }
 
-  async loadApp(path = "/") {
+  async load(path = "/") {
     if (this.courses !== undefined) {
       await this.server.seedCourses(this.courses)
     }
-    await this.browser.page.goto(this.server.urlForPath(path))
+    return await this.browser.page.goto(this.server.urlForPath(path))
   }
 
   get page(): Page {
