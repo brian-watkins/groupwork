@@ -2,18 +2,12 @@ import { RandomGenerator, unsafeUniformIntDistribution, xoroshiro128plus } from 
 import { Course, CourseId } from "./course";
 import { Group } from "./group";
 import { Student } from "./student";
+import { CourseReader } from "./courseReader";
+import { GroupsReader } from "./groupReader";
 
 export interface ChooseGroupsCommand {
   courseId: CourseId,
   size: number
-}
-
-export interface CourseReader {
-  get(courseId: CourseId): Promise<Course>
-}
-
-export interface GroupsReader {
-  get(courseId: CourseId): Promise<Array<Group>>
 }
 
 export async function chooseGroups(courseReader: CourseReader, groupsReader: GroupsReader, command: ChooseGroupsCommand): Promise<Group[]> {
