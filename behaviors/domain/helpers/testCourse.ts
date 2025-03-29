@@ -1,5 +1,5 @@
-import { Course } from "../../src/domain/course";
-import { Student } from "../../src/domain/student";
+import { Course } from "../../../src/domain/course";
+import { Student } from "../../../src/domain/student";
 
 export function testCourse(testId: number): TestCourse {
   return new TestCourse(testId)

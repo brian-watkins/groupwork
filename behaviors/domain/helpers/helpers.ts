@@ -1,7 +1,7 @@
 import { equalTo, Matcher, objectWithProperty, valueWhere } from "great-expectations"
-import { Student } from "../../src/domain/student"
+import { Student } from "../../../src/domain/student"
 import { testStudent } from "./testStudent"
-import { Group } from "../../src/domain/group"
+import { Group } from "../../../src/domain/group"
 
 export function allStudentsIn(groups: Array<Group>): Array<Student> {
   return groups

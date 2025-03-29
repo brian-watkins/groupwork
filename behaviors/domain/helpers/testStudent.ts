@@ -1,4 +1,4 @@
-import { Student } from "../../src/domain/student";
+import { Student } from "../../../src/domain/student";
 
 export function testStudent(testId: number): TestStudent {
   return new TestStudent(testId)

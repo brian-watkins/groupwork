@@ -1,7 +1,7 @@
 import { Context } from "best-behavior";
-import { Course, CourseId } from "../../src/domain/course";
-import { Group } from "../../src/domain/group";
-import { chooseGroups, CourseReader, GroupsReader } from "../../src/domain/chooseGroups";
+import { Course, CourseId } from "../../../src/domain/course";
+import { Group } from "../../../src/domain/group";
+import { chooseGroups, CourseReader, GroupsReader } from "../../../src/domain/chooseGroups";
 
 export const testableGroupWorkDomain: Context<TestableGroupWork> = {
   init: () => new TestableGroupWork()

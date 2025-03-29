@@ -4,8 +4,8 @@ import { testCourse } from "./helpers/testCourse";
 import { testStudent, testStudents } from "./helpers/testStudent";
 import { testGroup } from "./helpers/testGroup";
 import { arrayWith, arrayWithLength, expect, is, Matcher, valueWhere } from "great-expectations";
-import { Student } from "../src/domain/student";
-import { Group } from "../src/domain/group";
+import { Student } from "../../src/domain/student";
+import { Group } from "../../src/domain/group";
 import { allStudentsIn, students } from "./helpers/helpers";
 
 export default behavior("choosing groups based on history", [
