@@ -15,7 +15,7 @@ export default behavior("course students page", [
             .withCourses([
               testCourse(1).withStudents(testStudents(3))
             ])
-            .load('/')
+            .load()
         })
       ],
       perform: [
