@@ -111,7 +111,12 @@ export class DisplayElement {
   }
 
   async dragTo(element: DisplayElement): Promise<void> {
-    await this.locator.dragTo(element.locator, { timeout: this.options.timeout })
+    await this.locator.dragTo(element.locator, {
+      force: true,
+      sourcePosition: { x: 10, y: 10 },
+      targetPosition: { x: 10, y: 10 },
+      timeout: 2000
+    })
   }
 
   async selectOption(option: string): Promise<void> {
