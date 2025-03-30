@@ -1,6 +1,6 @@
 import { behavior, example, fact, effect, step } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
-import { arrayWith, equalTo, expect, is, stringContaining } from "great-expectations";
+import { arrayWith, equalTo, expect, is, resolvesTo, stringContaining } from "great-expectations";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent, testStudents } from "../domain/helpers/testStudent";
 
@@ -29,7 +29,9 @@ export default behavior("course students page", [
           const headerText = await context.page.locator("h1").innerText({ timeout: 5000 })
           expect(headerText, is(testCourse(1).name))
         }),
-        effect("the page shows a list of students for the course", async (context) => {
+        effect("the page shows a group with all the students", async (context) => {
+          await expect(context.page.locator("[data-student-group]").count(), resolvesTo(1))
+
           const students = await context.page.locator("[data-student-name]").allInnerTexts()
           expect(students, is(arrayWith([
             equalTo(testStudent(1).name),
@@ -64,8 +66,9 @@ export default behavior("course students page", [
           expect(headerText, is(testCourse(1).name))
         }),
         effect("the page shows a message about no students", async (context) => {
-          const noStudentsMessage = await context.page.textContent('[data-testid="student-list"]') ?? ""
-          expect(noStudentsMessage, is(stringContaining("No students")))
+          await expect(context.page.locator('[data-no-students]').isVisible({ timeout: 1000 }),
+            resolvesTo(true)
+          )
         })
       ]
     }),

@@ -14,6 +14,7 @@ const prismaCourseReaderContext = {
   init: async (): Promise<Context> => {
     // Create a new Prisma client for testing
     const prisma = new PrismaClient();
+    await prisma.course.deleteMany();
     
     // Create a test course
     const course = await prisma.course.create({

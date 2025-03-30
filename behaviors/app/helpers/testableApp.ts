@@ -73,6 +73,12 @@ class TestApp {
     return await this.browser.page.goto(this.server.urlForPath(path))
   }
 
+  async loadCourse(index: number) {
+    await this.load()
+    await this.page.locator("[data-course-details]").nth(index).click({ timeout: 3000 })
+    await this.page.waitForURL('**\/courses/*')
+  }
+
   get page(): Page {
     return this.browser.page
   }
