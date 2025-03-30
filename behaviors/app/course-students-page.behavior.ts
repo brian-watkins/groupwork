@@ -1,6 +1,6 @@
 import { behavior, example, fact, effect, step } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
-import { arrayWith, equalTo, expect, is, resolvesTo, stringContaining } from "great-expectations";
+import { arrayWith, equalTo, expect, is, resolvesTo } from "great-expectations";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent, testStudents } from "../domain/helpers/testStudent";
 
@@ -20,19 +20,19 @@ export default behavior("course students page", [
       ],
       perform: [
         step("click on a course", async (context) => {
-          await context.page.locator("[data-course-details]").nth(0).click()
+          await context.display.selectAll("[data-course-details]").atIndex(0).click()
           await context.page.waitForURL('**\/courses/*')
         })
       ],
       observe: [
         effect("the page displays the course name", async (context) => {
-          const headerText = await context.page.locator("h1").innerText({ timeout: 5000 })
+          const headerText = await context.display.select("h1").text()
           expect(headerText, is(testCourse(1).name))
         }),
         effect("the page shows a group with all the students", async (context) => {
-          await expect(context.page.locator("[data-student-group]").count(), resolvesTo(1))
+          await expect(context.display.selectAll("[data-student-group]").count(), resolvesTo(1))
 
-          const students = await context.page.locator("[data-student-name]").allInnerTexts()
+          const students = await context.display.selectAll("[data-student-name]").texts()
           expect(students, is(arrayWith([
             equalTo(testStudent(1).name),
             equalTo(testStudent(2).name),
@@ -56,17 +56,17 @@ export default behavior("course students page", [
       ],
       perform: [
         step("click on a course", async (context) => {
-          await context.page.locator("[data-course-details]").nth(0).click()
+          await context.display.selectAll("[data-course-details]").atIndex(0).click()
           await context.page.waitForURL('**\/courses/*')
         })
       ],
       observe: [
         effect("the page displays the course name", async (context) => {
-          const headerText = await context.page.locator("h1").innerText({ timeout: 5000 })
+          const headerText = await context.display.select("h1").text()
           expect(headerText, is(testCourse(1).name))
         }),
         effect("the page shows a message about no students", async (context) => {
-          await expect(context.page.locator('[data-no-students]').isVisible({ timeout: 1000 }),
+          await expect(context.display.select('[data-no-students]').isVisible(),
             resolvesTo(true)
           )
         })

@@ -28,12 +28,12 @@ export default behavior("courses page", [
       ],
       observe: [
         effect("the page title is displayed", async (context) => {
-          await expect(context.page.locator("h1").innerText({ timeout: 5000 }),
+          await expect(context.display.select("h1").text(),
             resolvesTo(stringContaining("Welcome"))
           )
         }),
         effect("course list is displayed", async (context) => {
-          const courses = await context.page.locator("[data-course-name]").allInnerTexts()
+          const courses = await context.display.selectAll("[data-course-name]").texts()
           expect(courses, is([
             testCourse(1).name,
             testCourse(2).name
