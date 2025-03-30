@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { Context, useWithContext } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
 import { Page } from "playwright"
+import { TestDisplay } from "./display"
 
 function serverContext(): Context<AppServer> {
   return {
@@ -81,5 +82,9 @@ class TestApp {
 
   get page(): Page {
     return this.browser.page
+  }
+
+  get display(): TestDisplay {
+    return new TestDisplay(this.page, { timeout: 2000 })
   }
 }
