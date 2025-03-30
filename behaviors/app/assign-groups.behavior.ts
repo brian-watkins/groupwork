@@ -6,7 +6,7 @@ import { testStudents } from "../domain/helpers/testStudent";
 
 export default behavior("Assign Students to Groups", [
 
-  (m) => m.pick() && example(testableApp)
+  example(testableApp)
     .description("assigning students to groups from the course page")
     .script({
       suppose: [
