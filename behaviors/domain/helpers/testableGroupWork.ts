@@ -3,7 +3,7 @@ import { CourseReader } from "@/domain/courseReader";
 import { GroupsReader } from "@/domain/groupReader";
 import { Group } from "@/domain/group";
 import { Course, CourseId } from "@/domain/course";
-import { chooseGroups } from "@/domain/chooseGroups";
+import { assignGroups } from "@/domain/assignGroups";
 
 export const testableGroupWorkDomain: Context<TestableGroupWork> = {
   init: () => new TestableGroupWork()
@@ -25,7 +25,7 @@ class TestableGroupWork {
   }
 
   async chooseGroupsOf(size: number): Promise<void> {
-    this.currentGroups = await chooseGroups(this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
+    this.currentGroups = await assignGroups(this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
   }
 
   getCurrentGroups(): Array<Group> {

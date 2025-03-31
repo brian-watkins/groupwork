@@ -44,7 +44,11 @@ async function main() {
           { name: 'Ian Anderson' },
           { name: 'Julia Martinez' },
           { name: 'Kevin Thompson' },
-          { name: 'Lily White' }
+          { name: 'Lily White' },
+          { name: 'Audrey Jones' },
+          { name: 'Mary Watkins' },
+          { name: 'Philip Watkins' },
+          { name: 'Ernest Jones' },
         ]
       }
     }

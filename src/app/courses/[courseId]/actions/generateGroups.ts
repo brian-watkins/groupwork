@@ -1,13 +1,13 @@
 'use server';
 
 import { courseReader, groupsReader } from "@/app/app-config";
-import { chooseGroups } from "@/domain/chooseGroups";
+import { assignGroups } from "@/domain/assignGroups";
 import { CourseId } from "@/domain/course";
 import { Group } from "@/domain/group";
 
-export async function assignGroups(courseId: CourseId, size: number = 2): Promise<Group[]> {
+export async function generateGroups(courseId: CourseId, size: number = 2): Promise<Group[]> {
   try {
-    return await chooseGroups(
+    return await assignGroups(
       courseReader,
       groupsReader,
       { courseId, size }

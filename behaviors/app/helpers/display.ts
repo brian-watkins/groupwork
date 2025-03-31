@@ -126,6 +126,10 @@ export class DisplayElement {
   async selectedOption(): Promise<string> {
     return await this.locator.inputValue({ timeout: this.options.timeout })
   }
+
+  async inputValue(): Promise<string> {
+    return await this.locator.inputValue({ timeout: this.options.timeout })
+  }
 }
 
 export class DisplayElementList {

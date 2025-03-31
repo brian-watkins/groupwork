@@ -1,18 +1,22 @@
 import { RandomGenerator, unsafeUniformIntDistribution, xoroshiro128plus } from "pure-rand"
-import { Course, CourseId } from "./course";
-import { Group } from "./group";
+import { CourseId } from "./course";
+import { Group, isValidGroupSize } from "./group";
 import { Student } from "./student";
 import { CourseReader } from "./courseReader";
 import { GroupsReader } from "./groupReader";
 
-export interface ChooseGroupsCommand {
+export interface AssignGroupsCommand {
   courseId: CourseId,
   size: number
 }
 
-export async function chooseGroups(courseReader: CourseReader, groupsReader: GroupsReader, command: ChooseGroupsCommand): Promise<Group[]> {
+export async function assignGroups(courseReader: CourseReader, groupsReader: GroupsReader, command: AssignGroupsCommand): Promise<Group[]> {
   const course = await courseReader.get(command.courseId)
   const history = await groupsReader.get(command.courseId)
+  
+  if (!isValidGroupSize(command.size, course.students.length)) {
+    throw new Error(`Invalid group size: ${command.size}. Must be between 2 and ${Math.floor(course.students.length / 2)}`);
+  }
   
   return findGroupsOfSize(history, course.students, command.size)
 }
