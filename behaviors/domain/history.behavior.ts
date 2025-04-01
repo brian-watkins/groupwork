@@ -3,10 +3,8 @@ import { testableGroupWorkDomain } from "./helpers/testableGroupWork";
 import { testCourse } from "./helpers/testCourse";
 import { testStudent, testStudents } from "./helpers/testStudent";
 import { testGroup } from "./helpers/testGroup";
-import { arrayWith, arrayWithLength, expect, is, Matcher, valueWhere } from "great-expectations";
-import { Student } from "../../src/domain/student";
-import { Group } from "../../src/domain/group";
-import { allStudentsIn, students } from "./helpers/helpers";
+import { arrayWithLength, expect, is, setContaining } from "great-expectations";
+import { groupSetWithGroupSatisfying, groupSetWithStudents, student, students } from "./helpers/matchers";
 
 export default behavior("choosing groups based on history", [
 
@@ -33,40 +31,21 @@ export default behavior("choosing groups based on history", [
           expect(context.getCurrentGroups(), is(arrayWithLength(2)))
         }),
         effect("student 1 is not paired with student 2", (context) => {
-          expect(groupWith(context.getCurrentGroups(), testStudent(1))!,
-            is(groupWithOneOf([testStudent(3), testStudent(4)]))
-          )
+          expect(context.getCurrentGroups(), is(groupSetWithGroupSatisfying([
+            setContaining(student(1)),
+            setContaining(student(2), { times: 0 })
+          ])))
         }),
         effect("student 3 is not paired with student 4", (context) => {
-          expect(groupWith(context.getCurrentGroups(), testStudent(3))!,
-            is(groupWithOneOf([testStudent(1), testStudent(2)]))
-          )
+          expect(context.getCurrentGroups(), is(groupSetWithGroupSatisfying([
+            setContaining(student(3)),
+            setContaining(student(4), { times: 0 })
+          ])))
         }),
         effect("all the students are grouped", (context) => {
-          expect(allStudentsIn(context.getCurrentGroups()), is(
-            arrayWith(students(4), { withAnyOrder: true }))
-          )
+          expect(context.getCurrentGroups(), is(groupSetWithStudents(students(4))))
         })
       ]
     })
 
 ])
-
-function groupWith(groups: Array<Group>, student: Student): Group | undefined {
-  return groups
-    .find(group => Array.from(group.members)
-      .map(g => g.id)
-      .includes(testStudent(1).id)
-    )
-}
-
-function groupWithOneOf(students: Array<Student>): Matcher<Group> {
-  return valueWhere((group) => {
-    const members = Array.from(group.members)
-    for (let i = 0; i < students.length; i++) {
-      const hasIt = members.map(member => member.id).includes(students[i].id)
-      if (hasIt) return true
-    }
-    return false
-  }, `a group with one of ${students.map(s => s.id).join(", ")}`)
-}

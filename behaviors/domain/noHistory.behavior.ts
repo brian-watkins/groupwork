@@ -3,7 +3,7 @@ import { testCourse } from "./helpers/testCourse"
 import { testStudents } from "./helpers/testStudent"
 import { testableGroupWorkDomain } from "./helpers/testableGroupWork"
 import { arrayWith, expect, is, objectWithProperty } from "great-expectations"
-import { allStudentsIn, setWithSize, students } from "./helpers/helpers"
+import { groupSetWithStudents, setWithSize, students } from "./helpers/matchers"
 
 export default behavior("choosing with no history", [
 
@@ -25,9 +25,7 @@ export default behavior("choosing with no history", [
           expect(context.getCurrentGroups().length, is(2))
         }),
         effect("the two groups are distinct", async (context) => {
-          expect(allStudentsIn(context.getCurrentGroups()), is(
-            arrayWith(students(4), { withAnyOrder: true }))
-          )
+          expect(context.getCurrentGroups(), is(groupSetWithStudents(students(4))))
         })
       ]
     }),
@@ -53,9 +51,7 @@ export default behavior("choosing with no history", [
           ], { withAnyOrder: true })))
         }),
         effect("the two groups are distinct", async (context) => {
-          expect(allStudentsIn(context.getCurrentGroups()), is(arrayWith(
-            students(5), { withAnyOrder: true }))
-          )
+          expect(context.getCurrentGroups(), is(groupSetWithStudents(students(5))))
         })
       ]
     }),
@@ -83,12 +79,9 @@ export default behavior("choosing with no history", [
           ], { withAnyOrder: true })))
         }),
         effect("all the students are included once", async (context) => {
-          expect(allStudentsIn(context.getCurrentGroups()), is(
-            arrayWith(students(11), { withAnyOrder: true }))
-          )
+          expect(context.getCurrentGroups(), is(groupSetWithStudents(students(11))))
         })
       ]
     }),
 
 ])
-

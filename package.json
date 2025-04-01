@@ -26,7 +26,7 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "best-behavior": "^0.15.2",
-    "great-expectations": "^1.9.2",
+    "great-expectations": "^1.10.1",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.17",
     "tsx": "^4.19.3",
