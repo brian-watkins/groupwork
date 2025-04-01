@@ -1,6 +1,6 @@
 import { behavior, example, fact, effect } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
-import { expect, is, resolvesTo, stringContaining } from "great-expectations";
+import { expect, resolvesTo, stringContaining } from "great-expectations";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent } from "../domain/helpers/testStudent";
 
@@ -33,8 +33,7 @@ export default behavior("courses page", [
           )
         }),
         effect("course list is displayed", async (context) => {
-          const courses = await context.display.selectAll("[data-course-name]").texts()
-          expect(courses, is([
+          await expect(context.display.courses.texts(), resolvesTo([
             testCourse(1).name,
             testCourse(2).name
           ]))

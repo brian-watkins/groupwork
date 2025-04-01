@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { Context, useWithContext } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
 import { Page } from "playwright"
-import { TestDisplay } from "./display"
+import { DisplayElement, DisplayElementList, TestDisplay } from "./display"
 
 function serverContext(): Context<AppServer> {
   return {
@@ -74,17 +74,63 @@ class TestApp {
     return await this.browser.page.goto(this.server.urlForPath(path))
   }
 
-  async loadCourse(index: number) {
+  async loadCourseGroups(index: number) {
     await this.load()
-    await this.page.locator("[data-course-details]").nth(index).click({ timeout: 3000 })
-    await this.page.waitForURL('**\/courses/*')
+    await this.display.navigateToCourse(index)
   }
 
   get page(): Page {
     return this.browser.page
   }
 
-  get display(): TestDisplay {
-    return new TestDisplay(this.page, { timeout: 2000 })
+  get display(): MainDisplay {
+    return new MainDisplay(this.page, { timeout: 2000 })
+  }
+
+  get courseGroupsDisplay(): CourseGroupsPageDisplay {
+    return new CourseGroupsPageDisplay(this.page, { timeout: 2000 })
+  }
+}
+
+class MainDisplay extends TestDisplay {
+  async navigateToCourse(index: number): Promise<void> {
+    await this.page.locator("[data-course-details]").nth(index).click({ timeout: 3000 })
+    await this.page.waitForURL('**\/courses/*')
+  }
+
+  get courses(): DisplayElementList {
+    return this.selectAll("[data-course-name]")
+  }
+}
+
+class CourseGroupsPageDisplay extends TestDisplay {
+  async waitForGroups(count: number): Promise<void> {
+    await this.select(`[data-student-group]:nth-child(${count})`).waitForVisible()
+  }
+
+  get groupSizeInput(): DisplayElement {
+    return this.select("[data-group-size-input]")
+  }
+
+  get assignGroupsButton(): DisplayElement {
+    return this.select("[data-assign-groups-button]")
+  }
+
+  get groups(): DisplayElementList {
+    return this.selectAll("[data-student-group]")
+  }
+
+  get noStudents(): DisplayElement {
+    return this.select("[data-no-students]")
+  }
+
+  group(index: number): GroupDisplayElement {
+    return new GroupDisplayElement(this.page.locator("[data-student-group]").nth(index), this.options)
+  }
+}
+
+class GroupDisplayElement extends DisplayElement {
+  get members(): DisplayElementList {
+    return this.selectAllDescendants("[data-group-member]")
   }
 }

@@ -1,13 +1,14 @@
 import { behavior, example, fact, effect, step } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
-import { arrayWith, equalTo, expect, is, resolvesTo } from "great-expectations";
+import { arrayWith, expect, is, resolvesTo } from "great-expectations";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent, testStudents } from "../domain/helpers/testStudent";
+import { studentName } from "./helpers/matchers";
 
 export default behavior("course students page", [
 
   example(testableApp)
-    .description("navigate to a course and view its students")
+    .description("navigate to a course and view its groups")
     .script({
       suppose: [
         fact("the app is loaded with courses", async (context) => {
@@ -20,8 +21,7 @@ export default behavior("course students page", [
       ],
       perform: [
         step("click on a course", async (context) => {
-          await context.display.selectAll("[data-course-details]").atIndex(0).click()
-          await context.page.waitForURL('**\/courses/*')
+          await context.display.navigateToCourse(0)
         })
       ],
       observe: [
@@ -30,20 +30,19 @@ export default behavior("course students page", [
           expect(headerText, is(testCourse(1).name))
         }),
         effect("the page shows a group with all the students", async (context) => {
-          await expect(context.display.selectAll("[data-student-group]").count(), resolvesTo(1))
+          await expect(context.courseGroupsDisplay.groups.count(), resolvesTo(1))
 
-          const students = await context.display.selectAll("[data-student-name]").texts()
-          expect(students, is(arrayWith([
-            equalTo(testStudent(1).name),
-            equalTo(testStudent(2).name),
-            equalTo(testStudent(3).name),
+          await expect(context.courseGroupsDisplay.group(0).members.texts(), resolvesTo(arrayWith([
+            studentName(testStudent(1)),
+            studentName(testStudent(2)),
+            studentName(testStudent(3))
           ], { withAnyOrder: true })))
         })
       ]
     }),
 
   example(testableApp)
-    .description("navigate to a course with no students")
+    .description("navigate to groups for a course with no students")
     .script({
       suppose: [
         fact("the app is loaded with a course that has no students", async (context) => {
@@ -56,8 +55,7 @@ export default behavior("course students page", [
       ],
       perform: [
         step("click on a course", async (context) => {
-          await context.display.selectAll("[data-course-details]").atIndex(0).click()
-          await context.page.waitForURL('**\/courses/*')
+          await context.display.navigateToCourse(0)
         })
       ],
       observe: [
@@ -66,7 +64,7 @@ export default behavior("course students page", [
           expect(headerText, is(testCourse(1).name))
         }),
         effect("the page shows a message about no students", async (context) => {
-          await expect(context.display.select('[data-no-students]').isVisible(),
+          await expect(context.courseGroupsDisplay.noStudents.isVisible(),
             resolvesTo(true)
           )
         })
