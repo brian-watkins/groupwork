@@ -4,9 +4,14 @@ export function testStudent(testId: number): TestStudent {
   return new TestStudent(testId)
 }
 
-export function testStudents(size: number): Array<TestStudent> {
+export interface StudentOptions {
+  startingIndex?: number
+}
+
+export function testStudents(size: number, options: StudentOptions = {}): Array<TestStudent> {
+  const start = options.startingIndex ?? 1
   let students: Array<TestStudent> = []
-  for (let i = 1; i <= size; i++) {
+  for (let i = start; i < size + start; i++) {
     students.push(testStudent(i))
   }
   return students

@@ -1,75 +1,64 @@
-import { behavior, example, effect } from "best-behavior";
-import { expect, is, equalTo, stringContaining, arrayWithLength } from "great-expectations";
-import { PrismaCourseReader } from "../../src/domain/infrastructure/prismaCourseReader";
-import { PrismaClient } from "@prisma/client";
-
-interface Context {
-  prisma: PrismaClient;
-  courseId: string;
-  courseReader: PrismaCourseReader;
-}
-
-// Context to set up and tear down the database for each test
-const prismaCourseReaderContext = {
-  init: async (): Promise<Context> => {
-    // Create a new Prisma client for testing
-    const prisma = new PrismaClient();
-    await prisma.course.deleteMany();
-    
-    // Create a test course
-    const course = await prisma.course.create({
-      data: {
-        name: "Introduction to Programming",
-        students: {
-          create: [
-            { name: "Alice Smith" },
-            { name: "Bob Johnson" }
-          ]
-        }
-      }
-    });
-    
-    return {
-      prisma,
-      courseId: course.id,
-      courseReader: new PrismaCourseReader(prisma)
-    };
-  },
-  
-  teardown: async (context: Context) => {
-    // Clean up the database after test
-    await context.prisma.student.deleteMany();
-    await context.prisma.course.deleteMany();
-    await context.prisma.$disconnect();
-  }
-};
+import { behavior, example, effect, fact } from "best-behavior";
+import { expect, is, equalTo, arrayWith, objectWith, resolvesTo } from "great-expectations";
+import { testableDatabase } from "./helpers/testableDatabase";
+import { testCourse } from "./helpers/testCourse";
+import { testStudents } from "./helpers/testStudent";
+import { Course } from "../../src/domain/course";
+import { Student } from "@/domain/student";
+import { studentName } from "./helpers/matchers";
 
 export default behavior("PrismaCourseReader", [
-  example(prismaCourseReaderContext)
+  example(testableDatabase)
     .description("reads a course with its students")
     .script({
+      suppose: [
+        fact("there is a course with students", async (context) => {
+          await context.withCourse(testCourse(1).withStudents(testStudents(2)))
+        })
+      ],
       observe: [
-        effect("it gets the course with the correct ID", async (context) => {
-          const course = await context.courseReader.get(context.courseId);
-          
-          expect(course.id, is(equalTo(context.courseId)));
-          expect(course.name, is(stringContaining("Introduction to Programming")));
-          expect(course.students, is(arrayWithLength(2)));
+        effect("it gets the course with the correct details", async (context) => {
+          await expect(context.getCourse(testCourse(1)), resolvesTo(objectWith({
+            name: equalTo("Course #1"),
+            students: arrayWith<Student>([
+              studentName(1),
+              studentName(2)
+            ])
+          })))
         })
       ]
     }),
-    
-  example(prismaCourseReaderContext)
+
+  example(testableDatabase)
     .description("reads all courses")
     .script({
+      suppose: [
+        fact("there are multiple courses with students", async (context) => {
+          await context.withCourse(testCourse(1).withStudents(testStudents(2)))
+          await context.withCourse(testCourse(2).withStudents(testStudents(3, { startingIndex: 3 })))
+        })
+      ],
       observe: [
-        effect("it gets a list of all courses", async (context) => {
-          const courses = await context.courseReader.getAll();
-          
-          expect(courses.length, is(equalTo(1)));
-          expect(courses[0].id, is(equalTo(context.courseId)));
-          expect(courses[0].name, is(stringContaining("Introduction to Programming")));
-          expect(courses[0].students, is(arrayWithLength(2)));
+        effect("it gets a list of all courses with their students", async (context) => {
+          const courses = await context.getAllCourses()
+
+          expect(courses, is(arrayWith<Course>([
+            objectWith({
+              name: equalTo(testCourse(1).name),
+              students: arrayWith<Student>([
+                studentName(1),
+                studentName(2),
+              ])
+            }),
+            objectWith({
+              name: equalTo(testCourse(2).name),
+              students: arrayWith<Student>([
+                studentName(3),
+                studentName(4),
+                studentName(5),
+              ])
+            })
+          ])))
         })
       ]
     })

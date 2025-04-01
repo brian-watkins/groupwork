@@ -17,6 +17,10 @@ export function student(testId: number): Matcher<Student> {
   return objectWithProperty("id", equalTo(testStudent(testId).id))
 }
 
+export function studentName(testId: number): Matcher<Student> {
+  return objectWithProperty("name", equalTo(testStudent(testId).name))
+}
+
 export function students(size: number): Array<Matcher<Student>> {
   let matchers: Array<Matcher<Student>> = []
   for (let i = 1; i <= size; i++) {

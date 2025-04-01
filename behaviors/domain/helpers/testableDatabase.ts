@@ -48,6 +48,11 @@ class TestDatabase {
     return courseReader.get(courseId!)
   }
 
+  async getAllCourses(): Promise<Array<Course>> {
+    const courseReader = new PrismaCourseReader(this.prisma)
+    return courseReader.getAll()
+  }
+
   async createGroupSet(details: GroupSetDetails): Promise<void> {
     const groupSetWriter = new PrismaGroupSetWriter(this.prisma)
     await groupSetWriter.create(details)
