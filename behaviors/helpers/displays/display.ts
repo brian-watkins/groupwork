@@ -148,14 +148,6 @@ export class DisplayElementList {
     return new DisplayElement(this.locator.nth(index), this.options)
   }
 
-  first(): DisplayElement {
-    return this.atIndex(0)
-  }
-
-  skip(count: number): DisplayElementList {
-    return new DisplayElementList(this.locator.filter({ has: this.locator.page().locator(`*:nth-child(n+${count + 1})`) }), this.options)
-  }
-
   texts(selector?: string): Promise<Array<string>> {
     if (selector) {
       return this.locator.locator(selector).allInnerTexts()
