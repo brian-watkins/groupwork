@@ -18,6 +18,9 @@ export class PrismaGroupSetReader implements GroupSetReader {
             students: true
           }
         }
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
 
@@ -26,7 +29,6 @@ export class PrismaGroupSetReader implements GroupSetReader {
   
   private mapToDomainModel(prismaGroupSet: any): GroupSet {
     const groups: Group[] = prismaGroupSet.groups.map((prismaGroup: any) => {
-      // Create a Set of Student objects from the group students
       const members = new Set<Student>(
         prismaGroup.students.map((student: any) => ({
           id: student.id,

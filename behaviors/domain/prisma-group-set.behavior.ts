@@ -1,5 +1,5 @@
 import { behavior, example, effect, fact, step } from "best-behavior";
-import { expect, is, equalTo, arrayWith, objectWith, arrayContaining, objectWithProperty, setWithSize, setWith } from "great-expectations";
+import { expect, is, equalTo, arrayWith, objectWith } from "great-expectations";
 import { DateTime } from "luxon";
 import { Group } from "../../src/domain/group";
 import { testableDatabase } from "./helpers/testableDatabase";
@@ -72,6 +72,53 @@ export default behavior("Persisting GroupSets", [
               ], { withAnyOrder: true })
             })
           ])))
+        })
+      ]
+    }),
+
+  example(testableDatabase)
+    .description("reads group sets ordered by creation date in descending order")
+    .script({
+      suppose: [
+        fact("there is a course with multiple group sets created at different times", async (context) => {
+          await context.withCourse(testCourse(1).withStudents(testStudents(4)))
+
+          const course = await context.getCourse(testCourse(1))
+
+          const group1: Group = {
+            members: new Set([course.students[0], course.students[1]])
+          }
+
+          const group2: Group = {
+            members: new Set([course.students[2], course.students[3]])
+          }
+
+          // Create an older group set
+          await context.createGroupSet({
+            name: "Older Group Set",
+            courseId: course.id,
+            createdAt: DateTime.fromISO("2025-03-01T12:00:00.000+00:00"),
+            groups: [group1, group2]
+          })
+
+          // Create a newer group set
+          await context.createGroupSet({
+            name: "Newer Group Set",
+            courseId: course.id,
+            createdAt: DateTime.fromISO("2025-04-01T12:00:00.000+00:00"),
+            groups: [group1, group2]
+          })
+        })
+      ],
+      observe: [
+        effect("the group sets are returned with newest first", async (context) => {
+          const groupSets = await context.getGroupSetsForCourse(testCourse(1))
+
+          expect(groupSets.length, is(2))
+          expect(groupSets[0].name, is("Newer Group Set"))
+          expect(groupSets[0].createdAt, is(equalTo(DateTime.fromISO("2025-04-01T12:00:00.000+00:00"))))
+          expect(groupSets[1].name, is("Older Group Set"))
+          expect(groupSets[1].createdAt, is(equalTo(DateTime.fromISO("2025-03-01T12:00:00.000+00:00"))))
         })
       ]
     })
