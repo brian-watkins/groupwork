@@ -30,9 +30,9 @@ export default behavior("course students page", [
           expect(headerText, is(testCourse(1).name))
         }),
         effect("the page shows a group with all the students", async (context) => {
-          await expect(context.courseGroupsDisplay.groups.count(), resolvesTo(1))
+          await expect(context.courseGroupsDisplay.groupSetForm.groups.count(), resolvesTo(1))
 
-          await expect(context.courseGroupsDisplay.group(0).members.texts(), resolvesTo(arrayWith([
+          await expect(context.courseGroupsDisplay.groupSetForm.group(0).members.texts(), resolvesTo(arrayWith([
             studentName(testStudent(1)),
             studentName(testStudent(2)),
             studentName(testStudent(3))

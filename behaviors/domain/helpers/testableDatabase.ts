@@ -18,7 +18,6 @@ export const testableDatabase: Context<TestDatabase> = {
 class TestDatabase {
   private prisma = new PrismaClient();
   private createdCourses: Map<string, CourseId> = new Map()
-  private createdGroupSets: Map<string, GroupSetId> = new Map()
 
   async reset(): Promise<void> {
     await this.prisma.course.deleteMany({})
@@ -53,9 +52,9 @@ class TestDatabase {
     return courseReader.getAll()
   }
 
-  async createGroupSet(details: GroupSetDetails): Promise<void> {
+  async createGroupSet(details: GroupSetDetails): Promise<GroupSet> {
     const groupSetWriter = new PrismaGroupSetWriter(this.prisma)
-    await groupSetWriter.create(details)
+    return await groupSetWriter.create(details)
   }
 
   async getGroupSetsForCourse(course: Course): Promise<Array<GroupSet>> {

@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma"
 import { Context, useWithContext } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
 import { Page } from "playwright"
-import { DisplayElement, DisplayElementList, TestDisplay } from "./display"
+import { DisplayElement, DisplayElementList, TestDisplay } from "../../helpers/displays/display"
+import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay"
+import { GroupSetDisplayElement } from "../../helpers/displays/groupSetDisplayElement"
 
 function serverContext(): Context<AppServer> {
   return {
@@ -58,7 +60,7 @@ export const testableApp: Context<TestApp> = useServer({
 })
 
 class TestApp {
-  private courses: Array<Course> | undefined
+  private courses: Array<Course> = []
 
   constructor(private server: AppServer, private browser: BrowserTestInstrument) { }
 
@@ -104,8 +106,8 @@ class MainDisplay extends TestDisplay {
 }
 
 class CourseGroupsPageDisplay extends TestDisplay {
-  async waitForGroups(count: number): Promise<void> {
-    await this.select(`[data-student-group]:nth-child(${count})`).waitForVisible()
+  get groupSetForm(): GroupSetFormElement {
+    return new GroupSetFormElement(this.page.locator("[data-group-set-form]"), this.options)
   }
 
   get groupSizeInput(): DisplayElement {
@@ -116,21 +118,19 @@ class CourseGroupsPageDisplay extends TestDisplay {
     return this.select("[data-assign-groups-button]")
   }
 
-  get groups(): DisplayElementList {
-    return this.selectAll("[data-student-group]")
+  get recordSuccessMessage(): DisplayElement {
+    return this.select(".bg-green-100.text-green-800")
   }
 
   get noStudents(): DisplayElement {
     return this.select("[data-no-students]")
   }
 
-  group(index: number): GroupDisplayElement {
-    return new GroupDisplayElement(this.page.locator("[data-student-group]").nth(index), this.options)
+  get groupSets(): DisplayElementList {
+    return this.selectAll("[data-group-set]")
   }
-}
 
-class GroupDisplayElement extends DisplayElement {
-  get members(): DisplayElementList {
-    return this.selectAllDescendants("[data-group-member]")
+  groupSet(index: number): GroupSetDisplayElement {
+    return new GroupSetDisplayElement(this.page.locator("[data-group-set]").nth(index), this.options)
   }
 }

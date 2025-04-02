@@ -1,4 +1,4 @@
-import { arrayContaining, equalTo, Matcher, objectWithProperty, satisfying, setContaining, valueWhere } from "great-expectations"
+import { arrayContaining, equalTo, Matcher, objectWithProperty, satisfying, setContaining, setWith, valueWhere } from "great-expectations"
 import { Student } from "../../../src/domain/student"
 import { testStudent } from "./testStudent"
 import { Group } from "@/domain/group"
@@ -11,6 +11,10 @@ export function groupSetWithStudents(studentMatchers: Array<Matcher<Student>>): 
 
 export function groupSetWithGroupSatisfying(members: Array<Matcher<Set<Student>>>): Matcher<Array<Group>> {
   return arrayContaining(objectWithProperty("members", satisfying(members)))
+}
+
+export function groupWithMembers(members: Array<Matcher<Student>>): Matcher<Group> {
+  return objectWithProperty("members", setWith(members))
 }
 
 export function student(testId: number): Matcher<Student> {

@@ -1,7 +1,7 @@
 import { Group } from "@/domain/group";
 import { Context, useWithContext } from "best-behavior";
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser";
-import { TestDisplay } from "../../app/helpers/display";
+import { TestDisplay } from "../../helpers/displays/display";
 
 const useBrowser = useWithContext({
   browser: browserContext()

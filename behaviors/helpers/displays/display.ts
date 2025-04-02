@@ -40,7 +40,7 @@ export interface TypingOptions {
 }
 
 export class DisplayElement {
-  constructor(protected locator: Locator, protected options: TestDisplayOptions) { }
+  constructor(public locator: Locator, protected options: TestDisplayOptions) { }
 
   async boundingRect(): Promise<BoundingRect> {
     const box = await this.locator.boundingBox()
@@ -80,6 +80,10 @@ export class DisplayElement {
 
   async blur(): Promise<void> {
     await this.locator.blur({ timeout: this.options.timeout })
+  }
+
+  async clear(): Promise<void> {
+    await this.locator.clear({ timeout: this.options.timeout })
   }
 
   isEnabled(): Promise<boolean> {
@@ -130,6 +134,11 @@ export class DisplayElement {
   async inputValue(): Promise<string> {
     return await this.locator.inputValue({ timeout: this.options.timeout })
   }
+
+  async attribute(name: string): Promise<string> {
+    const value = await this.locator.getAttribute(name, { timeout: this.options.timeout })
+    return value ?? ""
+  }
 }
 
 export class DisplayElementList {
@@ -139,8 +148,28 @@ export class DisplayElementList {
     return new DisplayElement(this.locator.nth(index), this.options)
   }
 
-  texts(): Promise<Array<string>> {
+  first(): DisplayElement {
+    return this.atIndex(0)
+  }
+
+  skip(count: number): DisplayElementList {
+    return new DisplayElementList(this.locator.filter({ has: this.locator.page().locator(`*:nth-child(n+${count + 1})`) }), this.options)
+  }
+
+  texts(selector?: string): Promise<Array<string>> {
+    if (selector) {
+      return this.locator.locator(selector).allInnerTexts()
+    }
     return this.locator.allInnerTexts()
+  }
+
+  async isVisible(): Promise<boolean> {
+    try {
+      await this.locator.first().waitFor({ state: "visible", timeout: this.options.timeout })
+      return true
+    } catch {
+      return false
+    }
   }
 
   count(): Promise<number> {

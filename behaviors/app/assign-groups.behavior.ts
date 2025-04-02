@@ -25,11 +25,11 @@ export default behavior("Assign Students to Groups", [
       ],
       observe: [
         effect("displays the students in their assigned groups", async (browser) => {
-          await browser.courseGroupsDisplay.waitForGroups(2)
+          await browser.courseGroupsDisplay.groupSetForm.waitForGroups(2)
 
-          await expect(browser.courseGroupsDisplay.groups.count(), resolvesTo(2))
-          await expect(browser.courseGroupsDisplay.group(0).members.count(), resolvesTo(2))
-          await expect(browser.courseGroupsDisplay.group(1).members.count(), resolvesTo(3))
+          await expect(browser.courseGroupsDisplay.groupSetForm.groups.count(), resolvesTo(2))
+          await expect(browser.courseGroupsDisplay.groupSetForm.group(0).members.count(), resolvesTo(2))
+          await expect(browser.courseGroupsDisplay.groupSetForm.group(1).members.count(), resolvesTo(3))
         })
       ]
     }),
@@ -60,12 +60,12 @@ export default behavior("Assign Students to Groups", [
       ],
       observe: [
         effect("creates groups with the specified size", async (browser) => {
-          await browser.courseGroupsDisplay.waitForGroups(3)
+          await browser.courseGroupsDisplay.groupSetForm.waitForGroups(3)
           
-          await expect(browser.courseGroupsDisplay.groups.count(), resolvesTo(3))
-          await expect(browser.courseGroupsDisplay.group(0).members.count(), resolvesTo(3))
-          await expect(browser.courseGroupsDisplay.group(1).members.count(), resolvesTo(3))
-          await expect(browser.courseGroupsDisplay.group(2).members.count(), resolvesTo(3))
+          await expect(browser.courseGroupsDisplay.groupSetForm.groups.count(), resolvesTo(3))
+          await expect(browser.courseGroupsDisplay.groupSetForm.group(0).members.count(), resolvesTo(3))
+          await expect(browser.courseGroupsDisplay.groupSetForm.group(1).members.count(), resolvesTo(3))
+          await expect(browser.courseGroupsDisplay.groupSetForm.group(2).members.count(), resolvesTo(3))
         })
       ]
     })

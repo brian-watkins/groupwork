@@ -1,7 +1,8 @@
 import { CourseId } from "@/domain/course";
 import { notFound } from "next/navigation";
-import { courseReader } from "../../app-config";
+import { courseReader, groupSetReader } from "../../app-config";
 import CourseContent from "./components/CourseContent";
+import { toDisplayableGroupSets } from "./components/DisplayableGroupSet";
 
 export default async function CourseStudentsPage({
   params
@@ -26,13 +27,15 @@ export default async function CourseStudentsPage({
     )
   }
 
+  const groupSets = await groupSetReader.getByCourse(courseId);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">{course.name}</h1>
 
       <CourseContent
-        courseId={courseId}
-        students={course.students}
+        course={course}
+        groupSets={toDisplayableGroupSets(groupSets)}
       />
     </div>
   );

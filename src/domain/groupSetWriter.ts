@@ -1,14 +1,15 @@
 import { DateTime } from "luxon";
-import { Course } from "./course";
+import { CourseId } from "./course";
 import { Group } from "./group";
+import { GroupSet } from "./groupSet";
 
 export interface GroupSetDetails {
-  course: Course
+  courseId: CourseId
   name: string
   createdAt?: DateTime
   groups: Array<Group>
 }
 
 export interface GroupSetWriter {
-  create(details: GroupSetDetails): Promise<void>
+  create(details: GroupSetDetails): Promise<GroupSet>
 }

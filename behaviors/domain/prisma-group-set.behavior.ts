@@ -1,10 +1,11 @@
 import { behavior, example, effect, fact, step } from "best-behavior";
-import { expect, is, equalTo, arrayWith, objectWith, arrayContaining, objectWithProperty, setWithSize } from "great-expectations";
+import { expect, is, equalTo, arrayWith, objectWith, arrayContaining, objectWithProperty, setWithSize, setWith } from "great-expectations";
 import { DateTime } from "luxon";
 import { Group } from "../../src/domain/group";
 import { testableDatabase } from "./helpers/testableDatabase";
 import { testCourse } from "./helpers/testCourse";
 import { testStudents } from "./helpers/testStudent";
+import { groupWithMembers, studentName } from "./helpers/matchers";
 
 export default behavior("Persisting GroupSets", [
 
@@ -28,12 +29,27 @@ export default behavior("Persisting GroupSets", [
             members: new Set([course.students[2], course.students[3]])
           }
 
-          await context.createGroupSet({
+          const createdGroupSet = await context.createGroupSet({
             name: "Fun Set of Groups",
-            course,
+            courseId: course.id,
             createdAt: DateTime.fromISO("2025-04-01T12:12:33.123+06:00"),
             groups: [group1, group2]
           })
+
+          expect(createdGroupSet, is(objectWith({
+            name: equalTo("Fun Set of Groups"),
+            createdAt: equalTo(DateTime.fromISO("2025-04-01T12:12:33.123+06:00")),
+            groups: arrayWith<Group>([
+              groupWithMembers([
+                studentName(1),
+                studentName(2)
+              ]),
+              groupWithMembers([
+                studentName(3),
+                studentName(4)
+              ])
+            ], { withAnyOrder: true })
+          })))
         })
       ],
       observe: [
@@ -44,7 +60,16 @@ export default behavior("Persisting GroupSets", [
             objectWith({
               name: equalTo("Fun Set of Groups"),
               createdAt: equalTo(DateTime.fromISO("2025-04-01T12:12:33.123+06:00")),
-              groups: arrayContaining<Group>(objectWithProperty("members", setWithSize(2)), { times: 2 })
+              groups: arrayWith<Group>([
+                groupWithMembers([
+                  studentName(1),
+                  studentName(2)
+                ]),
+                groupWithMembers([
+                  studentName(3),
+                  studentName(4)
+                ])
+              ], { withAnyOrder: true })
             })
           ])))
         })
