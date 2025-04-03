@@ -1,7 +1,7 @@
-import { PrismaCourseReader } from "@/domain/infrastructure/prismaCourseReader";
-import { PrismaGroupsReader } from "@/domain/infrastructure/prismaGroupsReader";
-import { PrismaGroupSetReader } from "@/domain/infrastructure/prismaGroupSetReader";
-import { PrismaGroupSetWriter } from "@/domain/infrastructure/prismaGroupSetWriter";
+import { PrismaCourseReader } from "@/infrastructure/prismaCourseReader";
+import { PrismaGroupsReader } from "@/infrastructure/prismaGroupsReader";
+import { PrismaGroupSetReader } from "@/infrastructure/prismaGroupSetReader";
+import { PrismaGroupSetWriter } from "@/infrastructure/prismaGroupSetWriter";
 import { prisma } from "@/lib/prisma";
 
 export const courseReader = new PrismaCourseReader(prisma);

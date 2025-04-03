@@ -1,8 +1,10 @@
 import { Course, CourseId } from "@/domain/course";
+import { Group } from "@/domain/group";
 import { GroupSet, GroupSetId } from "@/domain/groupSet";
 import { GroupSetDetails } from "@/domain/groupSetWriter";
 import { PrismaCourseReader } from "@/infrastructure/prismaCourseReader";
 import { PrismaGroupSetReader } from "@/infrastructure/prismaGroupSetReader";
+import { PrismaGroupsReader } from "@/infrastructure/prismaGroupsReader";
 import { PrismaGroupSetWriter } from "@/infrastructure/prismaGroupSetWriter";
 import { PrismaClient } from "@prisma/client";
 import { Context } from "best-behavior";
@@ -61,5 +63,11 @@ class TestDatabase {
     const courseId = this.createdCourses.get(course.name)
     const groupSetReader = new PrismaGroupSetReader(this.prisma)
     return groupSetReader.getByCourse(courseId!)
+  }
+
+  async getGroupsForCourse(course: Course): Promise<Array<Group>> {
+    const courseId = this.createdCourses.get(course.name)
+    const groupsReader = new PrismaGroupsReader(this.prisma)
+    return groupsReader.get(courseId!)
   }
 }
