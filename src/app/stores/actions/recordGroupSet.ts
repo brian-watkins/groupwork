@@ -1,11 +1,11 @@
 'use server';
 
 import { groupSetWriter } from "@/app/app-config";
+import { DisplayableGroupSet, toDisplayableGroupSet } from "@/app/courses/[courseId]/components/DisplayableGroupSet";
 import { CourseId } from "@/domain/course";
 import { Group } from "@/domain/group";
 import { DateTime } from "luxon";
 import { revalidatePath } from "next/cache";
-import { DisplayableGroupSet, toDisplayableGroupSet } from "../components/DisplayableGroupSet";
 
 export async function recordGroupSet(
   courseId: CourseId,

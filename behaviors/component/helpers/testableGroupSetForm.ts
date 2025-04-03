@@ -2,6 +2,8 @@ import { Group } from "@/domain/group";
 import { Context, useWithContext } from "best-behavior";
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser";
 import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay";
+import { Student } from "@/domain/student";
+import { testCourse } from "../../domain/helpers/testCourse";
 
 const useBrowser = useWithContext({
   browser: browserContext()
@@ -14,18 +16,18 @@ export const testableGroupSetForm: Context<TestableGroupSetForm> = useBrowser({
 })
 
 class TestableGroupSetForm {
-  private groups: Array<Group> = [];
-  private isRecording: boolean = false;
+  private groups: Array<Group> = []
+  private students: Array<Student> = []
 
   constructor(private browser: BrowserTestInstrument) { }
 
-  withGroups(groups: Array<Group>) {
-    this.groups = groups;
-    return this;
+  withStudents(students: Array<Student>) {
+    this.students = students
+    return this
   }
 
-  withIsRecording(isRecording: boolean) {
-    this.isRecording = isRecording;
+  withGroups(groups: Array<Group>) {
+    this.groups = groups;
     return this;
   }
 
@@ -39,28 +41,26 @@ class TestableGroupSetForm {
 
       const { render } = await import("./render/renderGroupSetForm");
       
-      // Create a function that will be called when record button is clicked
-      // This will set a flag on window that we can check in our test
-      window.recordedGroupSetName = null;
-      const onRecordGroups = (name: string) => {
-        window.recordedGroupSetName = name;
-      };
-      
       render(
+        data.course,
         data.groups.map(deserializeTestGroup), 
-        onRecordGroups,
-        data.isRecording
       );
-    }, { 
+    }, {
+      course: testCourse(1).withStudents(this.students), 
       groups: this.groups.map(serializeTestGroup),
-      isRecording: this.isRecording
     });
   }
 
-  async getRecordedGroupSetName(): Promise<string | null> {
+  async completeRecordGroupSetsAction(): Promise<void> {
     return this.browser.page.evaluate(() => {
-      return window.recordedGroupSetName;
+      window.resolveRecordGroups()
     });
+  }
+
+  async calledRecordGroups(): Promise<boolean> {
+    return this.browser.page.evaluate(() => {
+      return window.calledRecordGroups > 0
+    })
   }
 
   get display(): GroupSetFormElement {

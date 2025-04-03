@@ -1,26 +1,48 @@
 'use client';
 
-import { Group } from "@/domain/group";
+import { isValidGroupSize } from "@/domain/group";
 import GroupList from "./GroupList";
 import { useState } from "react";
+import { Course } from "@/domain/course";
+import { useGroupStore } from "@/app/contexts/GroupStoreContext";
 
 interface GroupSetFormProps {
-  groups: Group[];
-  onRecordGroups: (name: string) => void;
-  isRecording: boolean;
+  course: Course
 }
 
-export default function GroupSetForm({ groups, onRecordGroups, isRecording }: GroupSetFormProps) {
+export default function GroupSetForm({ course }: GroupSetFormProps) {
   const [groupSetName, setGroupSetName] = useState("");
   const [showError, setShowError] = useState(false);
+  const [groupSize, setGroupSize] = useState<number>(2);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAssigning, setIsAssigning] = useState(false)
 
-  const handleRecordClick = () => {
+  const groups = useGroupStore(store => store.groups)
+  const assignGroups = useGroupStore(store => store.assignGroups)  
+  const recordGroups = useGroupStore(store => store.recordGroups)  
+
+  const handleRecordGroups = async () => {
     if (groupSetName.trim() === "") {
       setShowError(true);
       return;
     }
 
-    onRecordGroups(groupSetName);
+    setIsRecording(true);
+    await recordGroups(course, groupSetName, groups);
+    setIsRecording(false);
+  };
+
+  const handleAssignGroups = async () => {
+    setIsAssigning(true)
+    await assignGroups(course, groupSize);
+    setIsAssigning(false)
+  };
+
+  const handleGroupSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && isValidGroupSize(value, course.students.length)) {
+      setGroupSize(value);
+    }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,16 +75,36 @@ export default function GroupSetForm({ groups, onRecordGroups, isRecording }: Gr
             </p>
           )}
         </div>
+        <div data-group-size-container className="border border-gray-300 p-4 rounded-md flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span>Create groups of</span>
+            <input
+              data-group-size-input
+              type="number"
+              value={groupSize}
+              onChange={handleGroupSizeChange}
+              className="w-16 border border-gray-300 rounded px-2 py-1"
+            />
+            <span>members</span>
+          </div>
+          <button
+            data-assign-groups-button
+            onClick={handleAssignGroups}
+            disabled={isAssigning}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Assign to Groups
+          </button>
+        </div>
         <button
           data-record-groups-button
-          onClick={handleRecordClick}
+          onClick={handleRecordGroups}
           disabled={isRecording}
           className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isRecording ? 'Recording...' : 'Record Groups'}
+          Record Groups
         </button>
       </div>
-
       <GroupList groups={groups} />
     </div>
   );

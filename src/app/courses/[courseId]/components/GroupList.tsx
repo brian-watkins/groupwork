@@ -2,7 +2,7 @@
 
 import { Group } from "@/domain/group";
 import { Student } from "@/domain/student";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DndContext,
   useDraggable,
@@ -75,6 +75,13 @@ export default function GroupList({ groups }: GroupListProps) {
   const [studentGroups, setStudentGroups] = useState<Student[][]>(() => extractStudents(groups));
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [overGroupId, setOverGroupId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Not sure if this is good but seems necessary since groups can change
+    // from outside when groups are assigned. but we can also modify the
+    // groups inside by dragging and dropping
+    setStudentGroups(extractStudents(groups))
+  }, [ groups ])
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;

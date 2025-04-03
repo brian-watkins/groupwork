@@ -1,18 +1,17 @@
 import { behavior, example, fact, effect, step } from "best-behavior";
-import { expect, is, stringContaining, equalTo, resolvesTo } from "great-expectations";
-import { testGroup } from "../domain/helpers/testGroup";
+import { expect, stringContaining, resolvesTo } from "great-expectations";
 import { testStudents } from "../domain/helpers/testStudent";
 import { testableGroupSetForm } from "./helpers/testableGroupSetForm";
 
 export default behavior("GroupSetForm component", [
 
   example(testableGroupSetForm)
-    .description("attempt to record a group set without a name")
+    .description("group set name field validation")
     .script({
       suppose: [
         fact("the form is rendered with groups", async (context) => {
           await context
-            .withGroups([testGroup(...testStudents(4))])
+            .withStudents(testStudents(4))
             .render()
         })
       ],
@@ -30,27 +29,11 @@ export default behavior("GroupSetForm component", [
             stringContaining("border-red-500")
           ))
         }),
-        effect("the onRecordGroups callback is not called", async (context) => {
-          const recordedName = await context.getRecordedGroupSetName();
-          expect(recordedName, is(equalTo(null)));
+        effect("the record groups action is not called", async (context) => {
+          await expect(context.calledRecordGroups(), resolvesTo(false))
         })
       ]
-    }),
-
-  example(testableGroupSetForm)
-    .description("clear validation error after entering a name")
-    .script({
-      suppose: [
-        fact("the form is rendered with groups", async (context) => {
-          await context
-            .withGroups([testGroup(...testStudents(4))])
-            .render()
-        }),
-        fact("a validation error is triggered", async (context) => {
-          await context.display.recordGroupsButton.click();
-          await context.display.inputError.waitForVisible();
-        })
-      ],
+    }).andThen({
       perform: [
         step("enter a name in the input field", async (context) => {
           await context.display.groupSetNameInput.type("New Name");
@@ -74,19 +57,32 @@ export default behavior("GroupSetForm component", [
       suppose: [
         fact("the form is rendered with isRecording=true", async (context) => {
           await context
-            .withGroups([testGroup(...testStudents(4))])
-            .withIsRecording(true)
+            .withStudents(testStudents(4))
             .render()
+        })
+      ],
+      perform: [
+        step("enter a name in the input field", async (context) => {
+          await context.display.groupSetNameInput.type("Fun Groups");
+        }),
+        step("click the record groups button", async (context) => {
+          await context.display.recordGroupsButton.click()
         })
       ],
       observe: [
         effect("the Record Groups button is disabled", async (context) => {
-          const isEnabled = await context.display.recordGroupsButton.isEnabled();
-          expect(isEnabled, is(false));
-        }),
-        effect("the button text shows 'Recording...'", async (context) => {
-          const buttonText = await context.display.recordGroupsButton.text();
-          expect(buttonText, is("Recording..."));
+          await expect(context.display.recordGroupsButton.isEnabled(), resolvesTo(false))
+        })
+      ]
+    }).andThen({
+      perform: [
+        step("the record groups action completes", async (context) => {
+          await context.completeRecordGroupSetsAction()
+        })
+      ],
+      observe: [
+        effect("the Record Groups button is enabled", async (context) => {
+          await expect(context.display.recordGroupsButton.isEnabled(), resolvesTo(true))
         })
       ]
     })

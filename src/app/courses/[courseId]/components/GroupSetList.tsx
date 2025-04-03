@@ -4,12 +4,28 @@ import { DisplayableGroupSet } from "./DisplayableGroupSet";
 import { useState } from "react";
 import GroupList from "./GroupList";
 import { DateTime } from "luxon";
+import { useGroupStore } from "@/app/contexts/GroupStoreContext";
 
 interface GroupSetProps {
   groupSet: DisplayableGroupSet;
 }
 
-export default function GroupSet({ groupSet }: GroupSetProps) {
+export default function GroupSetList() {
+  const groupSets = useGroupStore(store => store.groupSets)
+
+  return (
+    <>
+      {groupSets.map(groupSet =>
+        <GroupSet
+          key={groupSet.id}
+          groupSet={groupSet}
+        />
+      )}
+    </>
+  )
+}
+
+function GroupSet({ groupSet }: GroupSetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -34,7 +50,7 @@ export default function GroupSet({ groupSet }: GroupSetProps) {
         </div>
         <div className="text-blue-600">{isExpanded ? "▲" : "▼"}</div>
       </div>
-      
+
       {isExpanded && (
         <div className="mt-4">
           <GroupList groups={groupSet.groups} />

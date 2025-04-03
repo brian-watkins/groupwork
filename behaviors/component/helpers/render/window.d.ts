@@ -1,3 +1,4 @@
 interface Window {
-  recordedGroupSetName: string | null;
+  resolveRecordGroups: () => {}
+  calledRecordGroups: number
 }
