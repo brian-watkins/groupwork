@@ -1,7 +1,7 @@
+import { GroupSet } from "@/domain/groupSet";
+import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter";
 import { PrismaClient } from "@prisma/client";
-import { GroupSetDetails, GroupSetWriter } from "../groupSetWriter";
 import { DateTime } from "luxon";
-import { GroupSet } from "../groupSet";
 
 export class PrismaGroupSetWriter implements GroupSetWriter {
   constructor(private prisma: PrismaClient) { }

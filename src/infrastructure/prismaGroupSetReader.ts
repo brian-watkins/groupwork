@@ -1,10 +1,10 @@
-import { GroupSet } from "../groupSet";
-import { GroupSetReader } from "../groupSetReader";
-import { Group } from "../group";
-import { Student } from "../student";
 import { DateTime } from "luxon";
-import { CourseId } from "../course";
 import { PrismaClient } from "@prisma/client";
+import { GroupSetReader } from "@/domain/groupSetReader";
+import { CourseId } from "@/domain/course";
+import { GroupSet } from "@/domain/groupSet";
+import { Group } from "@/domain/group";
+import { Student } from "@/domain/student";
 
 export class PrismaGroupSetReader implements GroupSetReader {
   constructor(private prisma: PrismaClient) {}

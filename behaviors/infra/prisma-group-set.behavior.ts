@@ -3,9 +3,9 @@ import { expect, is, equalTo, arrayWith, objectWith } from "great-expectations";
 import { DateTime } from "luxon";
 import { Group } from "../../src/domain/group";
 import { testableDatabase } from "./helpers/testableDatabase";
-import { testCourse } from "./helpers/testCourse";
-import { testStudents } from "./helpers/testStudent";
-import { groupWithMembers, studentName } from "./helpers/matchers";
+import { testCourse } from "../domain/helpers/testCourse";
+import { testStudents } from "../domain/helpers/testStudent";
+import { groupWithMembers, studentName } from "../domain/helpers/matchers";
 
 export default behavior("Persisting GroupSets", [
 

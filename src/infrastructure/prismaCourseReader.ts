@@ -1,7 +1,7 @@
+import { Course, CourseId } from "@/domain/course";
+import { CourseReader } from "@/domain/courseReader";
+import { Student } from "@/domain/student";
 import { PrismaClient } from "@prisma/client";
-import { Course, CourseId } from "../course";
-import { CourseReader } from "../courseReader";
-import { Student } from "../student";
 
 export class PrismaCourseReader implements CourseReader {
   constructor(private prisma: PrismaClient) {}

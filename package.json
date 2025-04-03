@@ -11,7 +11,8 @@
     "lint": "next lint",
     "migrate:test": "DATABASE_URL='file:./test.db' prisma migrate reset --skip-seed --force",
     "test:app": "APP_ENV=test best --behaviors './behaviors/app/**/*.behavior.ts'",
-    "test:domain": "APP_ENV=test best --behaviors './behaviors/domain/**/*.behavior.ts'",
+    "test:domain": "best --behaviors './behaviors/domain/**/*.behavior.ts'",
+    "test:infra": "APP_ENV=test best --behaviors './behaviors/infra/**/*.behavior.ts'",
     "test:component": "best --behaviors './behaviors/component/**/*.behavior.ts'"
   },
   "keywords": [],

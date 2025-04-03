@@ -1,9 +1,9 @@
 import { Course, CourseId } from "@/domain/course";
 import { GroupSet, GroupSetId } from "@/domain/groupSet";
 import { GroupSetDetails } from "@/domain/groupSetWriter";
-import { PrismaCourseReader } from "@/domain/infrastructure/prismaCourseReader";
-import { PrismaGroupSetReader } from "@/domain/infrastructure/prismaGroupSetReader";
-import { PrismaGroupSetWriter } from "@/domain/infrastructure/prismaGroupSetWriter";
+import { PrismaCourseReader } from "@/infrastructure/prismaCourseReader";
+import { PrismaGroupSetReader } from "@/infrastructure/prismaGroupSetReader";
+import { PrismaGroupSetWriter } from "@/infrastructure/prismaGroupSetWriter";
 import { PrismaClient } from "@prisma/client";
 import { Context } from "best-behavior";
 

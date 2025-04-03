@@ -1,11 +1,11 @@
 import { behavior, example, effect, fact } from "best-behavior";
 import { expect, is, equalTo, arrayWith, objectWith, resolvesTo } from "great-expectations";
 import { testableDatabase } from "./helpers/testableDatabase";
-import { testCourse } from "./helpers/testCourse";
-import { testStudents } from "./helpers/testStudent";
+import { testCourse } from "../domain/helpers/testCourse";
+import { testStudents } from "../domain/helpers/testStudent";
 import { Course } from "../../src/domain/course";
 import { Student } from "@/domain/student";
-import { studentName } from "./helpers/matchers";
+import { studentName } from "../domain/helpers/matchers";
 
 export default behavior("PrismaCourseReader", [
   example(testableDatabase)
