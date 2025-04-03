@@ -18,7 +18,6 @@ export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false)
 
-  const groups = useGroupStore(store => store.groups)
   const assignGroups = useGroupStore(store => store.assignGroups)  
   const recordGroups = useGroupStore(store => store.recordGroups)  
 
@@ -29,7 +28,7 @@ export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
     }
 
     setIsRecording(true);
-    await recordGroups(course, groupSetName, groups);
+    await recordGroups(course, groupSetName);
     setIsRecording(false);
     onClose();
   };
@@ -99,7 +98,7 @@ export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
           </button>
         </div>
       </div>
-      <GroupList groups={groups} />
+      <GroupList />
       <div className="flex justify-between mt-4">
         <button
           data-cancel-button

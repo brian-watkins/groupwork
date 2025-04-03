@@ -2,7 +2,7 @@
 
 import { Group } from "@/domain/group";
 import { Student } from "@/domain/student";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   DndContext,
   useDraggable,
@@ -11,9 +11,12 @@ import {
   DragStartEvent,
   DragOverlay,
 } from '@dnd-kit/core';
+import { GroupSetId } from "@/domain/groupSet";
+import { useGroupStore } from "@/app/contexts/GroupStoreContext";
+import { getGroups } from "@/app/stores/selectors";
 
 interface GroupListProps {
-  groups: Group[];
+  groupSetId?: GroupSetId
 }
 
 interface DragState {
@@ -71,17 +74,12 @@ function DroppableGroup({ id, index, children, isOver }: { id: string; index: nu
   );
 }
 
-export default function GroupList({ groups }: GroupListProps) {
-  const [studentGroups, setStudentGroups] = useState<Student[][]>(() => extractStudents(groups));
+export default function GroupList({ groupSetId }: GroupListProps) {
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [overGroupId, setOverGroupId] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Not sure if this is good but seems necessary since groups can change
-    // from outside when groups are assigned. but we can also modify the
-    // groups inside by dragging and dropping
-    setStudentGroups(extractStudents(groups))
-  }, [ groups ])
+  const studentGroups: Student[][] = extractStudents(useGroupStore(getGroups(groupSetId)))
+  const setGroups = useGroupStore(state => state.setGroupsForGroupSet)
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
@@ -119,14 +117,16 @@ export default function GroupList({ groups }: GroupListProps) {
     setOverGroupId(null);
 
     if (fromGroupIndex !== toGroupIndex) {
-      setStudentGroups(prev => {
-        const newGroups = [...prev];
+      const newGroups = [...studentGroups];
 
-        newGroups[fromGroupIndex] = newGroups[fromGroupIndex].filter(s => s.id !== student.id);
-        newGroups[toGroupIndex] = [...newGroups[toGroupIndex], student];
+      newGroups[fromGroupIndex] = newGroups[fromGroupIndex].filter(s => s.id !== student.id);
+      newGroups[toGroupIndex] = [...newGroups[toGroupIndex], student];
 
-        return newGroups;
-      });
+      const groupsToSave: Array<Group> = newGroups.map(students => {
+        return { members: new Set(students) }
+      })
+
+      setGroups(groupSetId, groupsToSave)
     }
   }
 

@@ -1,11 +1,63 @@
 import { behavior, effect, example, fact, step } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
 import { testCourse } from "../domain/helpers/testCourse";
-import { testStudent } from "../domain/helpers/testStudent";
+import { testStudent, testStudents } from "../domain/helpers/testStudent";
 import { arrayWith, arrayWithLength, expect, is, resolvesTo } from "great-expectations";
 import { studentName } from "./helpers/matchers";
 
 export default behavior("record groups", [
+
+  example(testableApp)
+    .description("record groups after manual adjustment")
+    .script({
+      suppose: [
+        fact("the app is loaded with a course that has students", async (context) => {
+          await context
+            .withCourses([
+              testCourse(1).withStudents(testStudents(4))
+            ])
+            .loadCourseGroups(0)
+        })
+      ],
+      perform: [
+        step("click the 'Create New Groups' button", async (context) => {
+          await context.courseGroupsDisplay.createNewGroupsButton.click()
+        }),
+        step("create some groups", async (context) => {
+          await context.courseGroupsDisplay.assignGroupsButton.click()
+          await context.courseGroupsDisplay.groupSetForm.waitForGroups(2)
+        }),
+        step("manually move a student from group 1 to group 2", async (context) => {
+          const studentToDrag = context.display.selectAll("[data-student-group]").atIndex(0)
+            .selectAllDescendants("[data-group-member]").atIndex(0)
+
+          await studentToDrag.dragTo(context.display.selectAll("[data-student-group]").atIndex(1))
+        }),
+        step("name the group set", async (context) => {
+          await context.courseGroupsDisplay.groupSetForm.groupSetNameInput.type("Manually Adjusted Groups")
+        }),
+        step("record the adjusted groups", async (context) => {
+          await context.courseGroupsDisplay.groupSetForm.recordGroupsButton.click()
+          await context.courseGroupsDisplay.groupSet(0).group(1).waitForVisible()
+        })
+      ],
+      observe: [
+        effect("the first group should have one student", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSet(0).group(0).members.count(), resolvesTo(1))
+        }),
+        effect("the second group should have three students", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSet(0).group(1).members.count(), resolvesTo(3))
+        }),
+        effect("the groups should contain all students", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSet(0).allMembers.texts(), resolvesTo(arrayWith([
+            studentName(testStudent(1)),
+            studentName(testStudent(2)),
+            studentName(testStudent(3)),
+            studentName(testStudent(4))
+          ], { withAnyOrder: true })))
+        })
+      ]
+    }),
 
   example(testableApp)
     .description("record a new group set")

@@ -55,7 +55,7 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
 
       {isExpanded && (
         <div className="mt-4">
-          <GroupList groups={groupSet.groups} />
+          <GroupList groupSetId={groupSet.id} />
         </div>
       )}
     </div>

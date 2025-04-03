@@ -4,10 +4,7 @@ import { createRoot } from 'react-dom/client';
 import "@/app/globals.css";
 import { GroupStoreProvider } from "@/app/contexts/GroupStoreContext";
 import { Course } from "@/domain/course";
-import type { GroupStore, GroupStoreState } from "@/app/stores/groupStore";
-import { create } from "zustand";
-
-window.calledRecordGroups = 0
+import { createTestStore } from "./testStore";
 
 export function render(
   course: Course,
@@ -17,28 +14,9 @@ export function render(
   document.body.appendChild(elementRoot);
   const root = createRoot(elementRoot);
 
-  const testGroupStore = createTestStore({ groups })
-
   root.render(
-    <GroupStoreProvider store={testGroupStore}>
-      <GroupSetForm course={course} onClose={() => {}}/>
+    <GroupStoreProvider store={createTestStore({ newGroups: groups })}>
+      <GroupSetForm course={course} onClose={() => { }} />
     </GroupStoreProvider>
   );
-}
-
-function createTestStore(overrides: Partial<GroupStoreState>) {
-  return create<GroupStore>(() => ({
-    groups: [],
-    groupSets: [],
-    ...overrides,
-    async assignGroups(course, groupSize) {
-
-    },
-    async recordGroups(course, name, groups) {
-      window.calledRecordGroups++
-      return new Promise<void>(resolve => {
-        window.resolveRecordGroups = resolve as () => {}
-      })
-    },
-  }))
 }

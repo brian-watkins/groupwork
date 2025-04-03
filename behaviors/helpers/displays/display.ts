@@ -164,7 +164,8 @@ export class DisplayElementList {
     }
   }
 
-  count(): Promise<number> {
+  async count(): Promise<number> {
+    await this.locator.first().waitFor({ state: "visible", timeout: this.options.timeout })
     return this.locator.count()
   }
 }

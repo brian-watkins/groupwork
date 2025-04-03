@@ -17,7 +17,7 @@ export default function GroupsContent({ course, groupSets }: GroupsContentProps)
   const [showGroupSetForm, setShowGroupSetForm] = useState(false);
 
   return (
-    <GroupStoreProvider store={createGroupStore({ groups: [{ members: new Set(course.students) }], groupSets })}>
+    <GroupStoreProvider store={createGroupStore({ newGroups: [{ members: new Set(course.students) }], groupSets })}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Group Sets</h2>

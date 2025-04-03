@@ -17,4 +17,8 @@ export class GroupSetDisplayElement extends DisplayElement {
   group(index: number): GroupDisplayElement {
     return new GroupDisplayElement(this.locator.locator("[data-student-group]").nth(index), this.options)
   }
+
+  get allMembers(): DisplayElementList {
+    return this.selectAllDescendants("[data-group-member]")
+  }
 }
