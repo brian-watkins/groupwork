@@ -8,9 +8,10 @@ import { useGroupStore } from "@/app/contexts/GroupStoreContext";
 
 interface GroupSetFormProps {
   course: Course
+  onClose: () => void
 }
 
-export default function GroupSetForm({ course }: GroupSetFormProps) {
+export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
   const [groupSetName, setGroupSetName] = useState("");
   const [showError, setShowError] = useState(false);
   const [groupSize, setGroupSize] = useState<number>(2);
@@ -30,6 +31,7 @@ export default function GroupSetForm({ course }: GroupSetFormProps) {
     setIsRecording(true);
     await recordGroups(course, groupSetName, groups);
     setIsRecording(false);
+    onClose();
   };
 
   const handleAssignGroups = async () => {
@@ -98,7 +100,14 @@ export default function GroupSetForm({ course }: GroupSetFormProps) {
         </div>
       </div>
       <GroupList groups={groups} />
-      <div className="flex justify-end mt-4">
+      <div className="flex justify-between mt-4">
+        <button
+          data-cancel-button
+          onClick={onClose}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md shadow-sm"
+        >
+          Cancel
+        </button>
         <button
           data-record-groups-button
           onClick={handleRecordGroups}

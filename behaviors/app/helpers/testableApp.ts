@@ -114,6 +114,10 @@ class CourseGroupsPageDisplay extends TestDisplay {
     return this.select("[data-group-size-input]")
   }
 
+  get createNewGroupsButton(): DisplayElement {
+    return this.select("[data-create-new-groups-button]")
+  }
+
   get assignGroupsButton(): DisplayElement {
     return this.select("[data-assign-groups-button]")
   }

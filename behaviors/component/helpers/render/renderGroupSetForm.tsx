@@ -21,7 +21,7 @@ export function render(
 
   root.render(
     <GroupStoreProvider store={testGroupStore}>
-      <GroupSetForm course={course} />
+      <GroupSetForm course={course} onClose={() => {}}/>
     </GroupStoreProvider>
   );
 }

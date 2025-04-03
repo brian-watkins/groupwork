@@ -38,7 +38,10 @@ export const createGroupStore = (initialState: Partial<GroupStoreState> = {}) =>
       try {
         const newGroupSet = await recordGroupSet(course.id, name, groups)
         set((store) => {
-          return { groupSets: [newGroupSet, ...store.groupSets] }
+          return { 
+            groups: [], // Clear groups after recording
+            groupSets: [newGroupSet, ...store.groupSets] 
+          }
         })
       } catch (error) {
         console.log("Error recording groups", error)

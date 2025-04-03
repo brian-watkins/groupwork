@@ -10,6 +10,10 @@ export class GroupSetFormElement extends DisplayElement {
     return this.selectDescendant("[data-record-groups-button]")
   }
 
+  get cancelButton(): DisplayElement {
+    return this.selectDescendant("[data-cancel-button]")
+  }
+
   get groupSetNameInput(): DisplayElement {
     return this.selectDescendant("[data-group-set-name-input]")
   }

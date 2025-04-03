@@ -19,7 +19,10 @@ export default behavior("Assign Students to Groups", [
         })
       ],
       perform: [
-        step("clicking the 'Assign to Groups' button", async (browser) => {
+        step("click the 'Create New Groups' button", async (browser) => {
+          await browser.courseGroupsDisplay.createNewGroupsButton.click()
+        }),
+        step("click the 'Assign to Groups' button", async (browser) => {
           await browser.courseGroupsDisplay.assignGroupsButton.click()
         })
       ],
@@ -44,6 +47,11 @@ export default behavior("Assign Students to Groups", [
               testCourse(1).withStudents(testStudents(9))
             ])
             .loadCourseGroups(0)
+        })
+      ],
+      perform: [
+        step("clicking the 'Create New Groups' button", async (browser) => {
+          await browser.courseGroupsDisplay.createNewGroupsButton.click()
         })
       ],
       observe: [

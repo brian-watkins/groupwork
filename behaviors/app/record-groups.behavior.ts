@@ -25,6 +25,9 @@ export default behavior("record groups", [
         })
       ],
       perform: [
+        step("click the 'Create New Groups' button", async (context) => {
+          await context.courseGroupsDisplay.createNewGroupsButton.click()
+        }),
         step("create some groups", async (context) => {
           await context.courseGroupsDisplay.assignGroupsButton.click()
           await context.courseGroupsDisplay.groupSetForm.waitForGroups(2)
@@ -38,10 +41,16 @@ export default behavior("record groups", [
         })
       ],
       observe: [
+        effect("the form is hidden after recording", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSetForm.isHidden(), resolvesTo(true))
+        }),
         effect("the new group set appears in the list with the provided name", async (context) => {
           await expect(context.courseGroupsDisplay.groupSet(0).name.text(), resolvesTo(
             "First Group Set"
           ))
+        }),
+        effect("the new group set is expanded", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSet(0).groups.isVisible(), resolvesTo(true))
         })
       ]
     }).andThen({
@@ -70,6 +79,7 @@ export default behavior("record groups", [
     }).andThen({
       perform: [
         step("assign students to groups again", async (context) => {
+          await context.courseGroupsDisplay.createNewGroupsButton.click()
           await context.courseGroupsDisplay.assignGroupsButton.click()
         }),
         step("record a second group set", async (context) => {

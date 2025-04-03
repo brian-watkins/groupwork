@@ -7,7 +7,8 @@ import { DateTime } from "luxon";
 import { useGroupStore } from "@/app/contexts/GroupStoreContext";
 
 interface GroupSetProps {
-  groupSet: DisplayableGroupSet;
+  groupSet: DisplayableGroupSet
+  expanded: boolean
 }
 
 export default function GroupSetList() {
@@ -15,18 +16,19 @@ export default function GroupSetList() {
 
   return (
     <>
-      {groupSets.map(groupSet =>
+      {groupSets.map((groupSet, index) =>
         <GroupSet
           key={groupSet.id}
           groupSet={groupSet}
+          expanded={index === 0}
         />
       )}
     </>
   )
 }
 
-function GroupSet({ groupSet }: GroupSetProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+function GroupSet({ groupSet, expanded }: GroupSetProps) {
+  const [isExpanded, setIsExpanded] = useState(expanded);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);

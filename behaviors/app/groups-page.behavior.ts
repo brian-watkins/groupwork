@@ -29,14 +29,11 @@ export default behavior("course students page", [
           const headerText = await context.display.select("h1").text()
           expect(headerText, is(testCourse(1).name))
         }),
-        effect("the page shows a group with all the students", async (context) => {
-          await expect(context.courseGroupsDisplay.groupSetForm.groups.count(), resolvesTo(1))
-
-          await expect(context.courseGroupsDisplay.groupSetForm.group(0).members.texts(), resolvesTo(arrayWith([
-            studentName(testStudent(1)),
-            studentName(testStudent(2)),
-            studentName(testStudent(3))
-          ], { withAnyOrder: true })))
+        effect("the page shows a 'Create New Groups' button", async (context) => {
+          await expect(context.courseGroupsDisplay.createNewGroupsButton.isVisible(), resolvesTo(true))
+        }),
+        effect("the form is not initially visible", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSetForm.isHidden(), resolvesTo(true))
         })
       ]
     }),
@@ -67,6 +64,53 @@ export default behavior("course students page", [
           await expect(context.courseGroupsDisplay.noStudents.isVisible(),
             resolvesTo(true)
           )
+        })
+      ]
+    }),
+
+  example(testableApp)
+    .description("showing and hiding the group form")
+    .script({
+      suppose: [
+        fact("the app is loaded with courses", async (context) => {
+          await context
+            .withCourses([
+              testCourse(1).withStudents(testStudents(3))
+            ])
+            .loadCourseGroups(0)
+        })
+      ],
+      perform: [
+        step("click the 'Create New Groups' button", async (context) => {
+          await context.courseGroupsDisplay.createNewGroupsButton.click()
+        })
+      ],
+      observe: [
+        effect("the form is displayed", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSetForm.isVisible(), resolvesTo(true))
+        }),
+        effect("the form shows a group with all the students", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSetForm.groups.count(), resolvesTo(1))
+
+          await expect(context.courseGroupsDisplay.groupSetForm.group(0).members.texts(), resolvesTo(arrayWith([
+            studentName(testStudent(1)),
+            studentName(testStudent(2)),
+            studentName(testStudent(3))
+          ], { withAnyOrder: true })))
+        }),
+        effect("the form has a cancel button", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSetForm.cancelButton.isVisible(), resolvesTo(true))
+        })
+      ]
+    }).andThen({
+      perform: [
+        step("click the 'Cancel' button", async (context) => {
+          await context.courseGroupsDisplay.groupSetForm.cancelButton.click()
+        })
+      ],
+      observe: [
+        effect("the form is hidden", async (context) => {
+          await expect(context.courseGroupsDisplay.groupSetForm.isHidden(), resolvesTo(true))
         })
       ]
     }),
