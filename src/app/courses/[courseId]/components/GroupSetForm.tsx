@@ -75,7 +75,7 @@ export default function GroupSetForm({ course }: GroupSetFormProps) {
             </p>
           )}
         </div>
-        <div data-group-size-container className="border border-gray-300 p-4 rounded-md flex items-center gap-4">
+        <div data-group-size-container className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span>Create groups of</span>
             <input
@@ -96,6 +96,9 @@ export default function GroupSetForm({ course }: GroupSetFormProps) {
             Assign to Groups
           </button>
         </div>
+      </div>
+      <GroupList groups={groups} />
+      <div className="flex justify-end mt-4">
         <button
           data-record-groups-button
           onClick={handleRecordGroups}
@@ -105,7 +108,6 @@ export default function GroupSetForm({ course }: GroupSetFormProps) {
           Record Groups
         </button>
       </div>
-      <GroupList groups={groups} />
     </div>
   );
 }
