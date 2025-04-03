@@ -78,7 +78,7 @@ class TestApp {
 
   async loadCourseGroups(index: number) {
     await this.load()
-    await this.display.navigateToCourse(index)
+    await this.display.navigateToCourseGroups(index)
   }
 
   get page(): Page {
@@ -95,9 +95,9 @@ class TestApp {
 }
 
 class MainDisplay extends TestDisplay {
-  async navigateToCourse(index: number): Promise<void> {
+  async navigateToCourseGroups(index: number): Promise<void> {
     await this.page.locator("[data-course-details]").nth(index).click({ timeout: 3000 })
-    await this.page.waitForURL('**\/courses/*')
+    await this.page.waitForURL('**\/courses\/*\/groups')
   }
 
   get courses(): DisplayElementList {

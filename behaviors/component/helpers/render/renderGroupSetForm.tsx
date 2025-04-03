@@ -1,4 +1,4 @@
-import GroupSetForm from "@/app/courses/[courseId]/components/GroupSetForm";
+import GroupSetForm from "@/app/courses/[courseId]/groups/components/GroupSetForm";
 import { Group } from "@/domain/group";
 import { createRoot } from 'react-dom/client';
 import "@/app/globals.css";

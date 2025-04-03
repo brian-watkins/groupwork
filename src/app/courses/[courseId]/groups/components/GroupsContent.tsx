@@ -7,12 +7,12 @@ import { GroupStoreProvider } from "@/app/contexts/GroupStoreContext";
 import { createGroupStore } from "@/app/stores/groupStore";
 import GroupSetList from "./GroupSetList";
 
-interface CourseContentProps {
+interface GroupsContentProps {
   course: Course
   groupSets: DisplayableGroupSet[];
 }
 
-export default function CourseContent({ course, groupSets }: CourseContentProps) {
+export default function GroupsContent({ course, groupSets }: GroupsContentProps) {
   return (
     <GroupStoreProvider store={createGroupStore({ groups: [{ members: new Set(course.students) }], groupSets })}>
       <div>

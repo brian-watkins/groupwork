@@ -1,4 +1,4 @@
-import GroupList from "@/app/courses/[courseId]/components/GroupList";
+import GroupList from "@/app/courses/[courseId]/groups/components/GroupList";
 import { Group } from "@/domain/group";
 import { createRoot } from 'react-dom/client';
 import "@/app/globals.css"

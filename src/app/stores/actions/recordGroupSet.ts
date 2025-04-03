@@ -1,7 +1,7 @@
 'use server';
 
 import { groupSetWriter } from "@/app/app-config";
-import { DisplayableGroupSet, toDisplayableGroupSet } from "@/app/courses/[courseId]/components/DisplayableGroupSet";
+import { DisplayableGroupSet, toDisplayableGroupSet } from "@/app/courses/[courseId]/groups/components/DisplayableGroupSet";
 import { CourseId } from "@/domain/course";
 import { Group } from "@/domain/group";
 import { DateTime } from "luxon";

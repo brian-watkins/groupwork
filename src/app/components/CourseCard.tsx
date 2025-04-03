@@ -21,8 +21,8 @@ export function CourseCard({ course }: CourseCardProps) {
           <p className="text-sm text-gray-500">
             {course.students.length} students
           </p>
-          <Link 
-            href={`/courses/${course.id}`} 
+          <Link
+            href={`/courses/${course.id}/groups`}
             className="text-sky-600 hover:text-sky-800 text-sm font-medium"
             data-course-details
           >

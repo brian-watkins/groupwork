@@ -1,6 +1,6 @@
 import { behavior, example, fact, effect, step } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
-import { arrayWith, expect, is, resolvesTo } from "great-expectations";
+import { arrayWith, arrayWithLength, expect, is, resolvesTo } from "great-expectations";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent, testStudents } from "../domain/helpers/testStudent";
 import { studentName } from "./helpers/matchers";
@@ -21,7 +21,7 @@ export default behavior("course students page", [
       ],
       perform: [
         step("click on a course", async (context) => {
-          await context.display.navigateToCourse(0)
+          await context.display.navigateToCourseGroups(0)
         })
       ],
       observe: [
@@ -55,7 +55,7 @@ export default behavior("course students page", [
       ],
       perform: [
         step("click on a course", async (context) => {
-          await context.display.navigateToCourse(0)
+          await context.display.navigateToCourseGroups(0)
         })
       ],
       observe: [

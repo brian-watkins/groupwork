@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { Group } from '../../domain/group'
 import { Course } from '@/domain/course'
-import { DisplayableGroupSet } from '../courses/[courseId]/components/DisplayableGroupSet'
+import { DisplayableGroupSet } from '../courses/[courseId]/groups/components/DisplayableGroupSet'
 import { generateGroups } from './actions/generateGroups';
 import { recordGroupSet } from './actions/recordGroupSet';
 
