@@ -5,7 +5,9 @@ import { Group } from "@/domain/group"
 
 export function groupSetWithStudents(studentMatchers: Array<Matcher<Student>>): Matcher<Array<Group>> {
   return satisfying(
-    studentMatchers.map(student => arrayContaining(objectWithProperty("members", setContaining(student))))
+    studentMatchers.map(student => arrayContaining(
+      objectWithProperty("members", setContaining(student))
+    ))
   )
 }
 

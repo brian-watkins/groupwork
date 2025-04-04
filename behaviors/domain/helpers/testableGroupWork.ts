@@ -1,9 +1,10 @@
 import { Context } from "best-behavior";
 import { CourseReader } from "@/domain/courseReader";
 import { GroupsReader } from "@/domain/groupReader";
-import { Group } from "@/domain/group";
+import { Group, workedTogetherAlready } from "@/domain/group";
 import { Course, CourseId } from "@/domain/course";
 import { assignGroups } from "@/domain/assignGroups";
+import { Student } from "@/domain/student";
 
 export const testableGroupWorkDomain: Context<TestableGroupWork> = {
   init: () => new TestableGroupWork()
@@ -28,6 +29,10 @@ class TestableGroupWork {
     this.currentGroups = await assignGroups(this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
   }
 
+  getCurrentCollaborators(group: Group): Array<Array<Student>> {
+    return workedTogetherAlready(this.groupsReader.groups, group)
+  }
+
   getCurrentGroups(): Array<Group> {
     return this.currentGroups ?? []
   }
@@ -42,7 +47,7 @@ class TestCourseReader implements CourseReader {
 }
 
 class TestGroupsReader implements GroupsReader {
-  constructor (private groups: Array<Group>) { }
+  constructor (readonly groups: Array<Group>) { }
 
   async get(courseId: CourseId): Promise<Array<Group>> {
     return this.groups

@@ -10,55 +10,90 @@ export interface AssignGroupsCommand {
   size: number
 }
 
+interface StudentHistory {
+  student: Student
+  history: Array<Student>
+}
+
+function makeStudentHistory(groups: Array<Group>, student: Student): StudentHistory {
+  return {
+    student,
+    history: workedWith(groups, student)
+  }
+}
+
 export async function assignGroups(courseReader: CourseReader, groupsReader: GroupsReader, command: AssignGroupsCommand): Promise<Group[]> {
   const course = await courseReader.get(command.courseId)
   const history = await groupsReader.get(command.courseId)
-  
+
   if (!isValidGroupSize(command.size, course.students.length)) {
     throw new Error(`Invalid group size: ${command.size}. Must be between 2 and ${Math.floor(course.students.length / 2)}`);
   }
-  
-  return findGroupsOfSize(history, course.students, command.size)
+
+  const studentHistories = course.students
+    .map(student => makeStudentHistory(history, student))
+    .sort(byNumberWorkedWithAlready)
+
+  return findGroups(studentHistories, command.size)
 }
 
-function findGroupsOfSize(history: Array<Group>, students: Array<Student>, size: number) {
-  const groups: Array<Group> = []
-  let availableStudents = Array.from(students)
+
+function findGroups(histories: Array<StudentHistory>, size: number): Array<Group> {
+  const numberGroups = numberOfGroups(histories, size)
 
   const picker = new IndexPicker()
 
-  while (availableStudents.length >= size) {
-    let members = new Set<Student>()
-    let availableForGroup = Array.from(availableStudents)
-    for (let i = 0; i < size; i++) {
-      const index = picker.getIndex(availableForGroup)
-      const student = availableForGroup[index]
-      members.add(student)
-      availableForGroup.splice(index, 1)
-      const workedWithStudent = workedWith(history, student)
-      for (const worked of workedWithStudent) {
-        const index = availableForGroup.findIndex(s => s.id === worked.id)
-        if (index >= 0) {
-          availableForGroup.splice(index, 1)
-        }
+  const groups: Array<Group> = new Array(numberGroups)
+    .fill(undefined)
+    .map(() => ({ members: new Set() }))
+
+  for (const record of histories) {
+    let availableGroups: Array<Group> = []
+    for (const group of groups) {
+      if (group.members.size < size && !containsAnyOverlappingStudents(Array.from(group.members), record.history)) {
+        availableGroups.push(group)
       }
-      availableStudents = availableStudents.filter(s => s.id !== student.id)
     }
-    if (availableStudents.length < size) {
-      if (availableStudents.length > 1) {
-        groups.push({ members })
-        members = new Set()
-      }
-      availableStudents.forEach(student => members.add(student))
+    if (availableGroups.length === 0) {
+      availableGroups = groups.filter(group => group.members.size < size)
     }
-    groups.push({ members })
+    if (availableGroups.length === 0) {
+      availableGroups = groups
+    }
+    const groupNumber = picker.getIndex(availableGroups)
+    availableGroups[groupNumber].members.add(record.student)
   }
 
   return groups
 }
 
-function workedWith(history: Array<Group>, student: Student): Set<Student> {
-  return history.reduce((acc, cur) => {
+function numberOfGroups(histories: Array<StudentHistory>, size: number): number {
+  const remainder = histories.length % size
+  const baseGroups = Math.floor(histories.length / size)
+  return remainder <= 1 ? baseGroups : baseGroups + 1
+}
+
+function byNumberWorkedWithAlready(a: StudentHistory, b: StudentHistory): number {
+  if (a.history.length < b.history.length) {
+    return -1
+  } else if (a.history.length > b.history.length) {
+    return 1
+  }
+  return 0
+}
+
+function containsAnyOverlappingStudents(group: Array<Student>, history: Array<Student>): boolean {
+  const ids = group.map(s => s.id)
+  for (const historyItem of history) {
+    if (ids.includes(historyItem.id)) {
+      return true
+    }
+  }
+  return false
+}
+
+function workedWith(history: Array<Group>, student: Student): Array<Student> {
+  const partners = history.reduce((acc, cur) => {
     const members = Array.from(cur.members)
     if (members.map(m => m.id).includes(student.id)) {
       return acc.union(cur.members)
@@ -66,11 +101,13 @@ function workedWith(history: Array<Group>, student: Student): Set<Student> {
       return acc
     }
   }, new Set<Student>())
+
+  return Array.from(partners).filter(s => s.id !== student.id)
 }
 
 class IndexPicker {
   private generator: RandomGenerator
-  
+
   constructor() {
     const seed = Date.now() ^ (Math.random() * 0x100000000)
     this.generator = xoroshiro128plus(seed)

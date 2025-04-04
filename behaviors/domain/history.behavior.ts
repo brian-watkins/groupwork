@@ -3,8 +3,9 @@ import { testableGroupWorkDomain } from "./helpers/testableGroupWork";
 import { testCourse } from "./helpers/testCourse";
 import { testStudent, testStudents } from "./helpers/testStudent";
 import { testGroup } from "./helpers/testGroup";
-import { arrayWithLength, expect, is, setContaining } from "great-expectations";
+import { arrayContaining, arrayWith, arrayWithLength, expect, is, objectWithProperty, setContaining, setWithSize } from "great-expectations";
 import { groupSetWithGroupSatisfying, groupSetWithStudents, student, students } from "./helpers/matchers";
+import { workedTogetherAlready } from "@/domain/group";
 
 export default behavior("choosing groups based on history", [
 
@@ -46,6 +47,82 @@ export default behavior("choosing groups based on history", [
           expect(context.getCurrentGroups(), is(groupSetWithStudents(students(4))))
         })
       ]
-    })
+    }),
+
+  example(testableGroupWorkDomain)
+    .description("some students are chosen who have already partnered")
+    .script({
+      suppose: [
+        fact("there are four members of a class that have been in some groups", (context) => {
+          context
+            .withCourse(testCourse(1).withStudents(testStudents(4)))
+            .withGroups([
+              testGroup(testStudent(1), testStudent(2)),
+              testGroup(testStudent(3), testStudent(4)),
+              testGroup(testStudent(1), testStudent(3)),
+              testGroup(testStudent(2), testStudent(3))
+            ])
+        })
+      ],
+      perform: [
+        step("choose new groups of 2", async (context) => {
+          await context.chooseGroupsOf(2)
+        })
+      ],
+      observe: [
+        effect("there are two groups", (context) => {
+          expect(context.getCurrentGroups(), is(arrayWithLength(2)))
+          expect(context.getCurrentGroups(), is(arrayWith([
+            objectWithProperty("members", setWithSize(2)),
+            objectWithProperty("members", setWithSize(2))
+          ])))
+        }),
+        effect("all the students are grouped", (context) => {
+          expect(context.getCurrentGroups(), is(groupSetWithStudents(students(4))))
+        }),
+        effect("there is only one previous collaboration", (context) => {
+          const group1Collaborators = context.getCurrentCollaborators(context.getCurrentGroups()[0])
+          const group2Collaborators = context.getCurrentCollaborators(context.getCurrentGroups()[1])
+          expect([
+            group1Collaborators,
+            group2Collaborators
+          ], is(arrayContaining(
+            arrayWithLength(1), { times: 1 }
+          )))
+        })
+      ]
+    }),
+
+  example()
+    .description("workedTogetherAlready")
+    .script({
+      observe: [
+        effect("when students have worked together", () => {
+          const groups = [
+            testGroup(testStudent(1), testStudent(2), testStudent(4)),
+            testGroup(testStudent(1), testStudent(3), testStudent(4))
+          ]
+          const current = testGroup(testStudent(1), testStudent(2), testStudent(3))
+          const students = workedTogetherAlready(groups, current)
+          expect(students, is(arrayWith([
+            arrayWith([student(1), student(3)], { withAnyOrder: true }),
+            arrayWith([student(1), student(2)], { withAnyOrder: true })
+          ], { withAnyOrder: true })))
+        }),
+        effect("when no one has worked together", () => {
+          const groups = [
+            testGroup(testStudent(1), testStudent(2)),
+            testGroup(testStudent(3), testStudent(4)),
+            testGroup(testStudent(1), testStudent(3)),
+            testGroup(testStudent(2), testStudent(3))
+          ]
+          const current = testGroup(testStudent(1), testStudent(4))
+          const students = workedTogetherAlready(groups, current)
+          expect(students, is(arrayWithLength(0)))
+        })
+      ]
+    }),
+
+
 
 ])
