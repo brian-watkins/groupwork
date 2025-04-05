@@ -173,7 +173,7 @@ export default function GroupList({ groupSetId }: GroupListProps) {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div data-groups className="space-y-6">
+      <div data-groups className="grid grid-cols-3 gap-4">
         {studentGroups.map((groupMembers, index) => (
           <DroppableGroup
             key={`group-${index}`}
