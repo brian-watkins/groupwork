@@ -8,6 +8,8 @@ import { PrismaGroupsReader } from "@/infrastructure/prismaGroupsReader";
 import { PrismaGroupSetWriter } from "@/infrastructure/prismaGroupSetWriter";
 import { PrismaClient } from "@prisma/client";
 import { Context } from "best-behavior";
+import { CourseDetails } from "@/domain/courseWriter";
+import { PrismaCourseWriter } from "@/infrastructure/prismaCourseWriter";
 
 export const testableDatabase: Context<TestDatabase> = {
   init: async () => {
@@ -52,6 +54,11 @@ class TestDatabase {
   async getAllCourses(): Promise<Array<Course>> {
     const courseReader = new PrismaCourseReader(this.prisma)
     return courseReader.getAll()
+  }
+
+  async writeCourse(details: CourseDetails): Promise<void> {
+    const courseWriter = new PrismaCourseWriter(this.prisma)
+    await courseWriter.write(details)
   }
 
   async createGroupSet(details: GroupSetDetails): Promise<GroupSet> {

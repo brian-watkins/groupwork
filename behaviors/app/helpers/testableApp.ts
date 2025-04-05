@@ -31,8 +31,11 @@ class AppServer {
     return `${this.host}${path}`
   }
 
+  async resetDB(): Promise<void> {
+    await prisma.course.deleteMany()
+  }
+
   async seedCourses(courses: Array<Course>) {
-    await prisma.course.deleteMany({})
     for (const course of courses) {
       await prisma.course.create({
         data: {
@@ -70,6 +73,8 @@ class TestApp {
   }
 
   async load(path = "/") {
+    await this.server.resetDB()
+
     if (this.courses !== undefined) {
       await this.server.seedCourses(this.courses)
     }
@@ -85,8 +90,17 @@ class TestApp {
     return this.browser.page
   }
 
+  waitForHomePage(): Promise<void> {
+    const origin = new URL(this.page.url()).origin
+    return this.page.waitForURL(origin)
+  }
+
   get display(): MainDisplay {
     return new MainDisplay(this.page, { timeout: 2000 })
+  }
+
+  get createCourseDisplay(): CreateCoursePageDisplay {
+    return new CreateCoursePageDisplay(this.page, { timeout: 2000 })
   }
 
   get courseGroupsDisplay(): CourseGroupsPageDisplay {
@@ -100,8 +114,34 @@ class MainDisplay extends TestDisplay {
     await this.page.waitForURL('**\/courses\/*\/groups')
   }
 
+  get createCourseButton(): DisplayElement {
+    return this.select("[data-create-course-button]")
+  }
+
   get courses(): DisplayElementList {
     return this.selectAll("[data-course-name]")
+  }
+}
+
+class CreateCoursePageDisplay extends TestDisplay {
+  get courseNameInput(): DisplayElement {
+    return this.select("[data-course-name-input]")
+  }
+
+  get studentNameInput(): DisplayElement {
+    return this.select("[data-student-name-input]")
+  }
+
+  get addStudentButton(): DisplayElement {
+    return this.select("[data-add-student-button]")
+  }
+
+  get saveCourseButton(): DisplayElement {
+    return this.select("[data-save-course-button]")
+  }
+
+  get cancelButton(): DisplayElement {
+    return this.select("[data-cancel-button]")
   }
 }
 

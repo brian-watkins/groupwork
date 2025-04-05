@@ -1,6 +1,7 @@
 import { courseReader } from "./app-config";
 import { CourseList } from "./components/CourseList";
 import { CourseHeading } from "./components/client/CourseHeading";
+import { CreateCourseButton } from "./components/client/CreateCourseButton";
 
 export default async function Page() {
   const courses = await courseReader.getAll();
@@ -15,9 +16,12 @@ export default async function Page() {
         A platform for managing courses and student groups.
       </p>
       
-      <CourseHeading level={2} className="text-2xl font-bold text-sky-600 mb-6">
-        Courses
-      </CourseHeading>
+      <div className="flex justify-between items-center mb-6">
+        <CourseHeading level={2} className="text-2xl font-bold text-sky-600">
+          Courses
+        </CourseHeading>
+        <CreateCourseButton />
+      </div>
       
       <CourseList courses={courses} />
     </main>
