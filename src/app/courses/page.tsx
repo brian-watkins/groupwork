@@ -84,7 +84,7 @@ export default function CreateCoursePage() {
         {students.length > 0 && (
           <div className="mb-8">
             <h3 className="text-lg font-medium mb-2">Students</h3>
-            <ul className="border border-gray-200 rounded-md divide-y">
+            <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
               {students.map((student, index) => (
                 <li key={student.name} className="px-4 py-3 flex justify-between items-center">
                   <span>{student.name}</span>
