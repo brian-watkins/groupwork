@@ -1,8 +1,8 @@
 'use client';
 
-import { Group } from "@/domain/group";
+import { Group, workedTogetherAlready } from "@/domain/group";
 import { Student } from "@/domain/student";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   DndContext,
   useDraggable,
@@ -14,6 +14,7 @@ import {
 import { GroupSetId } from "@/domain/groupSet";
 import { useGroupStore } from "@/app/contexts/GroupStoreContext";
 import { getGroups } from "@/app/stores/selectors";
+import { DisplayableGroupSet } from "./DisplayableGroupSet";
 
 interface GroupListProps {
   groupSetId?: GroupSetId
@@ -28,7 +29,21 @@ function extractStudents(groups: Group[]): Student[][] {
   return groups.map(group => Array.from(group.members));
 }
 
-function DraggableStudent({ student, groupIndex }: { student: Student; groupIndex: number }) {
+function extractGroups(groupSetId: GroupSetId | undefined, groupSets: DisplayableGroupSet[]): Group[] {
+  if (groupSetId !== undefined) {
+    return []
+  } else {
+    return groupSets.flatMap(gs => gs.groups)
+  }
+}
+
+interface DraggableStudentProps {
+  student: Student,
+  groupIndex: number
+  hasPartners: boolean
+}
+
+function DraggableStudent({ student, groupIndex, hasPartners }: DraggableStudentProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `${student.id}:${groupIndex}`,
   });
@@ -48,7 +63,12 @@ function DraggableStudent({ student, groupIndex }: { student: Student; groupInde
         zIndex: isDragging ? 1000 : 1
       }}
     >
-      <div data-student-name className="font-medium">{student.name}</div>
+      <div className="flex items-center">
+        <div data-student-name className="font-medium">{student.name}</div>
+        {hasPartners && (
+          <div data-partnered-indicator className={`ml-2 w-2 h-2 rounded-full bg-orange-500`}></div>
+        )}
+      </div>
     </li>
   );
 }
@@ -78,8 +98,25 @@ export default function GroupList({ groupSetId }: GroupListProps) {
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [overGroupId, setOverGroupId] = useState<string | null>(null);
 
-  const studentGroups: Student[][] = extractStudents(useGroupStore(getGroups(groupSetId)))
+  const groups = useGroupStore(getGroups(groupSetId))
+  const studentGroups: Student[][] = extractStudents(groups)
   const setGroups = useGroupStore(state => state.setGroupsForGroupSet)
+  const history = extractGroups(groupSetId, useGroupStore(store => store.groupSets))
+
+  const collaborationMap = useMemo(() => {
+    const result = new Map<string, boolean>();
+
+    groups.forEach((group) => {
+      const collaborators = workedTogetherAlready(history, group);
+      collaborators.forEach((collaboratorGroup, index) => {
+        collaboratorGroup.forEach(student => {
+          result.set(student.id, true);
+        });
+      });
+    });
+
+    return result;
+  }, [groups, history])
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
@@ -149,6 +186,7 @@ export default function GroupList({ groupSetId }: GroupListProps) {
                 key={student.id}
                 student={student}
                 groupIndex={index}
+                hasPartners={collaborationMap.get(student.id)!}
               />
             ))}
           </DroppableGroup>

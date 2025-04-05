@@ -1,5 +1,5 @@
 import { behavior, example, effect, fact, step } from "best-behavior";
-import { expect, resolvesTo } from "great-expectations";
+import { arrayWith, equalTo, expect, is, resolvesTo } from "great-expectations";
 import { testableApp } from "./helpers/testableApp";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudents } from "../domain/helpers/testStudent";
@@ -29,10 +29,15 @@ export default behavior("Assign Students to Groups", [
       observe: [
         effect("displays the students in their assigned groups", async (browser) => {
           await browser.courseGroupsDisplay.groupSetForm.waitForGroups(2)
-
           await expect(browser.courseGroupsDisplay.groupSetForm.groups.count(), resolvesTo(2))
-          await expect(browser.courseGroupsDisplay.groupSetForm.group(0).members.count(), resolvesTo(2))
-          await expect(browser.courseGroupsDisplay.groupSetForm.group(1).members.count(), resolvesTo(3))
+
+          const group1Count = await browser.courseGroupsDisplay.groupSetForm.group(0).members.count()
+          const group2Count = await browser.courseGroupsDisplay.groupSetForm.group(1).members.count()
+
+          expect([ group1Count, group2Count ], is(arrayWith([
+            equalTo(2), 
+            equalTo(3)
+          ], { withAnyOrder: true })))
         })
       ]
     }),

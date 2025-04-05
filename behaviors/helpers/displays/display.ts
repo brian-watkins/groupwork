@@ -115,10 +115,18 @@ export class DisplayElement {
   }
 
   async dragTo(element: DisplayElement): Promise<void> {
+    const box = await this.boundingRect()
+    const elementBox = await element.boundingRect()
     await this.locator.dragTo(element.locator, {
       force: true,
-      sourcePosition: { x: 10, y: 10 },
-      targetPosition: { x: 10, y: 10 },
+      sourcePosition: {
+        x: box.width / 2,
+        y: box.height / 2
+      },
+      targetPosition: {
+        x: elementBox.width / 2,
+        y: elementBox.height / 2
+      },
       timeout: 2000
     })
   }

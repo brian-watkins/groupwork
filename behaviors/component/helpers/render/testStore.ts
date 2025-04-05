@@ -1,4 +1,5 @@
 import type { GroupStore, GroupStoreState } from "@/app/stores/groupStore"
+import { Group } from "@/domain/group"
 import { create } from "zustand"
 
 window.calledRecordGroups = 0
@@ -12,7 +13,12 @@ export function createTestStore(overrides: Partial<GroupStoreState>) {
       set({ newGroups: groups })
     },
     async assignGroups(course, groupSize) {
-
+      return new Promise<void>(resolve => {
+        window.resolveAssignGroups = (groups: Array<Group>) => {
+          set({ newGroups: groups })
+          resolve()
+        }
+      })
     },
     async recordGroups(course, name) {
       window.calledRecordGroups++

@@ -27,18 +27,19 @@ export default behavior("record groups", [
           await context.courseGroupsDisplay.assignGroupsButton.click()
           await context.courseGroupsDisplay.groupSetForm.waitForGroups(2)
         }),
-        step("manually move a student from group 1 to group 2", async (context) => {
-          const studentToDrag = context.display.selectAll("[data-student-group]").atIndex(0)
-            .selectAllDescendants("[data-group-member]").atIndex(0)
-
-          await studentToDrag.dragTo(context.display.selectAll("[data-student-group]").atIndex(1))
-        }),
         step("name the group set", async (context) => {
           await context.courseGroupsDisplay.groupSetForm.groupSetNameInput.type("Manually Adjusted Groups")
         }),
+        step("manually move a student from group 1 to group 2", async (context) => {
+          const studentToDrag = context.courseGroupsDisplay.groupSetForm.group(0).member(0)
+          await studentToDrag.dragTo(context.courseGroupsDisplay.groupSetForm.group(1))
+          await context.courseGroupsDisplay.groupSetForm.group(1).member(2).waitForVisible()
+        }),
         step("record the adjusted groups", async (context) => {
+          await context.display.pause(50)
           await context.courseGroupsDisplay.groupSetForm.recordGroupsButton.click()
           await context.courseGroupsDisplay.groupSet(0).group(1).waitForVisible()
+          await context.display.pause(50)
         })
       ],
       observe: [

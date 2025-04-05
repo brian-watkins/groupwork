@@ -1,10 +1,89 @@
 import { behavior, effect, example, fact, step } from "best-behavior";
 import { testGroup } from "../domain/helpers/testGroup";
 import { testStudents, testStudent } from "../domain/helpers/testStudent";
-import { expect, is, equalTo, arrayWith } from "great-expectations";
+import { expect, is, equalTo, arrayWith, resolvesTo } from "great-expectations";
 import { testableGroupList } from "./helpers/testableGroupList";
+import { testGroupSet } from "./helpers/testGroupSet";
 
 export default behavior("adjusting groups", [
+
+  example(testableGroupList)
+    .description("indicates when students have worked together before")
+    .script({
+      suppose: [
+        fact("there are previous group sets with students who worked together", async (context) => {
+          await context
+            .withGroupSets([
+              testGroupSet(1).withGroups([
+                testGroup(testStudent(1), testStudent(2)),
+                testGroup(testStudent(3), testStudent(5)),
+                testGroup(testStudent(4))
+              ])
+            ])
+            .withGroups([
+              testGroup(testStudent(3), testStudent(5)),
+              testGroup(testStudent(1), testStudent(4)),
+              testGroup(testStudent(2))
+            ])
+            .render();
+        })
+      ],
+      observe: [
+        effect("students who have worked together have a collaboration indicator", async (context) => {
+          await expect(context.display.group(0).member(0).partneredIndicator.isVisible(), resolvesTo(true))
+          await expect(context.display.group(0).member(1).partneredIndicator.isVisible(), resolvesTo(true))
+        }),
+        effect("students who haven't worked together don't have indicators", async (context) => {
+          await expect(context.display.group(1).member(0).partneredIndicator.isHidden(), resolvesTo(true))
+          await expect(context.display.group(1).member(1).partneredIndicator.isHidden(), resolvesTo(true))
+          await expect(context.display.group(2).member(0).partneredIndicator.isHidden(), resolvesTo(true))
+        })
+      ]
+    }),
+
+  example(testableGroupList)
+    .description("when students have worked with several people in the group before")
+    .script({
+      suppose: [
+        fact("there are previous group sets with students who worked together", async (context) => {
+          await context
+            .withGroupSets([
+              testGroupSet(1).withGroups([
+                testGroup(testStudent(1), testStudent(2), testStudent(3)),
+                testGroup(testStudent(4), testStudent(5), testStudent(6)),
+                testGroup(testStudent(7), testStudent(8), testStudent(9))
+              ]),
+              testGroupSet(1).withGroups([
+                testGroup(testStudent(4), testStudent(8), testStudent(3)),
+                testGroup(testStudent(7), testStudent(2), testStudent(6)),
+                testGroup(testStudent(1), testStudent(5), testStudent(9))
+              ])
+            ])
+            .withGroups([
+              testGroup(testStudent(1), testStudent(5), testStudent(3)),
+              testGroup(testStudent(2), testStudent(9), testStudent(4)),
+              testGroup(testStudent(6), testStudent(7), testStudent(8))
+            ])
+            .render();
+        })
+      ],
+      observe: [
+        effect("students who have worked together have a collaboration indicator", async (context) => {
+          await expect(context.display.group(0).member(0).partneredIndicator.isVisible(), resolvesTo(true))
+          await expect(context.display.group(0).member(1).partneredIndicator.isVisible(), resolvesTo(true))
+          await expect(context.display.group(0).member(2).partneredIndicator.isVisible(), resolvesTo(true))
+
+          await expect(context.display.group(2).member(0).partneredIndicator.isVisible(), resolvesTo(true))
+          await expect(context.display.group(2).member(1).partneredIndicator.isVisible(), resolvesTo(true))
+          await expect(context.display.group(2).member(2).partneredIndicator.isVisible(), resolvesTo(true))
+        }),
+        effect("students who haven't worked together don't have indicators", async (context) => {
+          await expect(context.display.group(1).member(0).partneredIndicator.isHidden(), resolvesTo(true))
+          await expect(context.display.group(1).member(1).partneredIndicator.isHidden(), resolvesTo(true))
+          await expect(context.display.group(1).member(2).partneredIndicator.isHidden(), resolvesTo(true))
+        })
+      ]
+    }),
 
   example(testableGroupList)
     .description("move one student to another group")
@@ -15,20 +94,19 @@ export default behavior("adjusting groups", [
             testGroup(...testStudents(3)),
             testGroup(testStudent(4), testStudent(5))
           ])
-            .render()          
+            .render()
         })
       ],
       perform: [
         step("drag one student to the other group", async (context) => {
-          const studentToDrag = context.display.selectAll("[data-student-group]").atIndex(0)
-            .selectAllDescendants("[data-group-member]").atIndex(1)
-
-          await studentToDrag.dragTo(context.display.selectAll("[data-student-group]").atIndex(1))
+          const studentToDrag = context.display.group(0).member(1)
+          await studentToDrag.dragTo(context.display.group(1))
         })
       ],
       observe: [
         effect("the second group has the dragged student", async (context) => {
-          const group2Students = await context.display.selectAll("[data-student-group]").atIndex(1).selectAllDescendants("[data-student-name]").texts()
+          const group2Students = await context.display.group(1).members.texts()
+          console.log('Group 2 students:', group2Students)
           expect(group2Students, is(arrayWith([
             equalTo(testStudent(2).name),
             equalTo(testStudent(4).name),
@@ -36,7 +114,7 @@ export default behavior("adjusting groups", [
           ], { withAnyOrder: true })))
         }),
         effect("the first group no longer has the dragged student", async (context) => {
-          const group1Students = await context.display.selectAll("[data-student-group]").atIndex(0).selectAllDescendants("[data-student-name]").texts()
+          const group1Students = await context.display.group(0).members.texts()
           expect(group1Students, is(arrayWith([
             equalTo(testStudent(1).name),
             equalTo(testStudent(3).name)
