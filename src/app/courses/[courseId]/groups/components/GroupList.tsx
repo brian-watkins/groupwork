@@ -66,7 +66,7 @@ function DraggableStudent({ student, groupIndex, hasPartners }: DraggableStudent
       <div className="flex items-center">
         <div data-student-name className="font-medium">{student.name}</div>
         {hasPartners && (
-          <div data-partnered-indicator className={`ml-2 w-2 h-2 rounded-full bg-orange-500`}></div>
+          <div data-partnered-indicator className={`ml-2 w-2 h-2 rounded-full bg-orange-600`}></div>
         )}
       </div>
     </li>
