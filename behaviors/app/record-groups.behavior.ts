@@ -36,10 +36,8 @@ export default behavior("record groups", [
           await context.courseGroupsDisplay.groupSetForm.group(1).member(2).waitForVisible()
         }),
         step("record the adjusted groups", async (context) => {
-          await context.display.pause(50)
           await context.courseGroupsDisplay.groupSetForm.recordGroupsButton.click()
           await context.courseGroupsDisplay.groupSet(0).group(1).waitForVisible()
-          await context.display.pause(50)
         })
       ],
       observe: [
@@ -50,7 +48,7 @@ export default behavior("record groups", [
           await expect(context.courseGroupsDisplay.groupSet(0).group(1).members.count(), resolvesTo(3))
         }),
         effect("the groups should contain all students", async (context) => {
-          await expect(context.courseGroupsDisplay.groupSet(0).allMembers.texts(), resolvesTo(arrayWith([
+          await expect(context.courseGroupsDisplay.groupSet(0).members.texts(), resolvesTo(arrayWith([
             studentName(testStudent(1)),
             studentName(testStudent(2)),
             studentName(testStudent(3)),

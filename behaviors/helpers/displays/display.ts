@@ -67,6 +67,7 @@ export class DisplayElement {
   }
 
   async click(): Promise<void> {
+    await this.locator.click({ trial: true })
     await this.locator.click({ timeout: this.options.timeout })
   }
 
@@ -156,10 +157,7 @@ export class DisplayElementList {
     return new DisplayElement(this.locator.nth(index), this.options)
   }
 
-  texts(selector?: string): Promise<Array<string>> {
-    if (selector) {
-      return this.locator.locator(selector).allInnerTexts()
-    }
+  texts(): Promise<Array<string>> {
     return this.locator.allInnerTexts()
   }
 
