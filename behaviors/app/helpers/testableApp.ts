@@ -111,7 +111,7 @@ class TestApp {
 
 class MainDisplay extends TestDisplay {
   async navigateToCourseGroups(index: number): Promise<void> {
-    await this.page.locator("[data-course-details]").nth(index).click({ timeout: 3000 })
+    await this.course(index).name.click()
     await this.page.waitForURL('**\/courses\/*\/groups')
   }
 
@@ -119,8 +119,22 @@ class MainDisplay extends TestDisplay {
     return this.select("[data-create-course-button]")
   }
 
-  get courses(): DisplayElementList {
+  get courseNames(): DisplayElementList {
     return this.selectAll("[data-course-name]")
+  }
+
+  course(index: number): CourseElement {
+    return new CourseElement(this.page.locator("[data-course]").nth(index), this.options)
+  }
+}
+
+class CourseElement extends DisplayElement {
+  get editButton(): DisplayElement {
+    return this.selectDescendant("[data-edit-course-button]")
+  }
+
+  get name(): DisplayElement {
+    return this.selectDescendant("[data-course-name]")
   }
 }
 

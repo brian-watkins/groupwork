@@ -33,7 +33,7 @@ export default behavior("courses page", [
           )
         }),
         effect("course list is displayed", async (context) => {
-          await expect(context.display.courses.texts(), resolvesTo([
+          await expect(context.display.courseNames.texts(), resolvesTo([
             testCourse(1).name,
             testCourse(2).name
           ]))

@@ -1,6 +1,6 @@
 import { Course, CourseId } from "@/domain/course";
 import { Group } from "@/domain/group";
-import { GroupSet, GroupSetId } from "@/domain/groupSet";
+import { GroupSet } from "@/domain/groupSet";
 import { GroupSetDetails } from "@/domain/groupSetWriter";
 import { PrismaCourseReader } from "@/infrastructure/prismaCourseReader";
 import { PrismaGroupSetReader } from "@/infrastructure/prismaGroupSetReader";
@@ -59,6 +59,11 @@ class TestDatabase {
   async writeCourse(details: CourseDetails): Promise<void> {
     const courseWriter = new PrismaCourseWriter(this.prisma)
     await courseWriter.write(details)
+  }
+
+  async saveCourse(course: Course): Promise<void> {
+    const courseWriter = new PrismaCourseWriter(this.prisma)
+    await courseWriter.save(course)
   }
 
   async createGroupSet(details: GroupSetDetails): Promise<GroupSet> {

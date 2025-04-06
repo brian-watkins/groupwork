@@ -13,7 +13,8 @@ export function render() {
   const testActions: CourseActions = {
     createCourse: async (name, students) => {
       window.createCourseDetails = { name, students }
-    }
+    },
+    updateCourse: async (course) => { }
   }
 
   function testReturnToMain() {

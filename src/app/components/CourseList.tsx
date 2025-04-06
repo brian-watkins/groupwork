@@ -35,7 +35,7 @@ export function CourseList({ courses }: CourseListProps) {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {courses.map(course => (
-            <tr key={course.id} className="hover:bg-gray-50">
+            <tr data-course key={course.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">
                 <Link href={`/courses/${course.id}/groups`}>
                   <Heading level={3} className="text-lg font-medium text-gray-900 hover:text-sky-600" data-course-name>
@@ -46,7 +46,14 @@ export function CourseList({ courses }: CourseListProps) {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {course.students.length} students
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2 justify-end">
+                <Link
+                  href={`/courses/${course.id}/edit`}
+                  className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors"
+                  data-edit-course-button
+                >
+                  Edit Course
+                </Link>
                 <Link
                   href={`/courses/${course.id}/groups`}
                   className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors"

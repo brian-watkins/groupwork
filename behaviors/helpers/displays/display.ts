@@ -76,7 +76,7 @@ export class DisplayElement {
   }
 
   async click(): Promise<void> {
-    await this.locator.click({ trial: true })
+    await this.locator.click({ trial: true, timeout: this.options.timeout })
     await this.locator.click({ timeout: this.options.timeout })
   }
 

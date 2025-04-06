@@ -48,8 +48,8 @@ export default behavior("create course page", [
       ],
       observe: [
         effect("the new course appears in the list", async (context) => {
-          await context.display.courses.atIndex(0).isVisible()
-          await expect(context.display.courses.texts(),
+          await context.display.courseNames.atIndex(0).isVisible()
+          await expect(context.display.courseNames.texts(),
             resolvesTo(arrayWith([
               stringContaining("New Test Course")
             ]))

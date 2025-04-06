@@ -1,3 +1,5 @@
+import { Course } from "./course"
+
 export interface StudentDetails {
   name: string
 }
@@ -9,4 +11,5 @@ export interface CourseDetails {
 
 export interface CourseWriter {
   write(course: CourseDetails): Promise<void>
+  save(course: Course): Promise<void>
 }

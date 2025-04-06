@@ -1,19 +1,23 @@
 import { CourseHeading } from "@/app/components/client/CourseHeading";
-import { useCreateCourseAction } from "@/app/contexts/CourseActionsContext";
+import { useCreateCourseAction, useUpdateCourseAction } from "@/app/contexts/CourseActionsContext";
+import { Course } from "@/domain/course";
+import { Student } from "@/domain/student";
 import { useState, useEffect } from "react";
-import { Button, Input, Label, Text } from "react-aria-components";
+import { Button, Input, Label } from "react-aria-components";
 
 export interface CourseFormProps {
-  shouldReturnToMain: () => void
+  shouldReturnToMain: () => void;
+  courseToEdit?: Course;
 }
 
-export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
-  const [courseName, setCourseName] = useState('')
+export function CourseForm({ shouldReturnToMain, courseToEdit }: CourseFormProps) {
+  const [courseName, setCourseName] = useState(courseToEdit?.name ?? "")
   const [studentName, setStudentName] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [students, setStudents] = useState<Array<string>>([])
+  const [students, setStudents] = useState<Array<Student>>(courseToEdit?.students ?? [])
   const [studentError, setStudentError] = useState<string | null>(null)
-  const createCourse = useCreateCourseAction()
+  const createCourse = useCreateCourseAction();
+  const updateCourse = useUpdateCourseAction();
 
   useEffect(() => {
     if (studentError) {
@@ -27,10 +31,21 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
     setIsSubmitting(true);
 
     try {
-      await createCourse(courseName, students);
-      shouldReturnToMain()
+      if (courseToEdit) {
+        await updateCourse({
+          ...courseToEdit,
+          name: courseName,
+          students: students
+        });
+      } else {
+        await createCourse(
+          courseName,
+          students.map(student => student.name)
+        );
+      }
+      shouldReturnToMain();
     } catch (error) {
-      console.error('Failed to create course:', error);
+      console.error(`Failed to save course:`, error);
     } finally {
       setIsSubmitting(false);
     }
@@ -41,19 +56,19 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
 
     const trimmedName = studentName.trim();
 
-    if (students.some(student => student === trimmedName)) {
+    if (students.some(student => student.name === trimmedName)) {
       setStudentError("A student with this name already exists");
       return;
     }
 
-    setStudents([trimmedName, ...students]);
+    setStudents([{ id: "", name: trimmedName }, ...students]);
     setStudentName('');
   };
 
   const removeStudent = (index: number) => {
-    const studentsList = [...students]
-    studentsList.splice(index, 1)
-    setStudents(studentsList)
+    const studentsList = [...students];
+    studentsList.splice(index, 1);
+    setStudents(studentsList);
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -69,21 +84,21 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
 
   const allowSubmit = (): boolean => {
     if (courseName.trim() === "") {
-      return false
+      return false;
     }
     if (students.length === 0) {
-      return false
+      return false;
     }
     if (isSubmitting) {
-      return false
+      return false;
     }
-    return true
+    return true;
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <CourseHeading level={1} className="text-2xl font-bold mb-6">
-        Create Course
+        {courseToEdit ? 'Edit Course' : 'Create Course'}
       </CourseHeading>
 
       <div className="max-w-2xl mx-auto">
@@ -140,8 +155,8 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
             <h3 className="text-lg font-medium mb-2">Students</h3>
             <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
               {students.map((student, index) => (
-                <li data-student key={student} className="px-4 py-3 flex justify-between items-center">
-                  <span data-student-name>{student}</span>
+                <li data-student key={student.name} className="px-4 py-3 flex justify-between items-center">
+                  <span data-student-name>{student.name}</span>
                   <button
                     data-remove-student
                     onClick={() => removeStudent(index)}
@@ -169,7 +184,7 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
             isDisabled={!allowSubmit()}
             className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 disabled:bg-gray-400"
           >
-            Save Course
+            {courseToEdit ? 'Save Changes' : 'Create Course'}
           </Button>
         </div>
       </div>
