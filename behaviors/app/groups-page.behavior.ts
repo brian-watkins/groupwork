@@ -1,6 +1,6 @@
 import { behavior, example, fact, effect, step } from "best-behavior";
 import { testableApp } from "./helpers/testableApp";
-import { arrayWith, arrayWithLength, expect, is, resolvesTo } from "great-expectations";
+import { arrayWith, expect, is, resolvesTo } from "great-expectations";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent, testStudents } from "../domain/helpers/testStudent";
 import { studentName } from "./helpers/matchers";

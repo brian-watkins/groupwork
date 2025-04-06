@@ -43,6 +43,11 @@ export enum Keys {
   Enter = "Enter"
 }
 
+export interface DragPosition {
+  x: number
+  y: number
+}
+
 export class DisplayElement {
   constructor(public locator: Locator, protected options: TestDisplayOptions) { }
 
@@ -113,31 +118,25 @@ export class DisplayElement {
     return true
   }
 
-  async dragBy(deltaX: number, deltaY: number): Promise<void> {
-    const box = await this.boundingRect()
-    const startX = box.x + box.width / 2
-    const startY = box.y + box.height / 2
-    await this.locator.page().mouse.move(startX, startY)
+  private async drag(start: DragPosition, end: DragPosition): Promise<void> {
+    await this.locator.page().mouse.move(start.x, start.y)
     await this.locator.page().mouse.down()
-    await this.locator.page().mouse.move(startX + deltaX, startY + deltaY)
+    await this.locator.page().mouse.move(end.x, end.y, { steps: 3 })
     await this.locator.page().mouse.up()
   }
 
   async dragTo(element: DisplayElement): Promise<void> {
     const box = await this.boundingRect()
     const elementBox = await element.boundingRect()
-    await this.locator.dragTo(element.locator, {
-      force: true,
-      sourcePosition: {
-        x: box.width / 2,
-        y: box.height / 2
-      },
-      targetPosition: {
-        x: elementBox.width / 2,
-        y: elementBox.height / 2
-      },
-      timeout: 2000
-    })
+    const start = {
+      x: box.x + box.width / 2,
+      y: box.y + box.height / 2
+    }
+    const end = {
+      x: elementBox.x + elementBox.width / 2,
+      y: elementBox.y + elementBox.height / 2
+    }
+    await this.drag(start, end)
   }
 
   async selectOption(option: string): Promise<void> {
