@@ -126,11 +126,33 @@ class MainDisplay extends TestDisplay {
   course(index: number): CourseElement {
     return new CourseElement(this.page.locator("[data-course]").nth(index), this.options)
   }
+
+  get deleteCourseConfirmationModal(): DeleteCourseConfirmationElement {
+    return new DeleteCourseConfirmationElement(this.page.locator("[data-testid='delete-course-confirmation']"), this.options)
+  }
+}
+
+class DeleteCourseConfirmationElement extends DisplayElement {
+  get message(): DisplayElement {
+    return this.selectDescendant("[data-confirmation-message]")
+  }
+
+  get cancelButton(): DisplayElement {
+    return this.selectDescendant("[data-cancel]")
+  }
+
+  get deleteButton(): DisplayElement {
+    return this.selectDescendant("[data-delete]")
+  }
 }
 
 class CourseElement extends DisplayElement {
   get editButton(): DisplayElement {
     return this.selectDescendant("[data-edit-course-button]")
+  }
+
+  get deleteButton(): DisplayElement {
+    return this.selectDescendant("[data-delete-course-button]")
   }
 
   get name(): DisplayElement {

@@ -2,13 +2,25 @@
 
 import { Course } from "@/domain/course";
 import Link from "next/link";
-import { Heading } from "react-aria-components";
+import { Heading, Button } from "react-aria-components";
+import { useState } from "react";
+import { DeleteCourseConfirmation } from "./DeleteCourseConfirmation";
 
 interface CourseListProps {
   courses: Course[];
 }
 
 export function CourseList({ courses }: CourseListProps) {
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+
+  const handleDeleteClick = (course: Course) => {
+    setCourseToDelete(course);
+  };
+
+  const handleCloseModal = () => {
+    setCourseToDelete(null);
+  };
+
   if (courses.length === 0) {
     return (
       <div className="text-center py-10">
@@ -61,11 +73,25 @@ export function CourseList({ courses }: CourseListProps) {
                 >
                   View Groups
                 </Link>
+                <Button
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  onPress={() => handleDeleteClick(course)}
+                  data-delete-course-button
+                >
+                  Delete
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {courseToDelete && (
+        <DeleteCourseConfirmation
+          course={courseToDelete}
+          isOpen={true}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }

@@ -12,4 +12,5 @@ export interface CourseDetails {
 export interface CourseWriter {
   write(course: CourseDetails): Promise<void>
   save(course: Course): Promise<void>
+  delete(course: Course): Promise<void>
 }

@@ -108,6 +108,10 @@ export class DisplayElement {
     await this.locator.waitFor({ state: "visible", timeout: this.options.timeout })
   }
 
+  async waitForHidden(): Promise<void> {
+    await this.locator.waitFor({ state: "hidden", timeout: this.options.timeout })
+  }
+
   async isVisible(): Promise<boolean> {
     await this.locator.waitFor({ state: "visible", timeout: this.options.timeout })
     return true

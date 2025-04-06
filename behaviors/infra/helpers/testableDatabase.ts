@@ -66,6 +66,11 @@ class TestDatabase {
     await courseWriter.save(course)
   }
 
+  async deleteCourse(course: Course): Promise<void> {
+    const courseWriter = new PrismaCourseWriter(this.prisma)
+    await courseWriter.delete(course)
+  }
+
   async createGroupSet(details: GroupSetDetails): Promise<GroupSet> {
     const groupSetWriter = new PrismaGroupSetWriter(this.prisma)
     return await groupSetWriter.create(details)

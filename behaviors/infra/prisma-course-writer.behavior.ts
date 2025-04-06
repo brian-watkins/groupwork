@@ -190,5 +190,59 @@ export default behavior("PrismaCourseWriter", [
           ])))
         })
       ]
+    }),
+
+  example(testableDatabase)
+    .description("deletes a course with all its students")
+    .script({
+      suppose: [
+        fact("there is a course with students", async (context) => {
+          await context.withCourse(testCourse(1).withStudents(testStudents(3)))
+        })
+      ],
+      perform: [
+        step("delete the course", async (context) => {
+          const courseToDelete = await context.getCourse(testCourse(1))
+          await context.deleteCourse(courseToDelete)
+        })
+      ],
+      observe: [
+        effect("the course and its students are removed from the database", async (context) => {
+          const courses = await context.getAllCourses()
+          expect(courses, is(arrayWith([])))
+        })
+      ]
+    }),
+
+  example(testableDatabase)
+    .description("deletes one course without affecting others")
+    .script({
+      suppose: [
+        fact("there are multiple courses", async (context) => {
+          await context.withCourse(testCourse(1).withStudents([testStudent(1), testStudent(2)]))
+          await context.withCourse(testCourse(2).withStudents([testStudent(3), testStudent(4)]))
+        })
+      ],
+      perform: [
+        step("delete one course", async (context) => {
+          const courseToDelete = await context.getCourse(testCourse(1))
+          await context.deleteCourse(courseToDelete)
+        })
+      ],
+      observe: [
+        effect("only the deleted course is removed, others remain intact", async (context) => {
+          const courses = await context.getAllCourses()
+
+          expect(courses, is(arrayWith([
+            objectWith({
+              name: equalTo(testCourse(2).name),
+              students: arrayWith<Student>([
+                studentName(3),
+                studentName(4)
+              ], { withAnyOrder: true })
+            })
+          ])))
+        })
+      ]
     })
 ]);

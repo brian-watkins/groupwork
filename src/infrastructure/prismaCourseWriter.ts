@@ -67,6 +67,17 @@ export class PrismaCourseWriter implements CourseWriter {
       throw error;
     }
   }
+
+  async delete(course: Course): Promise<void> {
+    try {
+      await this.prisma.course.delete({
+        where: { id: course.id }
+      });
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      throw error;
+    }
+  }
 }
 
 function findStudentsToDelete(existingCourse: Course, course: Course): Array<Student> {
