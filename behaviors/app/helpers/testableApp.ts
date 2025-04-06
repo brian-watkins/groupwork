@@ -6,6 +6,7 @@ import { Page } from "playwright"
 import { DisplayElement, DisplayElementList, TestDisplay } from "../../helpers/displays/display"
 import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay"
 import { GroupSetDisplayElement } from "../../helpers/displays/groupSetDisplayElement"
+import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay"
 
 function serverContext(): Context<AppServer> {
   return {
@@ -99,8 +100,8 @@ class TestApp {
     return new MainDisplay(this.page, { timeout: 2000 })
   }
 
-  get createCourseDisplay(): CreateCoursePageDisplay {
-    return new CreateCoursePageDisplay(this.page, { timeout: 2000 })
+  get courseFormDisplay(): CourseFormDisplay {
+    return new CourseFormDisplay(this.page, { timeout: 2000 })
   }
 
   get courseGroupsDisplay(): CourseGroupsPageDisplay {
@@ -120,28 +121,6 @@ class MainDisplay extends TestDisplay {
 
   get courses(): DisplayElementList {
     return this.selectAll("[data-course-name]")
-  }
-}
-
-class CreateCoursePageDisplay extends TestDisplay {
-  get courseNameInput(): DisplayElement {
-    return this.select("[data-course-name-input]")
-  }
-
-  get studentNameInput(): DisplayElement {
-    return this.select("[data-student-name-input]")
-  }
-
-  get addStudentButton(): DisplayElement {
-    return this.select("[data-add-student-button]")
-  }
-
-  get saveCourseButton(): DisplayElement {
-    return this.select("[data-save-course-button]")
-  }
-
-  get cancelButton(): DisplayElement {
-    return this.select("[data-cancel-button]")
   }
 }
 

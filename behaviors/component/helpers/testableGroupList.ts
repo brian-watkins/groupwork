@@ -5,10 +5,7 @@ import { DisplayElementList, TestDisplay } from "../../helpers/displays/display"
 import { DisplayableGroupSet } from "@/app/courses/[courseId]/groups/components/DisplayableGroupSet";
 import { GroupDisplayElement } from "../../helpers/displays/groupDisplayElement";
 import { GroupSet, GroupSetId } from "@/domain/groupSet";
-
-const useBrowser = useWithContext({
-  browser: browserContext()
-})
+import { useBrowser } from "./useBrowser";
 
 export const testableGroupList: Context<TestableGroupList> = useBrowser({
   init({ browser }) {
@@ -40,7 +37,7 @@ class TestableGroupList {
         }
       }
 
-      const { render } = await import("./render/renderGroupList")
+      const { render } = await import("./render/groups/renderGroupList")
       render(data.groupSetId, data.groups.map(deserializeTestGroup), data.groupSets)
     }, {
       groupSetId,

@@ -1,0 +1,38 @@
+import { Context } from "best-behavior";
+import { BrowserTestInstrument } from "best-behavior/browser";
+import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay";
+import { useBrowser } from "./useBrowser";
+
+export const testableCourseForm: Context<TestableCourseForm> = useBrowser({
+  init({ browser }) {
+    return new TestableCourseForm(browser)
+  },
+})
+
+export interface CreateCourseDetails {
+  name: string
+  students: Array<string>
+}
+
+class TestableCourseForm {
+  constructor(private browser: BrowserTestInstrument) { }
+
+  async render(): Promise<void> {
+    await this.browser.page.evaluate(async () => {
+      const { render } = await import("./render/courseForm/render");
+      render();
+    });
+  }
+
+  async getCreateCourseDetails(): Promise<CreateCourseDetails | undefined> {
+    return this.browser.page.evaluate(() => window.createCourseDetails)
+  }
+
+  async getReturnToMainCalls(): Promise<number> {
+    return this.browser.page.evaluate(() => window.shouldReturnToMainCalls)
+  }
+
+  get display(): CourseFormDisplay {
+    return new CourseFormDisplay(this.browser.page, { timeout: 200 });
+  }
+}

@@ -28,22 +28,22 @@ export default behavior("create course page", [
     }).andThen({
       perform: [
         step("enter a course name", async (context) => {
-          await context.createCourseDisplay.courseNameInput.type("New Test Course")
+          await context.courseFormDisplay.courseNameInput.type("New Test Course")
         }),
         step("add a student", async (context) => {
-          await context.createCourseDisplay.studentNameInput.type("Student 1")
-          await context.createCourseDisplay.addStudentButton.click()
+          await context.courseFormDisplay.studentNameInput.type("Student 1")
+          await context.courseFormDisplay.addStudentButton.click()
         }),
         step("add a second student", async (context) => {
-          await context.createCourseDisplay.studentNameInput.type("Student 2")
-          await context.createCourseDisplay.addStudentButton.click()
+          await context.courseFormDisplay.studentNameInput.type("Student 2")
+          await context.courseFormDisplay.addStudentButton.click()
         }),
         step("add a third student", async (context) => {
-          await context.createCourseDisplay.studentNameInput.type("Student 3")
-          await context.createCourseDisplay.addStudentButton.click()
+          await context.courseFormDisplay.studentNameInput.type("Student 3")
+          await context.courseFormDisplay.addStudentButton.click()
         }),
         step("save the course", async (context) => {
-          await context.createCourseDisplay.saveCourseButton.click()
+          await context.courseFormDisplay.saveCourseButton.click()
         })
       ],
       observe: [
@@ -72,29 +72,6 @@ export default behavior("create course page", [
             equalTo("Student 2"),
             equalTo("Student 3")
           ], { withAnyOrder: true })))
-        })
-      ]
-    }),
-
-  example(testableApp)
-    .description("canceling course creation")
-    .script({
-      suppose: [
-        fact("the create course page is loaded", async (context) => {
-          await context.load("/courses")
-        })
-      ],
-      perform: [
-        step("click the cancel button", async (context) => {
-          await context.createCourseDisplay.cancelButton.click()
-        })
-      ],
-      observe: [
-        effect("it returns to the main page", async (context) => {
-          await context.waitForHomePage()
-          await expect(context.display.select("h1").text(),
-            resolvesTo(stringContaining("Welcome"))
-          )
         })
       ]
     })

@@ -39,6 +39,10 @@ export interface TypingOptions {
   sequentially?: boolean
 }
 
+export enum Keys {
+  Enter = "Enter"
+}
+
 export class DisplayElement {
   constructor(public locator: Locator, protected options: TestDisplayOptions) { }
 
@@ -77,6 +81,10 @@ export class DisplayElement {
     } else {
       await this.locator.fill(text, { timeout: this.options.timeout })
     }
+  }
+
+  async press(key: Keys): Promise<void> {
+    await this.locator.press(key)
   }
 
   async blur(): Promise<void> {
@@ -155,6 +163,15 @@ export class DisplayElementList {
 
   atIndex(index: number): DisplayElement {
     return new DisplayElement(this.locator.nth(index), this.options)
+  }
+
+  async map<T>(mapper: (element: DisplayElement) => Promise<T>): Promise<Array<T>> {
+    const locators = await this.locator.all()
+    return Promise.all(
+      locators
+        .map(locator => new DisplayElement(locator, this.options))
+        .map(mapper)
+    )
   }
 
   texts(): Promise<Array<string>> {

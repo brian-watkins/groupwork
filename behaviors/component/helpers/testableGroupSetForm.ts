@@ -4,10 +4,8 @@ import { browserContext, BrowserTestInstrument } from "best-behavior/browser";
 import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay";
 import { Student } from "@/domain/student";
 import { testCourse } from "../../domain/helpers/testCourse";
+import { useBrowser } from "./useBrowser";
 
-const useBrowser = useWithContext({
-  browser: browserContext()
-})
 
 export const testableGroupSetForm: Context<TestableGroupSetForm> = useBrowser({
   init({ browser }) {
@@ -39,7 +37,7 @@ class TestableGroupSetForm {
         }
       }
 
-      const { render } = await import("./render/renderGroupSetForm");
+      const { render } = await import("./render/groups/renderGroupSetForm");
       
       render(
         data.course,
