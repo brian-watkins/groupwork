@@ -1,7 +1,7 @@
 import { CourseHeading } from "@/app/components/client/CourseHeading";
 import { useCreateCourseAction } from "@/app/contexts/CourseActionsContext";
-import { useState } from "react";
-import { Button, Input, Label } from "react-aria-components";
+import { useState, useEffect } from "react";
+import { Button, Input, Label, Text } from "react-aria-components";
 
 export interface CourseFormProps {
   shouldReturnToMain: () => void
@@ -12,8 +12,15 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
   const [studentName, setStudentName] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [students, setStudents] = useState<Array<string>>([])
+  const [studentError, setStudentError] = useState<string | null>(null)
   const createCourse = useCreateCourseAction()
-  
+
+  useEffect(() => {
+    if (studentError) {
+      setStudentError(null)
+    }
+  }, [studentName])
+
   const handleSubmit = async () => {
     if (!courseName) return;
 
@@ -32,12 +39,19 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
   const handleAddStudent = () => {
     if (!studentName.trim()) return;
 
-    setStudents([ studentName.trim(), ...students ]);
+    const trimmedName = studentName.trim();
+
+    if (students.some(student => student === trimmedName)) {
+      setStudentError("A student with this name already exists");
+      return;
+    }
+
+    setStudents([trimmedName, ...students]);
     setStudentName('');
   };
 
   const removeStudent = (index: number) => {
-    const studentsList = [ ...students ]
+    const studentsList = [...students]
     studentsList.splice(index, 1)
     setStudents(studentsList)
   }
@@ -90,22 +104,34 @@ export function CourseForm({ shouldReturnToMain }: CourseFormProps) {
           <Label className="block text-sm font-medium text-gray-700 mb-1">
             Add Students
           </Label>
-          <div className="flex">
-            <Input
-              data-student-name-input
-              value={studentName}
-              onChange={(e) => setStudentName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              placeholder="Enter student name"
-            />
-            <Button
-              data-add-student-button
-              onPress={handleAddStudent}
-              className="ml-2 px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700"
-            >
-              Add
-            </Button>
+          <div className="flex flex-col">
+            <div className="flex">
+              <Input
+                data-student-name-input
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                aria-invalid={studentError ? "true" : undefined}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm ${studentError ? "border-red-500" : "border-gray-300"
+                  }`}
+                placeholder="Enter student name"
+              />
+              <Button
+                data-add-student-button
+                onPress={handleAddStudent}
+                className="ml-2 px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700"
+              >
+                Add
+              </Button>
+            </div>
+            {studentError && (
+              <div
+                data-student-error-message
+                className="text-red-500 text-sm mt-1"
+              >
+                {studentError}
+              </div>
+            )}
           </div>
         </div>
 

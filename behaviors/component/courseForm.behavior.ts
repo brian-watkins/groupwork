@@ -196,6 +196,69 @@ export default behavior("Course Form component", [
           await expect(context.getReturnToMainCalls(), resolvesTo(1))
         })
       ]
+    }),
+
+  example(testableCourseForm)
+    .description("preventing duplicate student names")
+    .script({
+      suppose: [
+        fact("the form is rendered", async (context) => {
+          await context.render();
+        }),
+        fact("a student has been added", async (context) => {
+          await context.display.studentNameInput.type(testStudent(1).name);
+          await context.display.studentNameInput.press(Keys.Enter);
+        })
+      ],
+      perform: [
+        step("attempt to add a student with the same name", async (context) => {
+          await context.display.studentNameInput.type(testStudent(1).name);
+          await context.display.studentNameInput.press(Keys.Enter);
+        })
+      ],
+      observe: [
+        effect("the duplicate student is not added to the list", async (context) => {
+          await expect(context.display.studentNames(), resolvesTo(arrayWithLength(1)));
+          await expect(context.display.studentNames(), resolvesTo([testStudent(1).name]));
+        }),
+        effect("the input field shows an error state", async (context) => {
+          await expect(context.display.studentNameInput.attribute("aria-invalid"), resolvesTo("true"));
+        }),
+        effect("an error message is displayed", async (context) => {
+          const errorMessage = context.display.select("[data-student-error-message]");
+          await expect(errorMessage.isVisible(), resolvesTo(true));
+        })
+      ]
+    }).andThen({
+      perform: [
+        step("type a different student name", async (context) => {
+          await context.display.studentNameInput.clear();
+          await context.display.studentNameInput.type(testStudent(2).name);
+        })
+      ],
+      observe: [
+        effect("the error message disappears", async (context) => {
+          const errorMessage = context.display.select("[data-student-error-message]");
+          await expect(errorMessage.isHidden(), resolvesTo(true));
+        }),
+        effect("the input field no longer shows an error state", async (context) => {
+          await expect(context.display.studentNameInput.attribute("aria-invalid"), resolvesTo(""));
+        })
+      ]
+    }).andThen({
+      perform: [
+        step("add the student with a different name", async (context) => {
+          await context.display.studentNameInput.press(Keys.Enter);
+        })
+      ],
+      observe: [
+        effect("the new student is added to the list", async (context) => {
+          await expect(context.display.studentNames(), resolvesTo(arrayWith([
+            equalTo(testStudent(2).name),
+            equalTo(testStudent(1).name)
+          ])));
+        })
+      ]
     })
 
 ])
