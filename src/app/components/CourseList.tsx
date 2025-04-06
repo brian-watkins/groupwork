@@ -1,7 +1,8 @@
 "use client";
 
 import { Course } from "@/domain/course";
-import { CourseCard } from "./CourseCard";
+import Link from "next/link";
+import { Heading } from "react-aria-components";
 
 interface CourseListProps {
   courses: Course[];
@@ -17,10 +18,47 @@ export function CourseList({ courses }: CourseListProps) {
   }
 
   return (
-    <div data-testid="course-list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {courses.map(course => (
-        <CourseCard key={course.id} course={course} />
-      ))}
+    <div data-testid="course-list" className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Course Name
+            </th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Students
+            </th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {courses.map(course => (
+            <tr key={course.id} className="hover:bg-gray-50">
+              <td className="px-6 py-4 whitespace-nowrap">
+                <Link href={`/courses/${course.id}/groups`}>
+                  <Heading level={3} className="text-lg font-medium text-gray-900 hover:text-sky-600" data-course-name>
+                    {course.name}
+                  </Heading>
+                </Link>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {course.students.length} students
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <Link
+                  href={`/courses/${course.id}/groups`}
+                  className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors"
+                  data-course-details
+                >
+                  View Groups
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
