@@ -53,7 +53,6 @@ export default behavior("edit course", [
     }).andThen({
       perform: [
         step("modify the course name", async (context) => {
-          await context.courseFormDisplay.courseNameInput.clear()
           await context.courseFormDisplay.courseNameInput.type("Updated Course Name")
         }),
         step("add a new student", async (context) => {

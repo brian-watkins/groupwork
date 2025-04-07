@@ -5,11 +5,10 @@ import GroupSetForm from "./GroupSetForm";
 import { useEffect, useRef } from "react";
 
 interface GroupSetFormModalProps {
-  course: Course;
   onClose: () => void;
 }
 
-export default function GroupSetFormModal({ course, onClose }: GroupSetFormModalProps) {
+export default function GroupSetFormModal({ onClose }: GroupSetFormModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,14 +26,11 @@ export default function GroupSetFormModal({ course, onClose }: GroupSetFormModal
       }
     };
 
-    // Add event listeners
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscKey);
 
-    // Prevent scrolling of the background content
     document.body.style.overflow = 'hidden';
 
-    // Clean up event listeners when component unmounts
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscKey);
@@ -46,10 +42,7 @@ export default function GroupSetFormModal({ course, onClose }: GroupSetFormModal
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 pt-4 px-4 pb-4 overflow-y-auto">
       <div ref={modalRef} className="bg-white rounded-lg shadow-lg w-[calc(100%-2rem)] overflow-visible mb-4">
         <div className="p-6 md:p-8">
-          <GroupSetForm
-            course={course}
-            onClose={onClose}
-          />
+          <GroupSetForm onClose={onClose} />
         </div>
       </div>
     </div>

@@ -6,26 +6,32 @@ import { Course } from '@/domain/course'
 import { DisplayableGroupSet } from '../courses/[courseId]/groups/components/DisplayableGroupSet'
 import { generateGroups } from '../actions/generateGroups';
 import { recordGroupSet } from '../actions/recordGroupSet';
+import { updateGroupSet as updateGroupSetAction } from '../actions/updateGroupSet';
 import { GroupSetId } from '@/domain/groupSet';
 
 export interface GroupStoreState {
+  course: Course
   newGroups: Group[]
   groupSets: DisplayableGroupSet[]
   setGroupsForGroupSet: (groupSetId: GroupSetId | undefined, groups: Array<Group>) => void
+  courseSize: number
 }
 
 interface GroupActions {
-  assignGroups: (course: Course, groupSize: number) => Promise<void>
-  recordGroups: (course: Course, name: string) => Promise<void>
+  assignGroups: (groupSize: number) => Promise<void>
+  recordGroups: (name: string) => Promise<void>
+  updateGroupSet: (groupSet: DisplayableGroupSet) => Promise<void>
 }
 
 export type GroupStore = GroupStoreState & GroupActions
 
-export const createGroupStore = (initialState: Partial<GroupStoreState> = {}) => {
+export const createGroupStore = (initialState: Partial<GroupStoreState> & { course: Course }) => {
   return create<GroupStore>((set, get) => ({
     newGroups: [],
     groupSets: [],
     ...initialState,
+
+    courseSize: initialState.course.students.length,
 
     setGroupsForGroupSet: (groupSetId: GroupSetId | undefined, groups: Array<Group>) => {
       if (groupSetId !== undefined) {
@@ -43,18 +49,18 @@ export const createGroupStore = (initialState: Partial<GroupStoreState> = {}) =>
       }
     },
 
-    assignGroups: async (course: Course, groupSize: number) => {
+    assignGroups: async (groupSize: number) => {
       try {
-        const generatedGroups = await generateGroups(course.id, groupSize)
+        const generatedGroups = await generateGroups(get().course.id, groupSize)
         set({ newGroups: generatedGroups })
       } catch (error) {
         console.log("Error assigning groups", error)
       }
     },
 
-    recordGroups: async (course: Course, name: string) => {
+    recordGroups: async (name: string) => {
       try {
-        const newGroupSet = await recordGroupSet(course.id, name, get().newGroups)
+        const newGroupSet = await recordGroupSet(get().course.id, name, get().newGroups)
         set((store) => {
           return {
             newGroups: [],
@@ -63,6 +69,23 @@ export const createGroupStore = (initialState: Partial<GroupStoreState> = {}) =>
         })
       } catch (error) {
         console.log("Error recording groups", error)
+      }
+    },
+
+    updateGroupSet: async (groupSet: DisplayableGroupSet) => {
+      try {
+        await updateGroupSetAction(groupSet);
+
+        set((store) => {
+          const groupSets = store.groupSets
+            .map(gs => gs.id === groupSet.id ? groupSet : gs)
+
+          return {
+            groupSets
+          }
+        });
+      } catch (error) {
+        console.log("Error updating group set", error);
       }
     }
   }))

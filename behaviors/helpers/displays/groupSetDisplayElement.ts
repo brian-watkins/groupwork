@@ -10,6 +10,10 @@ export class GroupSetDisplayElement extends DisplayElement {
     return this.selectDescendant("[data-group-set-created-at]")
   }
 
+  get editButton(): DisplayElement {
+    return this.selectDescendant("[data-edit-group-set-button]")
+  }
+
   get groups(): DisplayElementList {
     return this.selectAllDescendants("[data-student-group]")
   }

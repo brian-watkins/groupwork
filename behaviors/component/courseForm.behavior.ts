@@ -232,7 +232,6 @@ export default behavior("Course Form component", [
     }).andThen({
       perform: [
         step("type a different student name", async (context) => {
-          await context.display.studentNameInput.clear();
           await context.display.studentNameInput.type(testStudent(2).name);
         })
       ],

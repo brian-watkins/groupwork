@@ -1,18 +1,20 @@
 import type { GroupStore, GroupStoreState } from "@/app/stores/groupStore"
+import { Course } from "@/domain/course"
 import { Group } from "@/domain/group"
 import { create } from "zustand"
 
 window.calledRecordGroups = 0
 
-export function createTestStore(overrides: Partial<GroupStoreState>) {
+export function createTestStore(overrides: Partial<GroupStoreState> & { course: Course }) {
   return create<GroupStore>((set, get) => ({
     newGroups: [],
     groupSets: [],
     ...overrides,
+    courseSize: overrides.course.students.length,
     setGroupsForGroupSet(groupSetId, groups) {
       set({ newGroups: groups })
     },
-    async assignGroups(course, groupSize) {
+    async assignGroups(groupSize) {
       return new Promise<void>(resolve => {
         window.resolveAssignGroups = (groups: Array<Group>) => {
           set({ newGroups: groups })
@@ -20,11 +22,12 @@ export function createTestStore(overrides: Partial<GroupStoreState>) {
         }
       })
     },
-    async recordGroups(course, name) {
+    async recordGroups(name) {
       window.calledRecordGroups++
       return new Promise<void>(resolve => {
         window.resolveRecordGroups = resolve as () => {}
       })
     },
+    async updateGroupSet(groupSet) { },
   }))
 }

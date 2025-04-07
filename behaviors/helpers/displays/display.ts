@@ -35,10 +35,6 @@ export interface BoundingRect {
   height: number
 }
 
-export interface TypingOptions {
-  sequentially?: boolean
-}
-
 export enum Keys {
   Enter = "Enter"
 }
@@ -80,12 +76,8 @@ export class DisplayElement {
     await this.locator.click({ timeout: this.options.timeout })
   }
 
-  async type(text: string, options: TypingOptions = {}): Promise<void> {
-    if (options.sequentially === true) {
-      await this.locator.pressSequentially(text, { timeout: this.options.timeout, delay: 10 })
-    } else {
-      await this.locator.fill(text, { timeout: this.options.timeout })
-    }
+  async type(text: string): Promise<void> {
+    await this.locator.fill(text, { timeout: this.options.timeout });
   }
 
   async press(key: Keys): Promise<void> {
@@ -94,10 +86,6 @@ export class DisplayElement {
 
   async blur(): Promise<void> {
     await this.locator.blur({ timeout: this.options.timeout })
-  }
-
-  async clear(): Promise<void> {
-    await this.locator.clear({ timeout: this.options.timeout })
   }
 
   isEnabled(): Promise<boolean> {

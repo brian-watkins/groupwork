@@ -15,8 +15,8 @@ export function render(
   const root = createRoot(elementRoot);
 
   root.render(
-    <GroupStoreProvider store={createTestStore({ newGroups: groups })}>
-      <GroupSetForm course={course} onClose={() => { }} />
+    <GroupStoreProvider store={createTestStore({ course, newGroups: groups })}>
+      <GroupSetForm onClose={() => { }} />
     </GroupStoreProvider>
   );
 }

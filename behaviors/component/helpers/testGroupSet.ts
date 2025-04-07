@@ -1,3 +1,4 @@
+import { Course } from "@/domain/course";
 import { Group } from "@/domain/group";
 import { GroupSet } from "@/domain/groupSet";
 import { DateTime } from "luxon";
@@ -22,6 +23,11 @@ class TestGroupSet implements GroupSet {
 
   withGroups(groups: Array<Group>) {
     this.groups = groups
+    return this
+  }
+
+  withCourse(course: Course) {
+    this.courseId = course.id
     return this
   }
 }

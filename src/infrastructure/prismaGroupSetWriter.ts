@@ -44,6 +44,32 @@ export class PrismaGroupSetWriter implements GroupSetWriter {
       }))
     }
   }
+
+  async save(groupSet: GroupSet): Promise<void> {
+    await this.prisma.group.deleteMany({
+      where: {
+        groupSetId: groupSet.id
+      }
+    });
+
+    await this.prisma.groupSet.update({
+      where: {
+        id: groupSet.id
+      },
+      data: {
+        name: groupSet.name,
+        groups: {
+          create: groupSet.groups.map(group => ({
+            students: {
+              connect: Array.from(group.members).map(student => ({
+                id: student.id
+              }))
+            }
+          }))
+        }
+      }
+    });
+  }
 }
 
 function getCreatedAtDate(date: DateTime | undefined): Date {

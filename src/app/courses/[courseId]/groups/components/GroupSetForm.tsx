@@ -2,24 +2,34 @@
 
 import { isValidGroupSize } from "@/domain/group";
 import GroupList from "./GroupList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Course } from "@/domain/course";
 import { useGroupStore } from "@/app/contexts/GroupStoreContext";
+import { DisplayableGroupSet } from "./DisplayableGroupSet";
 
 interface GroupSetFormProps {
-  course: Course
   onClose: () => void
+  groupSetToEdit?: DisplayableGroupSet
 }
 
-export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
-  const [groupSetName, setGroupSetName] = useState("");
+export default function GroupSetForm({ onClose, groupSetToEdit }: GroupSetFormProps) {
+  const [groupSetName, setGroupSetName] = useState(groupSetToEdit?.name || "");
   const [showError, setShowError] = useState(false);
   const [groupSize, setGroupSize] = useState<number>(2);
   const [isRecording, setIsRecording] = useState(false);
-  const [isAssigning, setIsAssigning] = useState(false)
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [isEditMode] = useState(!!groupSetToEdit);
 
-  const assignGroups = useGroupStore(store => store.assignGroups)  
-  const recordGroups = useGroupStore(store => store.recordGroups)  
+  const courseSize = useGroupStore(store => store.courseSize)
+  const assignGroups = useGroupStore(store => store.assignGroups);
+  const recordGroups = useGroupStore(store => store.recordGroups);
+  const updateGroupSet = useGroupStore(store => store.updateGroupSet);
+
+  useEffect(() => {
+    if (groupSetToEdit) {
+      setGroupSetName(groupSetToEdit.name || "");
+    }
+  }, [groupSetToEdit]);
 
   const handleRecordGroups = async () => {
     if (groupSetName.trim() === "") {
@@ -28,20 +38,29 @@ export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
     }
 
     setIsRecording(true);
-    await recordGroups(course, groupSetName);
+
+    if (isEditMode && groupSetToEdit) {
+      await updateGroupSet({
+        ...groupSetToEdit,
+        name: groupSetName
+      });
+    } else {
+      await recordGroups(groupSetName);
+    }
+
     setIsRecording(false);
     onClose();
   };
 
   const handleAssignGroups = async () => {
-    setIsAssigning(true)
-    await assignGroups(course, groupSize);
-    setIsAssigning(false)
+    setIsAssigning(true);
+    await assignGroups(groupSize);
+    setIsAssigning(false);
   };
 
   const handleGroupSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && isValidGroupSize(value, course.students.length)) {
+    if (!isNaN(value) && isValidGroupSize(value, courseSize)) {
       setGroupSize(value);
     }
   };
@@ -76,29 +95,31 @@ export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
             </p>
           )}
         </div>
-        <div data-group-size-container className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span>Create groups of</span>
-            <input
-              data-group-size-input
-              type="number"
-              value={groupSize}
-              onChange={handleGroupSizeChange}
-              className="w-16 border border-gray-300 rounded px-2 py-1"
-            />
-            <span>members</span>
+        {!isEditMode && (
+          <div data-group-size-container className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span>Create groups of</span>
+              <input
+                data-group-size-input
+                type="number"
+                value={groupSize}
+                onChange={handleGroupSizeChange}
+                className="w-16 border border-gray-300 rounded px-2 py-1"
+              />
+              <span>members</span>
+            </div>
+            <button
+              data-assign-groups-button
+              onClick={handleAssignGroups}
+              disabled={isAssigning}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Assign to Groups
+            </button>
           </div>
-          <button
-            data-assign-groups-button
-            onClick={handleAssignGroups}
-            disabled={isAssigning}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Assign to Groups
-          </button>
-        </div>
+        )}
       </div>
-      <GroupList />
+      {!isEditMode ? <GroupList /> : <GroupList groupSetId={groupSetToEdit?.id} editable={true} />}
       <div className="flex justify-between mt-4">
         <button
           data-cancel-button
@@ -113,7 +134,7 @@ export default function GroupSetForm({ course, onClose }: GroupSetFormProps) {
           disabled={isRecording}
           className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Record Groups
+          {isEditMode ? "Save Changes" : "Record Groups"}
         </button>
       </div>
     </div>

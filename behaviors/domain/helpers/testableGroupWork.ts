@@ -12,6 +12,7 @@ import { createGroupSet, GroupSetError } from "@/domain/createGroupSet";
 import { errorResult, okResult, Result } from "@/domain/result";
 import { DateTime } from "luxon";
 import { TeacherAuthorization } from "@/domain/teacherReader";
+import { saveGroupSet, UpdateGroupSetError } from "@/domain/saveGroupSet";
 
 export const testableGroupWorkDomain: Context<TestableGroupWork> = {
   init: () => new TestableGroupWork()
@@ -58,6 +59,10 @@ class TestableGroupWork {
       teacher,
       details
     )
+  }
+
+  async updateGroupSet(teacher: Teacher, groupSet: GroupSet): Promise<Result<GroupSet, UpdateGroupSetError>> {
+    return saveGroupSet(this.teacherAuth, this.groupSetWriter, teacher, groupSet)
   }
 
   get createdGroupSets(): GroupSetDetails[] {
@@ -119,4 +124,6 @@ class TestGroupSetWriter implements GroupSetWriter {
       groups: details.groups
     }
   }
+
+  async save(groupSet: GroupSet): Promise<void> { }
 }

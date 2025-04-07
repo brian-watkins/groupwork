@@ -31,6 +31,10 @@ class TestDatabase {
     await this.prisma.course.deleteMany({})
   }
 
+  getCreatedCourseId(course: Course): CourseId {
+    return this.createdCourses.get(course.name)!
+  }
+
   async withCourse(teacher: Teacher, course: Course) {
     const created = await this.prisma.course.create({
       data: {
@@ -97,6 +101,11 @@ class TestDatabase {
   async createGroupSet(details: GroupSetDetails): Promise<GroupSet> {
     const groupSetWriter = new PrismaGroupSetWriter(this.prisma)
     return await groupSetWriter.create(details)
+  }
+
+  async updateGroupSet(groupSet: GroupSet): Promise<void> {
+    const groupSetWriter = new PrismaGroupSetWriter(this.prisma)
+    await groupSetWriter.save(groupSet)
   }
 
   async getGroupSetsForCourse(course: Course): Promise<Array<GroupSet>> {
