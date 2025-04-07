@@ -6,6 +6,7 @@ import { testableDatabase } from "./helpers/testableDatabase";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudents } from "../domain/helpers/testStudent";
 import { groupWithMembers, studentName } from "../domain/helpers/matchers";
+import { testTeacher } from "../app/helpers/testTeacher";
 
 export default behavior("PrismaGroupsReader", [
   example(testableDatabase)
@@ -13,9 +14,9 @@ export default behavior("PrismaGroupsReader", [
     .script({
       suppose: [
         fact("there is a course with multiple group sets", async (context) => {
-          await context.withCourse(testCourse(1).withStudents(testStudents(6)))
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(6)))
 
-          const course = await context.getCourse(testCourse(1))
+          const course = await context.getCourse(testTeacher(1), testCourse(1))
 
           // First group set with two groups
           const group1: Group = {
@@ -74,7 +75,7 @@ export default behavior("PrismaGroupsReader", [
     .script({
       suppose: [
         fact("there is a course with students but no groups", async (context) => {
-          await context.withCourse(testCourse(1).withStudents(testStudents(3)))
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(3)))
         })
       ],
       observe: [
@@ -91,8 +92,8 @@ export default behavior("PrismaGroupsReader", [
       suppose: [
         fact("there are two courses, each with their own group sets", async (context) => {
           // First course
-          await context.withCourse(testCourse(1).withStudents(testStudents(2)))
-          const course1 = await context.getCourse(testCourse(1))
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(2)))
+          const course1 = await context.getCourse(testTeacher(1), testCourse(1))
           
           const group1: Group = {
             members: new Set([course1.students[0], course1.students[1]])
@@ -106,8 +107,8 @@ export default behavior("PrismaGroupsReader", [
           })
 
           // Second course
-          await context.withCourse(testCourse(2).withStudents(testStudents(2, { startingIndex: 3 })))
-          const course2 = await context.getCourse(testCourse(2))
+          await context.withCourse(testTeacher(1), testCourse(2).withStudents(testStudents(2, { startingIndex: 3 })))
+          const course2 = await context.getCourse(testTeacher(1), testCourse(2))
           
           const group2: Group = {
             members: new Set([course2.students[0], course2.students[1]])

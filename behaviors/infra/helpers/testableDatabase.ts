@@ -10,6 +10,7 @@ import { PrismaClient } from "@prisma/client";
 import { Context } from "best-behavior";
 import { CourseDetails } from "@/domain/courseWriter";
 import { PrismaCourseWriter } from "@/infrastructure/prismaCourseWriter";
+import { Teacher } from "@/domain/teacher";
 
 export const testableDatabase: Context<TestDatabase> = {
   init: async () => {
@@ -27,10 +28,11 @@ class TestDatabase {
     await this.prisma.course.deleteMany({})
   }
 
-  async withCourse(course: Course) {
+  async withCourse(teacher: Teacher, course: Course) {
     const created = await this.prisma.course.create({
       data: {
         name: course.name,
+        teacherId: teacher.id,
         students: {
           createMany: {
             data: course.students.map(student => {
@@ -45,30 +47,34 @@ class TestDatabase {
     this.createdCourses.set(created.name, created.id)
   }
 
-  async getCourse(course: Course): Promise<Course> {
+  async getCourse(teacher: Teacher, course: Course): Promise<Course> {
     const courseId = this.createdCourses.get(course.name)
+    return this.getCourseById(teacher, courseId!)
+  }
+
+  async getCourseById(teacher: Teacher, courseId: CourseId): Promise<Course> {
     const courseReader = new PrismaCourseReader(this.prisma)
-    return courseReader.get(courseId!)
+    return courseReader.get(teacher, courseId)
   }
 
-  async getAllCourses(): Promise<Array<Course>> {
+  async getAllCourses(teacher: Teacher): Promise<Array<Course>> {
     const courseReader = new PrismaCourseReader(this.prisma)
-    return courseReader.getAll()
+    return courseReader.getAll(teacher)
   }
 
-  async writeCourse(details: CourseDetails): Promise<void> {
+  async writeCourse(teacher: Teacher, details: CourseDetails): Promise<void> {
     const courseWriter = new PrismaCourseWriter(this.prisma)
-    await courseWriter.write(details)
+    await courseWriter.write(teacher, details)
   }
 
-  async saveCourse(course: Course): Promise<void> {
+  async saveCourse(teacher: Teacher, course: Course): Promise<void> {
     const courseWriter = new PrismaCourseWriter(this.prisma)
-    await courseWriter.save(course)
+    await courseWriter.save(teacher, course)
   }
 
-  async deleteCourse(course: Course): Promise<void> {
+  async deleteCourse(teacher: Teacher, course: Course): Promise<void> {
     const courseWriter = new PrismaCourseWriter(this.prisma)
-    await courseWriter.delete(course)
+    await courseWriter.delete(teacher, course)
   }
 
   async createGroupSet(details: GroupSetDetails): Promise<GroupSet> {

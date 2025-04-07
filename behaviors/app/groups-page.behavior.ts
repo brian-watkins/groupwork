@@ -4,6 +4,7 @@ import { arrayWith, expect, is, resolvesTo } from "great-expectations";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent, testStudents } from "../domain/helpers/testStudent";
 import { studentName } from "./helpers/matchers";
+import { authenticatedTeacher } from "./helpers/testTeacher";
 
 export default behavior("course students page", [
 
@@ -13,7 +14,7 @@ export default behavior("course students page", [
       suppose: [
         fact("the app is loaded with courses", async (context) => {
           await context
-            .withCourses([
+            .withCourses(authenticatedTeacher(), [
               testCourse(1).withStudents(testStudents(3))
             ])
             .loadCourses()
@@ -72,7 +73,7 @@ export default behavior("course students page", [
       suppose: [
         fact("the app is loaded with a course that has no students", async (context) => {
           await context
-            .withCourses([
+            .withCourses(authenticatedTeacher(), [
               testCourse(1).withStudents([])
             ])
             .loadCourses()

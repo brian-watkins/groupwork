@@ -4,6 +4,7 @@ import { Group, isValidGroupSize } from "./group";
 import { Student } from "./student";
 import { CourseReader } from "./courseReader";
 import { GroupsReader } from "./groupReader";
+import { Teacher } from "./teacher";
 
 export interface AssignGroupsCommand {
   courseId: CourseId,
@@ -22,8 +23,9 @@ function makeStudentHistory(groups: Array<Group>, student: Student): StudentHist
   }
 }
 
-export async function assignGroups(courseReader: CourseReader, groupsReader: GroupsReader, command: AssignGroupsCommand): Promise<Group[]> {
-  const course = await courseReader.get(command.courseId)
+export async function assignGroups(teacher: Teacher, courseReader: CourseReader, groupsReader: GroupsReader, command: AssignGroupsCommand): Promise<Group[]> {
+  const course = await courseReader.get(teacher, command.courseId)
+
   const history = await groupsReader.get(command.courseId)
 
   if (!isValidGroupSize(command.size, course.students.length)) {

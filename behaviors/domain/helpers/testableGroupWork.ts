@@ -5,6 +5,8 @@ import { Group, workedTogetherAlready } from "@/domain/group";
 import { Course, CourseId } from "@/domain/course";
 import { assignGroups } from "@/domain/assignGroups";
 import { Student } from "@/domain/student";
+import { Teacher } from "@/domain/teacher";
+import { testTeacher } from "../../app/helpers/testTeacher";
 
 export const testableGroupWorkDomain: Context<TestableGroupWork> = {
   init: () => new TestableGroupWork()
@@ -26,7 +28,7 @@ class TestableGroupWork {
   }
 
   async chooseGroupsOf(size: number): Promise<void> {
-    this.currentGroups = await assignGroups(this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
+    this.currentGroups = await assignGroups(testTeacher(1), this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
   }
 
   getCurrentCollaborators(group: Group): Array<Array<Student>> {
@@ -41,13 +43,21 @@ class TestableGroupWork {
 class TestCourseReader implements CourseReader {
   constructor(private course: Course) { }
 
-  async get(courseId: CourseId): Promise<Course> {
+  getAll(teacher: Teacher): Promise<Array<Course>> {
+    throw new Error("Method not implemented.");
+  }
+
+  async get(teacher: Teacher, courseId: CourseId): Promise<Course> {
+    if (teacher.id !== testTeacher(1).id) {
+      throw new Error("Unknown teacher!")
+    }
+
     return this.course
   }
 }
 
 class TestGroupsReader implements GroupsReader {
-  constructor (readonly groups: Array<Group>) { }
+  constructor(readonly groups: Array<Group>) { }
 
   async get(courseId: CourseId): Promise<Array<Group>> {
     return this.groups

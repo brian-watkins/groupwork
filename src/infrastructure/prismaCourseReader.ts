@@ -1,14 +1,15 @@
 import { Course, CourseId } from "@/domain/course";
 import { CourseReader } from "@/domain/courseReader";
 import { Student } from "@/domain/student";
+import { Teacher } from "@/domain/teacher";
 import { PrismaClient } from "@prisma/client";
 
 export class PrismaCourseReader implements CourseReader {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient) { }
 
-  async get(courseId: CourseId): Promise<Course> {
+  async get(teacher: Teacher, courseId: CourseId): Promise<Course> {
     const prismaData = await this.prisma.course.findUnique({
-      where: { id: courseId },
+      where: { id: courseId, teacherId: teacher.id },
       include: { students: true }
     });
 
@@ -28,10 +29,10 @@ export class PrismaCourseReader implements CourseReader {
       students
     };
   }
-  
-  // Let's add a method to get all courses, which we'll need for the homepage
-  async getAll(): Promise<Course[]> {
+
+  async getAll(teacher: Teacher): Promise<Course[]> {
     const prismaData = await this.prisma.course.findMany({
+      where: { teacherId: teacher.id },
       include: { students: true }
     });
 
@@ -42,6 +43,6 @@ export class PrismaCourseReader implements CourseReader {
         id: student.id,
         name: student.name
       }))
-    }));
+    }))
   }
 }

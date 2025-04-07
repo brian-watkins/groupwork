@@ -3,6 +3,7 @@ import { testableApp } from "./helpers/testableApp";
 import { expect, resolvesTo, stringContaining, arrayWith, equalTo, is } from "great-expectations";
 import { testStudent } from "../domain/helpers/testStudent";
 import { testCourse } from "../domain/helpers/testCourse";
+import { authenticatedTeacher } from "./helpers/testTeacher";
 
 export default behavior("edit course", [
 
@@ -12,7 +13,7 @@ export default behavior("edit course", [
       suppose: [
         fact("there is an existing course with students", async (context) => {
           await context
-            .withCourses([
+            .withCourses(authenticatedTeacher(), [
               testCourse(1).withStudents([
                 testStudent(1),
                 testStudent(2),

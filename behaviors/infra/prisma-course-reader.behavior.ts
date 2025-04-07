@@ -1,11 +1,13 @@
 import { behavior, example, effect, fact } from "best-behavior";
-import { expect, is, equalTo, arrayWith, objectWith, resolvesTo } from "great-expectations";
+import { expect, is, equalTo, arrayWith, objectWith, resolvesTo, stringContaining, rejectsWith } from "great-expectations";
 import { testableDatabase } from "./helpers/testableDatabase";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudents } from "../domain/helpers/testStudent";
 import { Course } from "../../src/domain/course";
 import { Student } from "@/domain/student";
 import { studentName } from "../domain/helpers/matchers";
+import { testTeacher } from "../app/helpers/testTeacher";
+import { errorWithMessage } from "./helpers/matchers";
 
 export default behavior("PrismaCourseReader", [
   example(testableDatabase)
@@ -13,12 +15,12 @@ export default behavior("PrismaCourseReader", [
     .script({
       suppose: [
         fact("there is a course with students", async (context) => {
-          await context.withCourse(testCourse(1).withStudents(testStudents(2)))
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(2)))
         })
       ],
       observe: [
         effect("it gets the course with the correct details", async (context) => {
-          await expect(context.getCourse(testCourse(1)), resolvesTo(objectWith({
+          await expect(context.getCourse(testTeacher(1), testCourse(1)), resolvesTo(objectWith({
             name: equalTo("Course #1"),
             students: arrayWith<Student>([
               studentName(1),
@@ -34,13 +36,13 @@ export default behavior("PrismaCourseReader", [
     .script({
       suppose: [
         fact("there are multiple courses with students", async (context) => {
-          await context.withCourse(testCourse(1).withStudents(testStudents(2)))
-          await context.withCourse(testCourse(2).withStudents(testStudents(3, { startingIndex: 3 })))
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(2)))
+          await context.withCourse(testTeacher(1), testCourse(2).withStudents(testStudents(3, { startingIndex: 3 })))
         })
       ],
       observe: [
         effect("it gets a list of all courses with their students", async (context) => {
-          const courses = await context.getAllCourses()
+          const courses = await context.getAllCourses(testTeacher(1))
 
           expect(courses, is(arrayWith<Course>([
             objectWith({
@@ -59,6 +61,56 @@ export default behavior("PrismaCourseReader", [
               ])
             })
           ])))
+        })
+      ]
+    }),
+
+  example(testableDatabase)
+    .description("prevents accessing courses created by another teacher")
+    .script({
+      suppose: [
+        fact("there are courses created by different teachers", async (context) => {
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(2)))
+          await context.withCourse(testTeacher(2), testCourse(2).withStudents(testStudents(2, { startingIndex: 3 })))
+        })
+      ],
+      observe: [
+        effect("each teacher can only see their own courses", async (context) => {
+          const teacher1Courses = await context.getAllCourses(testTeacher(1))
+          expect(teacher1Courses, is(arrayWith([
+            objectWith({
+              name: equalTo(testCourse(1).name)
+            })
+          ])))
+
+          const teacher2Courses = await context.getAllCourses(testTeacher(2))
+          expect(teacher2Courses, is(arrayWith([
+            objectWith({
+              name: equalTo(testCourse(2).name)
+            })
+          ])))
+        }),
+        effect("a teacher cannot access a course created by another teacher", async (context) => {
+          await expect(context.getCourse(testTeacher(1), testCourse(2)), rejectsWith(errorWithMessage(
+            stringContaining("not found")
+          )))
+        })
+      ]
+    }),
+
+  example(testableDatabase)
+    .description("throws error when attempting to access a non-existent course")
+    .script({
+      suppose: [
+        fact("there is a course with students", async (context) => {
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(2)))
+        })
+      ],
+      observe: [
+        effect("it throws an error when trying to access a non-existent course", async (context) => {
+          await expect(context.getCourseById(testTeacher(1), "non-existent-id"), rejectsWith(errorWithMessage(
+            stringContaining("not found")
+          )))
         })
       ]
     })

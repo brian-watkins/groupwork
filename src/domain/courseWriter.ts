@@ -1,4 +1,5 @@
 import { Course } from "./course"
+import { Teacher } from "./teacher"
 
 export interface StudentDetails {
   name: string
@@ -10,7 +11,7 @@ export interface CourseDetails {
 }
 
 export interface CourseWriter {
-  write(course: CourseDetails): Promise<void>
-  save(course: Course): Promise<void>
-  delete(course: Course): Promise<void>
+  write(teacher: Teacher, course: CourseDetails): Promise<void>
+  save(teacher: Teacher, course: Course): Promise<void>
+  delete(teacher: Teacher, course: Course): Promise<void>
 }

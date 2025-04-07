@@ -13,6 +13,7 @@ datasource db {
 model Course {
   id        String    @id @default(uuid())
   name      String
+  teacherId String
   students  Student[]
   groupSets GroupSet[]
 }

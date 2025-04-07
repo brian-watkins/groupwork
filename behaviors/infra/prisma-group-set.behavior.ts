@@ -6,6 +6,7 @@ import { testableDatabase } from "./helpers/testableDatabase";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudents } from "../domain/helpers/testStudent";
 import { groupWithMembers, studentName } from "../domain/helpers/matchers";
+import { testTeacher } from "../app/helpers/testTeacher";
 
 export default behavior("Persisting GroupSets", [
 
@@ -14,12 +15,12 @@ export default behavior("Persisting GroupSets", [
     .script({
       suppose: [
         fact("there is a course with students", async (context) => {
-          await context.withCourse(testCourse(1).withStudents(testStudents(4)))
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(4)))
         })
       ],
       perform: [
         step("a group set is created and written to the database", async (context) => {
-          const course = await context.getCourse(testCourse(1))
+          const course = await context.getCourse(testTeacher(1), testCourse(1))
 
           const group1: Group = {
             members: new Set([course.students[0], course.students[1]])
@@ -81,9 +82,9 @@ export default behavior("Persisting GroupSets", [
     .script({
       suppose: [
         fact("there is a course with multiple group sets created at different times", async (context) => {
-          await context.withCourse(testCourse(1).withStudents(testStudents(4)))
+          await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(4)))
 
-          const course = await context.getCourse(testCourse(1))
+          const course = await context.getCourse(testTeacher(1), testCourse(1))
 
           const group1: Group = {
             members: new Set([course.students[0], course.students[1]])

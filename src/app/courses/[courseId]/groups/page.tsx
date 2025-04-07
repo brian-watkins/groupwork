@@ -1,8 +1,10 @@
 import { courseReader, groupSetReader } from "@/app/app-config";
 import { CourseId } from "@/domain/course";
-import { notFound } from "next/navigation";
+import { notFound, unauthorized } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
 import { toDisplayableGroupSets } from "./components/DisplayableGroupSet";
 import GroupsContent from "./components/GroupsContent";
+import { toTeacher } from "@/lib/domainHelpers";
 
 export default async function CourseStudentsPage({
   params
@@ -11,9 +13,15 @@ export default async function CourseStudentsPage({
 }) {
   const { courseId } = await params;
 
+  const user = await currentUser();
+
+  if (!user) {
+    return unauthorized()
+  }
+
   let course;
   try {
-    course = await courseReader.get(courseId);
+    course = await courseReader.get(toTeacher(user), courseId);
   } catch (error) {
     notFound();
   }

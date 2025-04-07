@@ -1,5 +1,7 @@
 import { Course, CourseId } from "./course";
+import { Teacher } from "./teacher";
 
 export interface CourseReader {
-  get(courseId: CourseId): Promise<Course>
+  getAll(teacher: Teacher): Promise<Array<Course>> 
+  get(teacher: Teacher, courseId: CourseId): Promise<Course>
 }

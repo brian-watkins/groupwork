@@ -7,6 +7,7 @@ import { DisplayElement, DisplayElementList, TestDisplay } from "../../helpers/d
 import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay"
 import { GroupSetDisplayElement } from "../../helpers/displays/groupSetDisplayElement"
 import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay"
+import { Teacher } from "@/domain/teacher"
 
 function serverContext(): Context<AppServer> {
   return {
@@ -36,18 +37,21 @@ class AppServer {
     await prisma.course.deleteMany()
   }
 
-  async seedCourses(courses: Array<Course>) {
-    for (const course of courses) {
-      await prisma.course.create({
-        data: {
-          name: course.name,
-          students: {
-            create: course.students.map(student => {
-              return { name: student.name }
-            })
+  async seedCourses(courseSets: Array<CourseSet>) {
+    for (const courseSet of courseSets) {
+      for (const course of courseSet.courses) {
+        await prisma.course.create({
+          data: {
+            name: course.name,
+            teacherId: courseSet.teacher.id,
+            students: {
+              create: course.students.map(student => {
+                return { name: student.name }
+              })
+            }
           }
-        }
-      })
+        })
+      }
     }
   }
 }
@@ -63,35 +67,39 @@ export const testableApp: Context<TestApp> = useServer({
   },
 })
 
+interface CourseSet {
+  teacher: Teacher
+  courses: Array<Course>
+}
+
 class TestApp {
-  private courses: Array<Course> = []
+  private courseSets: Array<CourseSet> = []
 
   constructor(private server: AppServer, private browser: BrowserTestInstrument) { }
 
-  withCourses(courses: Array<Course>): TestApp {
-    this.courses = courses
+  withCourses(teacher: Teacher, courses: Array<Course>): TestApp {
+    this.courseSets.push({
+      teacher, courses
+    })
+
     return this
   }
 
   async load(path = "/") {
-    await this.server.resetDB()
-
-    if (this.courses !== undefined) {
-      await this.server.seedCourses(this.courses)
-    }
-    return await this.browser.page.goto(this.server.urlForPath(path))
+    await this.setupDB()
+    return await this.page.goto(path)
   }
 
   async loadCourses() {
-    console.log("Seeding db for test")
+    return await this.load("/courses")
+  }
+
+  private async setupDB(): Promise<void> {
     await this.server.resetDB()
 
-    if (this.courses !== undefined) {
-      await this.server.seedCourses(this.courses)
+    if (this.courseSets.length > 0) {
+      await this.server.seedCourses(this.courseSets)
     }
-
-    console.log("Loading courses")
-    return await this.browser.page.goto("/courses")
   }
 
   async loadCourseGroups(index: number) {
@@ -101,11 +109,6 @@ class TestApp {
 
   get page(): Page {
     return this.browser.page
-  }
-
-  waitForCoursesPage(): Promise<void> {
-    const origin = new URL(this.page.url()).origin
-    return this.page.waitForURL(`${origin}/courses`)
   }
 
   get display(): MainDisplay {
@@ -118,6 +121,10 @@ class TestApp {
 
   get courseGroupsDisplay(): CourseGroupsPageDisplay {
     return new CourseGroupsPageDisplay(this.page, { timeout: 2000 })
+  }
+
+  waitForCoursesPage(): Promise<void> {
+    return this.page.waitForURL(`**/courses`)
   }
 
   async waitForCreateCoursePage(): Promise<void> {

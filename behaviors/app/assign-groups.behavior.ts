@@ -3,6 +3,7 @@ import { arrayWith, equalTo, expect, is, resolvesTo } from "great-expectations";
 import { testableApp } from "./helpers/testableApp";
 import { testCourse } from "../domain/helpers/testCourse";
 import { testStudents } from "../domain/helpers/testStudent";
+import { authenticatedTeacher } from "./helpers/testTeacher";
 
 export default behavior("Assign Students to Groups", [
 
@@ -12,7 +13,7 @@ export default behavior("Assign Students to Groups", [
       suppose: [
         fact("the user is viewing a course with students", async (context) => {
           await context
-            .withCourses([
+            .withCourses(authenticatedTeacher(), [
               testCourse(1).withStudents(testStudents(5))
             ])
             .loadCourseGroups(0)
@@ -48,7 +49,7 @@ export default behavior("Assign Students to Groups", [
       suppose: [
         fact("the user is viewing a course with students", async (context) => {
           await context
-            .withCourses([
+            .withCourses(authenticatedTeacher(), [
               testCourse(1).withStudents(testStudents(9))
             ])
             .loadCourseGroups(0)

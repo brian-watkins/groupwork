@@ -4,6 +4,7 @@ import { testCourse } from "../domain/helpers/testCourse";
 import { testStudent, testStudents } from "../domain/helpers/testStudent";
 import { arrayWith, arrayWithLength, expect, is, resolvesTo } from "great-expectations";
 import { studentName } from "./helpers/matchers";
+import { authenticatedTeacher } from "./helpers/testTeacher";
 
 export default behavior("record groups", [
 
@@ -13,7 +14,7 @@ export default behavior("record groups", [
       suppose: [
         fact("the app is loaded with a course that has students", async (context) => {
           await context
-            .withCourses([
+            .withCourses(authenticatedTeacher(), [
               testCourse(1).withStudents(testStudents(4))
             ])
             .loadCourseGroups(0)
@@ -65,7 +66,7 @@ export default behavior("record groups", [
       suppose: [
         fact("the app is loaded with a course that has students", async (context) => {
           await context
-            .withCourses([
+            .withCourses(authenticatedTeacher(), [
               testCourse(1).withStudents([
                 testStudent(1),
                 testStudent(2),
@@ -133,6 +134,7 @@ export default behavior("record groups", [
         step("assign students to groups again", async (context) => {
           await context.courseGroupsDisplay.createNewGroupsButton.click()
           await context.courseGroupsDisplay.assignGroupsButton.click()
+          await context.courseGroupsDisplay.groupSetForm.waitForGroups(2)
         }),
         step("record a second group set", async (context) => {
           await context.courseGroupsDisplay.groupSetForm.groupSetNameInput.type("Second Group Set")

@@ -1,15 +1,17 @@
 import { Course } from "@/domain/course";
 import { CourseDetails, CourseWriter } from "@/domain/courseWriter";
-import { Student, StudentId } from "@/domain/student";
+import { Student } from "@/domain/student";
+import { Teacher } from "@/domain/teacher";
 import { PrismaClient } from "@prisma/client";
 
 export class PrismaCourseWriter implements CourseWriter {
   constructor(private prisma: PrismaClient) { }
 
-  async write(courseDetails: CourseDetails): Promise<void> {
+  async write(teacher: Teacher, courseDetails: CourseDetails): Promise<void> {
     await this.prisma.course.create({
       data: {
         name: courseDetails.name,
+        teacherId: teacher.id,
         students: {
           create: courseDetails.students.map(student => ({
             name: student.name
@@ -19,9 +21,9 @@ export class PrismaCourseWriter implements CourseWriter {
     })
   }
 
-  async save(course: Course): Promise<void> {
+  async save(teacher: Teacher, course: Course): Promise<void> {
     const existingCourse = await this.prisma.course.findUnique({
-      where: { id: course.id },
+      where: { id: course.id, teacherId: teacher.id },
       include: { students: true }
     });
 
@@ -68,14 +70,13 @@ export class PrismaCourseWriter implements CourseWriter {
     }
   }
 
-  async delete(course: Course): Promise<void> {
+  async delete(teacher: Teacher, course: Course): Promise<void> {
     try {
       await this.prisma.course.delete({
-        where: { id: course.id }
+        where: { id: course.id, teacherId: teacher.id }
       });
     } catch (error) {
-      console.error('Error deleting course:', error);
-      throw error;
+      throw new Error(`Course with id ${course.id} not found`);
     }
   }
 }
