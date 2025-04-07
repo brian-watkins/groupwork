@@ -3,6 +3,8 @@ import { DateTime } from 'luxon';
 
 const prisma = new PrismaClient();
 
+const local_user_id = "user_2vMpeLfUzMuxfEw0LOqaXFF2rRg"
+
 async function main() {
   // Clean existing data
   await prisma.group.deleteMany();
@@ -14,6 +16,7 @@ async function main() {
   const introToProgramming = await prisma.course.create({
     data: {
       name: 'Introduction to Programming',
+      teacherId: local_user_id,
       students: {
         create: [
           { name: 'Alice Smith' },
@@ -27,6 +30,7 @@ async function main() {
   const dataStructures = await prisma.course.create({
     data: {
       name: 'Data Structures and Algorithms',
+      teacherId: local_user_id,
       students: {
         create: [
           { name: 'David Wilson' },
@@ -41,6 +45,7 @@ async function main() {
   const webDevelopment = await prisma.course.create({
     data: {
       name: 'Web Development',
+      teacherId: local_user_id,
       students: {
         create: [
           { name: 'Hannah Taylor' },
