@@ -51,6 +51,11 @@ export function clerkAuthContext(options: ClerkContextOptions): Context<void> {
 }
 
 async function millisSinceLastRefresh(options: ClerkContextOptions): Promise<number> {
-  const stats = await fs.stat(options.storageStateFile)
-  return Date.now() - stats.mtime.getTime()
+  try {
+    const stats = await fs.stat(options.storageStateFile)
+    return Date.now() - stats.mtime.getTime()
+  } catch (err) {
+    // force a refresh
+    return options.refreshTimeMillis + 10
+  }
 }
