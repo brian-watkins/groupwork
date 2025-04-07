@@ -1,5 +1,6 @@
 import { Course, CourseId } from "@/domain/course";
-import { CourseReader } from "@/domain/courseReader";
+import { CourseReader, CourseReaderError } from "@/domain/courseReader";
+import { errorResult, okResult, Result } from "@/domain/result";
 import { Student } from "@/domain/student";
 import { Teacher } from "@/domain/teacher";
 import { PrismaClient } from "@prisma/client";
@@ -7,27 +8,26 @@ import { PrismaClient } from "@prisma/client";
 export class PrismaCourseReader implements CourseReader {
   constructor(private prisma: PrismaClient) { }
 
-  async get(teacher: Teacher, courseId: CourseId): Promise<Course> {
+  async get(teacher: Teacher, courseId: CourseId): Promise<Result<Course, CourseReaderError>> {
     const prismaData = await this.prisma.course.findUnique({
       where: { id: courseId, teacherId: teacher.id },
       include: { students: true }
     });
 
     if (!prismaData) {
-      throw new Error(`Course with ID ${courseId} not found`);
+      return errorResult(CourseReaderError.NotFound)
     }
 
-    // Map from Prisma model to domain model
     const students: Student[] = prismaData.students.map(student => ({
       id: student.id,
       name: student.name
     }));
 
-    return {
+    return okResult({
       id: prismaData.id,
       name: prismaData.name,
       students
-    };
+    })
   }
 
   async getAll(teacher: Teacher): Promise<Course[]> {

@@ -1,8 +1,9 @@
 import { courseReader } from '@/app/app-config';
 import { EditCourseClient } from './EditCourseClient';
 import { currentUser } from '@clerk/nextjs/server';
-import { unauthorized } from 'next/navigation';
+import { notFound, unauthorized } from 'next/navigation';
 import { toTeacher } from '@/lib/domainHelpers';
+import { ResultType } from '@/domain/result';
 
 export default async function EditCoursePage({
   params
@@ -17,9 +18,13 @@ export default async function EditCoursePage({
     return unauthorized()
   }
 
-  const course = await courseReader.get(toTeacher(user), courseId);
+  const courseResult = await courseReader.get(toTeacher(user), courseId);
+
+  if (courseResult.type === ResultType.ERROR) {
+    return notFound()
+  }
 
   return (
-    <EditCourseClient course={course} />
+    <EditCourseClient course={courseResult.value} />
   );
 }

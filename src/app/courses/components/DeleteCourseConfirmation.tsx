@@ -3,7 +3,7 @@
 import { Course } from "@/domain/course";
 import { Dialog, Button, Modal, ModalOverlay, Heading } from "react-aria-components";
 import { useState } from "react";
-import { deleteCourse } from "../stores/actions/deleteCourse";
+import { deleteCourse } from "../../actions/deleteCourse";
 import { useRouter } from "next/navigation";
 
 interface DeleteCourseConfirmationProps {

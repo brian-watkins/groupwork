@@ -5,6 +5,7 @@ import { Student } from "./student";
 import { CourseReader } from "./courseReader";
 import { GroupsReader } from "./groupReader";
 import { Teacher } from "./teacher";
+import { errorResult, okResult, Result, ResultType } from "./result";
 
 export interface AssignGroupsCommand {
   courseId: CourseId,
@@ -16,15 +17,18 @@ interface StudentHistory {
   history: Array<Student>
 }
 
-function makeStudentHistory(groups: Array<Group>, student: Student): StudentHistory {
-  return {
-    student,
-    history: workedWith(groups, student)
-  }
+export enum AssignGroupsError {
+  Unauthorized
 }
 
-export async function assignGroups(teacher: Teacher, courseReader: CourseReader, groupsReader: GroupsReader, command: AssignGroupsCommand): Promise<Group[]> {
-  const course = await courseReader.get(teacher, command.courseId)
+export async function assignGroups(teacher: Teacher, courseReader: CourseReader, groupsReader: GroupsReader, command: AssignGroupsCommand): Promise<Result<Group[], AssignGroupsError>> {
+  const courseResult = await courseReader.get(teacher, command.courseId)
+
+  if (courseResult.type === ResultType.ERROR) {
+    return errorResult(AssignGroupsError.Unauthorized)
+  }
+
+  const course = courseResult.value
 
   const history = await groupsReader.get(command.courseId)
 
@@ -36,9 +40,15 @@ export async function assignGroups(teacher: Teacher, courseReader: CourseReader,
     .map(student => makeStudentHistory(history, student))
     .sort(byNumberWorkedWithAlready)
 
-  return findGroups(studentHistories, command.size)
+  return okResult(findGroups(studentHistories, command.size))
 }
 
+function makeStudentHistory(groups: Array<Group>, student: Student): StudentHistory {
+  return {
+    student,
+    history: workedWith(groups, student)
+  }
+}
 
 function findGroups(histories: Array<StudentHistory>, size: number): Array<Group> {
   const numberGroups = numberOfGroups(histories, size)

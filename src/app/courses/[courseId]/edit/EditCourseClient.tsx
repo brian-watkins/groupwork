@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { CourseForm } from '../../components/CourseForm';
 import { CourseActionsProvider } from '../../../contexts/CourseActionsContext';
-import { updateCourse } from '../../../stores/actions/updateCourse';
-import { createCourse } from '../../../stores/actions/createCourse';
+import { updateCourse } from '../../../actions/updateCourse';
+import { createCourse } from '../../../actions/createCourse';
 import { Course } from '@/domain/course';
 
 interface EditCourseClientProps {

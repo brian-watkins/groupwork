@@ -120,7 +120,7 @@ export default behavior("PrismaCourseWriter", [
       ],
       perform: [
         step("update the course by changing its name and modifying students", async (context) => {
-          const courseToUpdate = await context.getCourse(testTeacher(1), testCourse(1))
+          const courseToUpdate = await context.getCourseValue(testTeacher(1), testCourse(1))
 
           // Update the course name
           courseToUpdate.name = "Updated Course Name";
@@ -145,7 +145,7 @@ export default behavior("PrismaCourseWriter", [
       observe: [
         effect("the updated course exists in the database with correct details", async (context) => {
           // Note that the id of the course is still saved in the test helper by the testCourse(1).name
-          const updatedCourse = await context.getCourse(testTeacher(1), testCourse(1));
+          const updatedCourse = await context.getCourseValue(testTeacher(1), testCourse(1));
 
           expect(updatedCourse.name, is(equalTo("Updated Course Name")));
 
@@ -168,7 +168,7 @@ export default behavior("PrismaCourseWriter", [
       ],
       perform: [
         step("update only the course name", async (context) => {
-          const courseToUpdate = await context.getCourse(testTeacher(1), testCourse(4));
+          const courseToUpdate = await context.getCourseValue(testTeacher(1), testCourse(4));
 
           // Update just the course name
           courseToUpdate.name = "Only Name Updated";
@@ -204,7 +204,7 @@ export default behavior("PrismaCourseWriter", [
       ],
       perform: [
         step("delete the course", async (context) => {
-          const courseToDelete = await context.getCourse(testTeacher(1), testCourse(1))
+          const courseToDelete = await context.getCourseValue(testTeacher(1), testCourse(1))
           await context.deleteCourse(testTeacher(1), courseToDelete)
         })
       ],
@@ -227,7 +227,7 @@ export default behavior("PrismaCourseWriter", [
       ],
       perform: [
         step("delete one course", async (context) => {
-          const courseToDelete = await context.getCourse(testTeacher(1), testCourse(1))
+          const courseToDelete = await context.getCourseValue(testTeacher(1), testCourse(1))
           await context.deleteCourse(testTeacher(1), courseToDelete)
         })
       ],
@@ -258,7 +258,7 @@ export default behavior("PrismaCourseWriter", [
       ],
       perform: [
         step("another teacher attempts to save changes to that course", async (context) => {
-          const courseToModify = await context.getCourse(testTeacher(1), testCourse(1))
+          const courseToModify = await context.getCourseValue(testTeacher(1), testCourse(1))
           courseToModify.name = "I changed it!"
 
           await expect(context.saveCourse(testTeacher(2), courseToModify), rejectsWith(errorWithMessage(
@@ -268,7 +268,7 @@ export default behavior("PrismaCourseWriter", [
       ],
       observe: [
         effect("the course remains unchanged", async (context) => {
-          const course = await context.getCourse(testTeacher(1), testCourse(1))
+          const course = await context.getCourseValue(testTeacher(1), testCourse(1))
           expect(course.name, is(equalTo("Course #1")))
         })
       ]
@@ -284,7 +284,7 @@ export default behavior("PrismaCourseWriter", [
       ],
       perform: [
         step("another teacher attempts to delete that course", async (context) => {
-          const courseToDelete = await context.getCourse(testTeacher(1), testCourse(1))
+          const courseToDelete = await context.getCourseValue(testTeacher(1), testCourse(1))
           await expect(context.deleteCourse(testTeacher(2), courseToDelete), rejectsWith(errorWithMessage(
             stringContaining("not found")
           )))

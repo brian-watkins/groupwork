@@ -1,8 +1,8 @@
 import { unauthorized } from "next/navigation";
 import { courseReader } from "../app-config";
-import { CourseList } from "../components/CourseList";
-import { CourseHeading } from "../components/client/CourseHeading";
-import { CreateCourseButton } from "../components/client/CreateCourseButton";
+import { CourseList } from "./components/CourseList";
+import { CourseHeading } from "./components/client/CourseHeading";
+import { CreateCourseButton } from "./components/client/CreateCourseButton";
 import { currentUser } from "@clerk/nextjs/server";
 import { toTeacher } from "@/lib/domainHelpers";
 

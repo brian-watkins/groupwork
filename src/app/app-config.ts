@@ -9,9 +9,12 @@ import { CourseWriter } from "@/domain/courseWriter";
 import { GroupsReader } from "@/domain/groupReader";
 import { GroupSetReader } from "@/domain/groupSetReader";
 import { GroupSetWriter } from "@/domain/groupSetWriter";
+import { TeacherAuthorization } from "@/domain/teacherReader";
+import { PrismaTeacherAuthorization } from "@/infrastructure/prismaTeacherAuthorization";
 
 export const courseReader: CourseReader = new PrismaCourseReader(prisma);
 export const courseWriter: CourseWriter = new PrismaCourseWriter(prisma);
 export const groupsReader: GroupsReader = new PrismaGroupsReader(prisma);
 export const groupSetReader: GroupSetReader = new PrismaGroupSetReader(prisma);
 export const groupSetWriter: GroupSetWriter = new PrismaGroupSetWriter(prisma);
+export const teacherAuth: TeacherAuthorization = new PrismaTeacherAuthorization(prisma)

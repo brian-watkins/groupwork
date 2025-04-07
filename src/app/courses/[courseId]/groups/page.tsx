@@ -5,6 +5,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { toDisplayableGroupSets } from "./components/DisplayableGroupSet";
 import GroupsContent from "./components/GroupsContent";
 import { toTeacher } from "@/lib/domainHelpers";
+import { ResultType } from "@/domain/result";
 
 export default async function CourseStudentsPage({
   params
@@ -19,12 +20,13 @@ export default async function CourseStudentsPage({
     return unauthorized()
   }
 
-  let course;
-  try {
-    course = await courseReader.get(toTeacher(user), courseId);
-  } catch (error) {
-    notFound();
+  const courseResult = await courseReader.get(toTeacher(user), courseId);
+
+  if (courseResult.type === ResultType.ERROR) {
+    return notFound()
   }
+
+  const course = courseResult.value
 
   if (course.students.length == 0) {
     return (

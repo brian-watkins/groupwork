@@ -1,12 +1,17 @@
 import { Context } from "best-behavior";
-import { CourseReader } from "@/domain/courseReader";
+import { CourseReader, CourseReaderError } from "@/domain/courseReader";
 import { GroupsReader } from "@/domain/groupReader";
 import { Group, workedTogetherAlready } from "@/domain/group";
 import { Course, CourseId } from "@/domain/course";
-import { assignGroups } from "@/domain/assignGroups";
+import { assignGroups, AssignGroupsError } from "@/domain/assignGroups";
 import { Student } from "@/domain/student";
-import { Teacher } from "@/domain/teacher";
-import { testTeacher } from "../../app/helpers/testTeacher";
+import { Teacher, TeacherId } from "@/domain/teacher";
+import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter";
+import { GroupSet } from "@/domain/groupSet";
+import { createGroupSet, GroupSetError } from "@/domain/createGroupSet";
+import { errorResult, okResult, Result } from "@/domain/result";
+import { DateTime } from "luxon";
+import { TeacherAuthorization } from "@/domain/teacherReader";
 
 export const testableGroupWorkDomain: Context<TestableGroupWork> = {
   init: () => new TestableGroupWork()
@@ -15,10 +20,13 @@ export const testableGroupWorkDomain: Context<TestableGroupWork> = {
 class TestableGroupWork {
   private courseReader: TestCourseReader | undefined
   private groupsReader: TestGroupsReader = new TestGroupsReader([])
-  private currentGroups: Array<Group> | undefined
+  private groupSetWriter: TestGroupSetWriter = new TestGroupSetWriter()
+  private currentGroups: Result<Array<Group>, AssignGroupsError> | undefined
+  private teacherAuth: TestTeacherAuthorization = new TestTeacherAuthorization()
 
-  withCourse(course: Course) {
-    this.courseReader = new TestCourseReader(course)
+  withCourse(teacher: Teacher, course: Course) {
+    this.courseReader = new TestCourseReader(teacher, course)
+    this.teacherAuth.addCourse(teacher, course)
     return this
   }
 
@@ -27,32 +35,66 @@ class TestableGroupWork {
     return this
   }
 
-  async chooseGroupsOf(size: number): Promise<void> {
-    this.currentGroups = await assignGroups(testTeacher(1), this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
+  async chooseGroupsOf(teacher: Teacher, size: number): Promise<void> {
+    this.currentGroups = await assignGroups(teacher, this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
   }
 
   getCurrentCollaborators(group: Group): Array<Array<Student>> {
     return workedTogetherAlready(this.groupsReader.groups, group)
   }
 
-  getCurrentGroups(): Array<Group> {
-    return this.currentGroups ?? []
+  getCurrentGroups(): Result<Array<Group>, AssignGroupsError> {
+    if (this.currentGroups === undefined) {
+      throw new Error("No groups chosen!")
+    }
+
+    return this.currentGroups
+  }
+
+  async createGroupSet(teacher: Teacher, details: GroupSetDetails): Promise<Result<GroupSet, GroupSetError>> {
+    return createGroupSet(
+      this.teacherAuth,
+      this.groupSetWriter,
+      teacher,
+      details
+    )
+  }
+
+  get createdGroupSets(): GroupSetDetails[] {
+    return this.groupSetWriter.createdGroupSets
+  }
+}
+
+class TestTeacherAuthorization implements TeacherAuthorization {
+  private courses: Map<TeacherId, Array<CourseId>> = new Map()
+
+  addCourse(teacher: Teacher, course: Course) {
+    let courses = this.courses.get(teacher.id)
+    if (courses === undefined) {
+      courses = []
+      this.courses.set(teacher.id, courses)
+    }
+    return courses.push(course.id)
+  }
+
+  async canManageCourse(teacher: Teacher, courseId: CourseId): Promise<boolean> {
+    return this.courses.get(teacher.id)?.some(id => id === courseId) ?? false
   }
 }
 
 class TestCourseReader implements CourseReader {
-  constructor(private course: Course) { }
+  constructor(private teacher: Teacher, private course: Course) { }
 
   getAll(teacher: Teacher): Promise<Array<Course>> {
     throw new Error("Method not implemented.");
   }
 
-  async get(teacher: Teacher, courseId: CourseId): Promise<Course> {
-    if (teacher.id !== testTeacher(1).id) {
-      throw new Error("Unknown teacher!")
+  async get(teacher: Teacher, courseId: CourseId): Promise<Result<Course, CourseReaderError>> {
+    if (teacher.id !== this.teacher.id) {
+      return errorResult(CourseReaderError.NotFound)
     }
 
-    return this.course
+    return okResult(this.course)
   }
 }
 
@@ -61,5 +103,20 @@ class TestGroupsReader implements GroupsReader {
 
   async get(courseId: CourseId): Promise<Array<Group>> {
     return this.groups
+  }
+}
+
+class TestGroupSetWriter implements GroupSetWriter {
+  createdGroupSets: GroupSetDetails[] = []
+
+  async create(details: GroupSetDetails): Promise<GroupSet> {
+    this.createdGroupSets.push(details)
+    return {
+      id: "group-set-1",
+      name: details.name,
+      courseId: details.courseId,
+      createdAt: DateTime.now(),
+      groups: details.groups
+    }
   }
 }

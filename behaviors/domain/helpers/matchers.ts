@@ -1,7 +1,8 @@
-import { arrayContaining, equalTo, Matcher, objectWithProperty, satisfying, setContaining, setWith, valueWhere } from "great-expectations"
+import { arrayContaining, equalTo, Invalid, Matcher, message, objectWithProperty, problem, satisfying, setContaining, setWith, valueWhere } from "great-expectations"
 import { Student } from "../../../src/domain/student"
 import { testStudent } from "./testStudent"
 import { Group } from "@/domain/group"
+import { Result, ResultType } from "@/domain/result"
 
 export function groupSetWithStudents(studentMatchers: Array<Matcher<Student>>): Matcher<Array<Group>> {
   return satisfying(
@@ -37,4 +38,30 @@ export function students(size: number): Array<Matcher<Student>> {
 
 export function setWithSize<T>(expectedSize: number): Matcher<Set<T>> {
   return valueWhere((set) => set.size === expectedSize, `a set that has size ${expectedSize}`)
+}
+
+export function okResultWith<T, E>(matcher: Matcher<T>): Matcher<Result<T, E>> {
+  return (actual) => {
+    if (actual.type === ResultType.OK) {
+      return objectWithProperty("value", matcher)(actual)
+    } else {
+      return new Invalid("The result was not ok.", {
+        actual: problem(actual),
+        expected: message`An ok result`
+      })
+    }
+  }
+}
+
+export function errorResultWith<T, E>(matcher: Matcher<E>): Matcher<Result<T, E>> {
+  return (actual) => {
+    if (actual.type === ResultType.ERROR) {
+      return objectWithProperty("error", matcher)(actual)
+    } else {
+      return new Invalid("The result was not an error.", {
+        actual: problem(actual),
+        expected: message`An error result`
+      })
+    }
+  }
 }

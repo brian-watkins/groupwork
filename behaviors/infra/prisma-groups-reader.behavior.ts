@@ -16,7 +16,7 @@ export default behavior("PrismaGroupsReader", [
         fact("there is a course with multiple group sets", async (context) => {
           await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(6)))
 
-          const course = await context.getCourse(testTeacher(1), testCourse(1))
+          const course = await context.getCourseValue(testTeacher(1), testCourse(1))
 
           // First group set with two groups
           const group1: Group = {
@@ -93,7 +93,7 @@ export default behavior("PrismaGroupsReader", [
         fact("there are two courses, each with their own group sets", async (context) => {
           // First course
           await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(2)))
-          const course1 = await context.getCourse(testTeacher(1), testCourse(1))
+          const course1 = await context.getCourseValue(testTeacher(1), testCourse(1))
           
           const group1: Group = {
             members: new Set([course1.students[0], course1.students[1]])
@@ -108,7 +108,7 @@ export default behavior("PrismaGroupsReader", [
 
           // Second course
           await context.withCourse(testTeacher(1), testCourse(2).withStudents(testStudents(2, { startingIndex: 3 })))
-          const course2 = await context.getCourse(testTeacher(1), testCourse(2))
+          const course2 = await context.getCourseValue(testTeacher(1), testCourse(2))
           
           const group2: Group = {
             members: new Set([course2.students[0], course2.students[1]])

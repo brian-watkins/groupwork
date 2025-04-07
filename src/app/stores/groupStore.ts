@@ -4,8 +4,8 @@ import { create } from 'zustand'
 import { Group } from '../../domain/group'
 import { Course } from '@/domain/course'
 import { DisplayableGroupSet } from '../courses/[courseId]/groups/components/DisplayableGroupSet'
-import { generateGroups } from './actions/generateGroups';
-import { recordGroupSet } from './actions/recordGroupSet';
+import { generateGroups } from '../actions/generateGroups';
+import { recordGroupSet } from '../actions/recordGroupSet';
 import { GroupSetId } from '@/domain/groupSet';
 
 export interface GroupStoreState {

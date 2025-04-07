@@ -5,9 +5,10 @@ import { testCourse } from "../domain/helpers/testCourse";
 import { testStudents } from "../domain/helpers/testStudent";
 import { Course } from "../../src/domain/course";
 import { Student } from "@/domain/student";
-import { studentName } from "../domain/helpers/matchers";
+import { errorResultWith, okResultWith, studentName } from "../domain/helpers/matchers";
 import { testTeacher } from "../app/helpers/testTeacher";
 import { errorWithMessage } from "./helpers/matchers";
+import { CourseReaderError } from "@/domain/courseReader";
 
 export default behavior("PrismaCourseReader", [
   example(testableDatabase)
@@ -20,13 +21,13 @@ export default behavior("PrismaCourseReader", [
       ],
       observe: [
         effect("it gets the course with the correct details", async (context) => {
-          await expect(context.getCourse(testTeacher(1), testCourse(1)), resolvesTo(objectWith({
+          await expect(context.getCourse(testTeacher(1), testCourse(1)), resolvesTo(okResultWith(objectWith({
             name: equalTo("Course #1"),
             students: arrayWith<Student>([
               studentName(1),
               studentName(2)
             ])
-          })))
+          }))))
         })
       ]
     }),
@@ -91,15 +92,15 @@ export default behavior("PrismaCourseReader", [
           ])))
         }),
         effect("a teacher cannot access a course created by another teacher", async (context) => {
-          await expect(context.getCourse(testTeacher(1), testCourse(2)), rejectsWith(errorWithMessage(
-            stringContaining("not found")
-          )))
+          await expect(context.getCourse(testTeacher(1), testCourse(2)), resolvesTo(
+            errorResultWith(equalTo(CourseReaderError.NotFound))
+          ))
         })
       ]
     }),
 
   example(testableDatabase)
-    .description("throws error when attempting to access a non-existent course")
+    .description("returns error when attempting to access a non-existent course")
     .script({
       suppose: [
         fact("there is a course with students", async (context) => {
@@ -107,10 +108,10 @@ export default behavior("PrismaCourseReader", [
         })
       ],
       observe: [
-        effect("it throws an error when trying to access a non-existent course", async (context) => {
-          await expect(context.getCourseById(testTeacher(1), "non-existent-id"), rejectsWith(errorWithMessage(
-            stringContaining("not found")
-          )))
+        effect("it retuens an error when trying to access a non-existent course", async (context) => {
+          await expect(context.getCourseById(testTeacher(1), "non-existent-id"), resolvesTo(
+            errorResultWith(equalTo(CourseReaderError.NotFound))
+          ))
         })
       ]
     })

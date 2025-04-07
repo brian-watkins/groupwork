@@ -11,6 +11,9 @@ import { Context } from "best-behavior";
 import { CourseDetails } from "@/domain/courseWriter";
 import { PrismaCourseWriter } from "@/infrastructure/prismaCourseWriter";
 import { Teacher } from "@/domain/teacher";
+import { CourseReaderError } from "@/domain/courseReader";
+import { Result, ResultType } from "@/domain/result";
+import { PrismaTeacherAuthorization } from "@/infrastructure/prismaTeacherAuthorization";
 
 export const testableDatabase: Context<TestDatabase> = {
   init: async () => {
@@ -47,12 +50,20 @@ class TestDatabase {
     this.createdCourses.set(created.name, created.id)
   }
 
-  async getCourse(teacher: Teacher, course: Course): Promise<Course> {
+  async getCourseValue(teacher: Teacher, course: Course): Promise<Course> {
+    const result = await this.getCourse(teacher, course)
+    if (result.type === ResultType.ERROR) {
+      throw new Error("Got error trying to get course!")
+    }
+    return result.value
+  }
+
+  async getCourse(teacher: Teacher, course: Course): Promise<Result<Course, CourseReaderError>> {
     const courseId = this.createdCourses.get(course.name)
     return this.getCourseById(teacher, courseId!)
   }
 
-  async getCourseById(teacher: Teacher, courseId: CourseId): Promise<Course> {
+  async getCourseById(teacher: Teacher, courseId: CourseId): Promise<Result<Course, CourseReaderError>> {
     const courseReader = new PrismaCourseReader(this.prisma)
     return courseReader.get(teacher, courseId)
   }
@@ -75,6 +86,12 @@ class TestDatabase {
   async deleteCourse(teacher: Teacher, course: Course): Promise<void> {
     const courseWriter = new PrismaCourseWriter(this.prisma)
     await courseWriter.delete(teacher, course)
+  }
+
+  async canManageCourse(teacher: Teacher, course: Course): Promise<boolean> {
+    const courseId = this.createdCourses.get(course.name) ?? "UNKNOWN_ID"
+    const teacherAuth = new PrismaTeacherAuthorization(this.prisma)
+    return teacherAuth.canManageCourse(teacher, courseId)
   }
 
   async createGroupSet(details: GroupSetDetails): Promise<GroupSet> {

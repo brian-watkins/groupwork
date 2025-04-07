@@ -1,4 +1,4 @@
-import { CourseHeading } from "@/app/components/client/CourseHeading";
+import { CourseHeading } from "@/app/courses/components/client/CourseHeading";
 import { useCreateCourseAction, useUpdateCourseAction } from "@/app/contexts/CourseActionsContext";
 import { Course } from "@/domain/course";
 import { Student } from "@/domain/student";

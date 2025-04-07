@@ -20,7 +20,7 @@ export default behavior("Persisting GroupSets", [
       ],
       perform: [
         step("a group set is created and written to the database", async (context) => {
-          const course = await context.getCourse(testTeacher(1), testCourse(1))
+          const course = await context.getCourseValue(testTeacher(1), testCourse(1))
 
           const group1: Group = {
             members: new Set([course.students[0], course.students[1]])
@@ -84,7 +84,7 @@ export default behavior("Persisting GroupSets", [
         fact("there is a course with multiple group sets created at different times", async (context) => {
           await context.withCourse(testTeacher(1), testCourse(1).withStudents(testStudents(4)))
 
-          const course = await context.getCourse(testTeacher(1), testCourse(1))
+          const course = await context.getCourseValue(testTeacher(1), testCourse(1))
 
           const group1: Group = {
             members: new Set([course.students[0], course.students[1]])
