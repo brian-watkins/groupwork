@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate:test": "DATABASE_URL='file:./test.db' prisma migrate reset --skip-seed --force",
-    "test:app": "APP_ENV=test best --behaviors './behaviors/app/**/*.behavior.ts'",
+    "test:app": "APP_ENV=test best --config ./behaviors/best.app.config.ts",
     "test:domain": "best --behaviors './behaviors/domain/**/*.behavior.ts'",
     "test:infra": "APP_ENV=test best --behaviors './behaviors/infra/**/*.behavior.ts'",
     "test:component": "best --behaviors './behaviors/component/**/*.behavior.ts'"
@@ -20,6 +20,7 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@clerk/testing": "^1.4.34",
     "@tailwindcss/postcss": "^4.0.17",
     "@tailwindcss/vite": "^4.0.17",
     "@types/luxon": "^3.6.0",
@@ -36,6 +37,7 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.13.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",

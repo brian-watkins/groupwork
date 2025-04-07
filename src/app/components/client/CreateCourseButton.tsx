@@ -7,7 +7,7 @@ export function CreateCourseButton() {
   const router = useRouter();
 
   const handleCreateCourse = () => {
-    router.push("/courses");
+    router.push("/courses/create");
   };
 
   return (

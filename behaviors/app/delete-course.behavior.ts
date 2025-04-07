@@ -23,7 +23,7 @@ export default behavior("delete course", [
                 testStudent(5),
               ])
             ])
-            .load()
+            .loadCourses()
         })
       ],
       perform: [

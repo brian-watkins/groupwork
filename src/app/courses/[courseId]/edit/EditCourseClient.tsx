@@ -15,7 +15,7 @@ export function EditCourseClient({ course }: EditCourseClientProps) {
   const router = useRouter();
 
   function returnToMain() {
-    router.push('/');
+    router.push('/courses');
   }
 
   return (

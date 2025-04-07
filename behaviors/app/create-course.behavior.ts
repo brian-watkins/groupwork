@@ -9,17 +9,17 @@ export default behavior("create course page", [
     .script({
       suppose: [
         fact("the app is loaded", async (context) => {
-          await context.load()
+          await context.loadCourses()
         })
       ],
       perform: [
-        step("click the create course button", async (context) => {
+        step("navigate to the create course page", async (context) => {
           await context.display.createCourseButton.click()
+          await context.waitForCreateCoursePage()
         })
       ],
       observe: [
         effect("it navigates to the create course page", async (context) => {
-          await context.page.waitForURL('**/courses')
           await expect(context.display.select("h1").text(),
             resolvesTo(stringContaining("Create Course"))
           )

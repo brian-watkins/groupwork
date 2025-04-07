@@ -19,17 +19,17 @@ export default behavior("edit course", [
                 testStudent(3),
               ])
             ])
-            .load()
+            .loadCourses()
         })
       ],
       perform: [
-        step("click the edit course button", async (context) => {
+        step("select the course to edit", async (context) => {
           await context.display.course(0).editButton.click()
+          await context.waitForEditCoursePage()
         })
       ],
       observe: [
         effect("it navigates to the edit course page", async (context) => {
-          await context.page.waitForURL('**/courses/*/edit')
           await expect(context.display.select("h1").text(),
             resolvesTo(stringContaining("Edit Course"))
           )
@@ -64,7 +64,7 @@ export default behavior("edit course", [
         }),
         step("save the course", async (context) => {
           await context.courseFormDisplay.saveCourseButton.click()
-          await context.waitForHomePage()
+          await context.waitForCoursesPage()
         })
       ],
       observe: [

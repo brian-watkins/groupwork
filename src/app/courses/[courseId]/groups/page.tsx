@@ -7,7 +7,7 @@ import GroupsContent from "./components/GroupsContent";
 export default async function CourseStudentsPage({
   params
 }: {
-  params: { courseId: CourseId }
+  params: Promise<{ courseId: CourseId }>
 }) {
   const { courseId } = await params;
 

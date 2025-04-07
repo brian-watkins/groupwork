@@ -23,7 +23,7 @@ export default behavior("courses page", [
                 testStudent(5),
               ])
             ])
-            .load()
+            .loadCourses()
         })
       ],
       observe: [

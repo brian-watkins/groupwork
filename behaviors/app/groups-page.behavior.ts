@@ -16,7 +16,7 @@ export default behavior("course students page", [
             .withCourses([
               testCourse(1).withStudents(testStudents(3))
             ])
-            .load()
+            .loadCourses()
         })
       ],
       perform: [
@@ -28,58 +28,12 @@ export default behavior("course students page", [
         effect("the page displays the course name", async (context) => {
           const headerText = await context.display.select("h1").text()
           expect(headerText, is(testCourse(1).name))
-        }),
-        effect("the page shows a 'Create New Groups' button", async (context) => {
-          await expect(context.courseGroupsDisplay.createNewGroupsButton.isVisible(), resolvesTo(true))
         }),
         effect("the form is not initially visible", async (context) => {
           await expect(context.courseGroupsDisplay.groupSetForm.isHidden(), resolvesTo(true))
         })
       ]
-    }),
-
-  example(testableApp)
-    .description("navigate to groups for a course with no students")
-    .script({
-      suppose: [
-        fact("the app is loaded with a course that has no students", async (context) => {
-          await context
-            .withCourses([
-              testCourse(1).withStudents([])
-            ])
-            .load()
-        })
-      ],
-      perform: [
-        step("click on a course", async (context) => {
-          await context.display.navigateToCourseGroups(0)
-        })
-      ],
-      observe: [
-        effect("the page displays the course name", async (context) => {
-          const headerText = await context.display.select("h1").text()
-          expect(headerText, is(testCourse(1).name))
-        }),
-        effect("the page shows a message about no students", async (context) => {
-          await expect(context.courseGroupsDisplay.noStudents.isVisible(),
-            resolvesTo(true)
-          )
-        })
-      ]
-    }),
-
-  example(testableApp)
-    .description("showing and hiding the group form")
-    .script({
-      suppose: [
-        fact("the app is loaded with courses", async (context) => {
-          await context
-            .withCourses([
-              testCourse(1).withStudents(testStudents(3))
-            ])
-            .loadCourseGroups(0)
-        })
-      ],
+    }).andThen({
       perform: [
         step("click the 'Create New Groups' button", async (context) => {
           await context.courseGroupsDisplay.createNewGroupsButton.click()
@@ -97,9 +51,6 @@ export default behavior("course students page", [
             studentName(testStudent(2)),
             studentName(testStudent(3))
           ], { withAnyOrder: true })))
-        }),
-        effect("the form has a cancel button", async (context) => {
-          await expect(context.courseGroupsDisplay.groupSetForm.cancelButton.isVisible(), resolvesTo(true))
         })
       ]
     }).andThen({
@@ -111,6 +62,36 @@ export default behavior("course students page", [
       observe: [
         effect("the form is hidden", async (context) => {
           await expect(context.courseGroupsDisplay.groupSetForm.isHidden(), resolvesTo(true))
+        })
+      ]
+    }),
+
+  example(testableApp)
+    .description("navigate to groups for a course with no students")
+    .script({
+      suppose: [
+        fact("the app is loaded with a course that has no students", async (context) => {
+          await context
+            .withCourses([
+              testCourse(1).withStudents([])
+            ])
+            .loadCourses()
+        })
+      ],
+      perform: [
+        step("click on a course", async (context) => {
+          await context.display.navigateToCourseGroups(0)
+        })
+      ],
+      observe: [
+        effect("the page displays the course name", async (context) => {
+          const headerText = await context.display.select("h1").text()
+          expect(headerText, is(testCourse(1).name))
+        }),
+        effect("the page shows a message about no students", async (context) => {
+          await expect(context.courseGroupsDisplay.noStudents.isVisible(),
+            resolvesTo(true)
+          )
         })
       ]
     }),

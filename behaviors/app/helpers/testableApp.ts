@@ -82,8 +82,20 @@ class TestApp {
     return await this.browser.page.goto(this.server.urlForPath(path))
   }
 
+  async loadCourses() {
+    console.log("Seeding db for test")
+    await this.server.resetDB()
+
+    if (this.courses !== undefined) {
+      await this.server.seedCourses(this.courses)
+    }
+
+    console.log("Loading courses")
+    return await this.browser.page.goto("/courses")
+  }
+
   async loadCourseGroups(index: number) {
-    await this.load()
+    await this.loadCourses()
     await this.display.navigateToCourseGroups(index)
   }
 
@@ -91,9 +103,9 @@ class TestApp {
     return this.browser.page
   }
 
-  waitForHomePage(): Promise<void> {
+  waitForCoursesPage(): Promise<void> {
     const origin = new URL(this.page.url()).origin
-    return this.page.waitForURL(origin)
+    return this.page.waitForURL(`${origin}/courses`)
   }
 
   get display(): MainDisplay {
@@ -106,6 +118,14 @@ class TestApp {
 
   get courseGroupsDisplay(): CourseGroupsPageDisplay {
     return new CourseGroupsPageDisplay(this.page, { timeout: 2000 })
+  }
+
+  async waitForCreateCoursePage(): Promise<void> {
+    await this.page.waitForURL('**/courses/create')
+  }
+
+  async waitForEditCoursePage(): Promise<void> {
+    await this.page.waitForURL('**/courses/*/edit')
   }
 }
 

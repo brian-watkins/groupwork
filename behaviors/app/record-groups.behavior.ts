@@ -37,7 +37,8 @@ export default behavior("record groups", [
         }),
         step("record the adjusted groups", async (context) => {
           await context.courseGroupsDisplay.groupSetForm.recordGroupsButton.click()
-          await context.courseGroupsDisplay.groupSet(0).group(1).waitForVisible()
+          await context.courseGroupsDisplay.groupSetForm.waitForHidden()
+          await context.courseGroupsDisplay.groupSet(0).group(1).member(2).waitForVisible()
         })
       ],
       observe: [

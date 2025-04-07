@@ -4,7 +4,7 @@ import { EditCourseClient } from './EditCourseClient';
 export default async function EditCoursePage({
   params
 }: {
-  params: { courseId: string }
+  params: Promise<{ courseId: string }>
 }) {
   const { courseId } = await params
   const course = await courseReader.get(courseId);
