@@ -16,6 +16,7 @@ export const testableGroupList: Context<TestableGroupList> = useBrowser({
 class TestableGroupList {
   private groups: Array<Group> = []
   private groupSets: Array<GroupSet> = []
+  private editable: boolean = true
 
   constructor(private browser: BrowserTestInstrument) { }
 
@@ -29,6 +30,11 @@ class TestableGroupList {
     return this
   }
 
+  setEditable(editable: boolean) {
+    this.editable = editable
+    return this
+  }
+
   async render(groupSetId?: GroupSetId): Promise<void> {
     await this.browser.page.evaluate(async (data) => {
       function deserializeTestGroup(data: any): Group {
@@ -38,11 +44,12 @@ class TestableGroupList {
       }
 
       const { render } = await import("./render/groups/renderGroupList")
-      render(data.groupSetId, data.groups.map(deserializeTestGroup), data.groupSets)
+      render(data.groupSetId, data.groups.map(deserializeTestGroup), data.groupSets, data.editable)
     }, {
       groupSetId,
       groups: this.groups.map(serializeTestGroup),
-      groupSets: this.groupSets.map(serializeTestGroupSet)
+      groupSets: this.groupSets.map(serializeTestGroupSet),
+      editable: this.editable
     })
   }
 

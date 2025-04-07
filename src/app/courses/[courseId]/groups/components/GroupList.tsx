@@ -18,6 +18,7 @@ import { DisplayableGroupSet } from "./DisplayableGroupSet";
 
 interface GroupListProps {
   groupSetId?: GroupSetId
+  editable?: boolean
 }
 
 interface DragState {
@@ -43,9 +44,10 @@ interface DraggableStudentProps {
   hasPartners: boolean
 }
 
-function DraggableStudent({ student, groupIndex, hasPartners }: DraggableStudentProps) {
+function DraggableStudent({ student, groupIndex, hasPartners, isDraggingDisabled = false }: DraggableStudentProps & { isDraggingDisabled?: boolean }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `${student.id}:${groupIndex}`,
+    disabled: isDraggingDisabled
   });
 
   return (
@@ -54,7 +56,7 @@ function DraggableStudent({ student, groupIndex, hasPartners }: DraggableStudent
       {...attributes}
       {...listeners}
       data-group-member
-      className={`py-3 cursor-grab ${isDragging ? 'opacity-30 bg-gray-100' : ''}`}
+      className={`py-3 ${isDraggingDisabled ? 'cursor-default' : 'cursor-grab'} ${isDragging ? 'opacity-30 bg-gray-100' : ''}`}
       style={{
         touchAction: 'none',
         transform: isDragging ? 'scale(1.02)' : undefined,
@@ -94,7 +96,7 @@ function DroppableGroup({ id, index, children, isOver }: { id: string; index: nu
   );
 }
 
-export default function GroupList({ groupSetId }: GroupListProps) {
+export default function GroupList({ groupSetId, editable = true }: GroupListProps) {
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [overGroupId, setOverGroupId] = useState<string | null>(null);
 
@@ -169,9 +171,9 @@ export default function GroupList({ groupSetId }: GroupListProps) {
 
   return (
     <DndContext
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
+      onDragStart={editable ? handleDragStart : undefined}
+      onDragOver={editable ? handleDragOver : undefined}
+      onDragEnd={editable ? handleDragEnd : undefined}
     >
       <div data-groups className="grid grid-cols-3 gap-4">
         {studentGroups.map((groupMembers, index) => (
@@ -187,6 +189,7 @@ export default function GroupList({ groupSetId }: GroupListProps) {
                 student={student}
                 groupIndex={index}
                 hasPartners={collaborationMap.get(student.id)!}
+                isDraggingDisabled={!editable}
               />
             ))}
           </DroppableGroup>

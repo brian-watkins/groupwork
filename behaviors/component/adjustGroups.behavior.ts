@@ -121,6 +121,43 @@ export default behavior("adjusting groups", [
           ], { withAnyOrder: true })))
         })
       ]
+    }),
+
+  example(testableGroupList)
+    .description("dragging is disabled when the group list is not editable")
+    .script({
+      suppose: [
+        fact("there are multiple groups with students and editing is disabled", async (context) => {
+          await context.withGroups([
+            testGroup(...testStudents(3)),
+            testGroup(testStudent(4), testStudent(5))
+          ])
+            .setEditable(false)
+            .render()
+        })
+      ],
+      perform: [
+        step("attempt to drag one student to the other group", async (context) => {
+          const studentToDrag = context.display.group(0).member(1)
+          await studentToDrag.dragTo(context.display.group(1))
+        })
+      ],
+      observe: [
+        effect("the students remain in their original groups", async (context) => {
+          const group1Students = await context.display.group(0).members.texts()
+          expect(group1Students, is(arrayWith([
+            equalTo(testStudent(1).name),
+            equalTo(testStudent(2).name),
+            equalTo(testStudent(3).name)
+          ], { withAnyOrder: true })))
+
+          const group2Students = await context.display.group(1).members.texts()
+          expect(group2Students, is(arrayWith([
+            equalTo(testStudent(4).name),
+            equalTo(testStudent(5).name)
+          ], { withAnyOrder: true })))
+        })
+      ]
     })
 
 ])

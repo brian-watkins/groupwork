@@ -7,14 +7,14 @@ import { createTestStore } from "./testStore";
 import { DisplayableGroupSet } from "@/app/courses/[courseId]/groups/components/DisplayableGroupSet";
 import { GroupSetId } from "@/domain/groupSet";
 
-export function render(groupSetId: GroupSetId | undefined, newGroups: Array<Group>, groupSets: DisplayableGroupSet[] = []) {
+export function render(groupSetId: GroupSetId | undefined, newGroups: Array<Group>, groupSets: DisplayableGroupSet[] = [], editable: boolean) {
   const elementRoot = document.createElement("div")
   document.body.appendChild(elementRoot)
   const root = createRoot(elementRoot)
   
   root.render(
     <GroupStoreProvider store={createTestStore({ newGroups, groupSets })}>
-      <GroupList groupSetId={groupSetId}></GroupList>
+      <GroupList groupSetId={groupSetId} editable={editable}></GroupList>
     </GroupStoreProvider>
   )
 }
