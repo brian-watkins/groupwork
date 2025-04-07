@@ -23,25 +23,20 @@ export async function recordGroupSet(
     return unauthorized()
   }
 
-  try {
-    const newGroupSetResult = await createGroupSet(teacherAuth, groupSetWriter, toTeacher(user), {
-      courseId: courseId,
-      name,
-      groups,
-      createdAt: DateTime.now()
-    });
+  const newGroupSetResult = await createGroupSet(teacherAuth, groupSetWriter, toTeacher(user), {
+    courseId: courseId,
+    name,
+    groups,
+    createdAt: DateTime.now()
+  });
 
-    if (newGroupSetResult.type === ResultType.ERROR) {
-      throw new Error("Could not create group set!")
-    }
-
-    const displayableGroupSet = toDisplayableGroupSet(newGroupSetResult.value);
-
-    revalidatePath(`/courses/${courseId}`);
-
-    return displayableGroupSet;
-  } catch (error) {
-    console.error("Error recording group set:", error);
-    throw error;
+  if (newGroupSetResult.type === ResultType.ERROR) {
+    return unauthorized()
   }
+
+  const displayableGroupSet = toDisplayableGroupSet(newGroupSetResult.value);
+
+  revalidatePath(`/courses/${courseId}`);
+
+  return displayableGroupSet;
 }
