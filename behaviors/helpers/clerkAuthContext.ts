@@ -1,18 +1,14 @@
 import { clerk, clerkSetup } from "@clerk/testing/playwright"
 import { Context } from "best-behavior"
-import { loadEnvFile } from "node:process"
 import fs from "node:fs/promises"
 import { chromium } from "playwright"
 
 export interface ClerkContextOptions {
-  envFile: string
   storageStateFile: string
   refreshTimeMillis: number
 }
 
 export function clerkAuthContext(options: ClerkContextOptions): Context<void> {
-  loadEnvFile(options.envFile)
-  
   return {
     init: async () => {
       const timeSinceLastRefresh = await millisSinceLastRefresh(options)

@@ -4,9 +4,7 @@ import { PrismaClient } from "@prisma/client";
 // exhausting your database connection limit during hot reloading.
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const databaseUrl = process.env.APP_ENV === 'test' 
-  ? 'file:./test.db'
-  : process.env.DATABASE_URL;
+const databaseUrl = process.env.DATABASE_URL
 
 export const prisma =
   globalForPrisma.prisma ||

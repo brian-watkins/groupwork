@@ -14,7 +14,6 @@ export default defineConfig({
     })
   },
   context: clerkAuthContext({
-    envFile: ".env.test",
     storageStateFile: "./behaviors/.browserStorageState/state.json",
     refreshTimeMillis: 3 * 24 * 60 * 60 * 1000
   })
