@@ -12,7 +12,7 @@
     "local:test:db": "./scripts/startTestDB.sh",
     "local:test:db:migrate": "wait-on tcp:5432 && dotenv -e .env.test -- prisma migrate reset --skip-seed --force",
     "local:test": "run-p -l -n local:test:**",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "test:app": "dotenv -e .env.test -- best --config ./behaviors/best.app.config.ts",
