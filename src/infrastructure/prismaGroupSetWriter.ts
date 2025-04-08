@@ -68,7 +68,15 @@ export class PrismaGroupSetWriter implements GroupSetWriter {
           }))
         }
       }
-    });
+    })
+  }
+
+  async delete(groupSet: GroupSet): Promise<void> {
+    await this.prisma.groupSet.delete({
+      where: {
+        id: groupSet.id
+      }
+    })
   }
 }
 

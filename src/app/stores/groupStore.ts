@@ -7,6 +7,7 @@ import { DisplayableGroupSet } from '../courses/[courseId]/groups/components/Dis
 import { generateGroups } from '../actions/generateGroups';
 import { recordGroupSet } from '../actions/recordGroupSet';
 import { updateGroupSet as updateGroupSetAction } from '../actions/updateGroupSet';
+import { deleteGroupSetAction } from '../actions/deleteGroupSet';
 import { GroupSetId } from '@/domain/groupSet';
 
 export interface GroupStoreState {
@@ -21,6 +22,7 @@ interface GroupActions {
   assignGroups: (groupSize: number) => Promise<void>
   recordGroups: (name: string) => Promise<void>
   updateGroupSet: (groupSet: DisplayableGroupSet) => Promise<void>
+  deleteGroupSet: (groupSet: DisplayableGroupSet) => Promise<void>
 }
 
 export type GroupStore = GroupStoreState & GroupActions
@@ -86,6 +88,20 @@ export const createGroupStore = (initialState: Partial<GroupStoreState> & { cour
         });
       } catch (error) {
         console.log("Error updating group set", error);
+      }
+    },
+
+    deleteGroupSet: async (groupSet: DisplayableGroupSet) => {
+      try {
+        await deleteGroupSetAction(groupSet);
+
+        set((store) => {
+          return {
+            groupSets: store.groupSets.filter(gs => gs.id !== groupSet.id)
+          }
+        });
+      } catch (error) {
+        console.log("Error deleting group set", error);
       }
     }
   }))

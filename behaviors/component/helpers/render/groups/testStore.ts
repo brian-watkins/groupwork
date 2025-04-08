@@ -29,5 +29,6 @@ export function createTestStore(overrides: Partial<GroupStoreState> & { course: 
       })
     },
     async updateGroupSet(groupSet) { },
+    async deleteGroupSet(groupSet) { },
   }))
 }

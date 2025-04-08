@@ -13,4 +13,5 @@ export interface GroupSetDetails {
 export interface GroupSetWriter {
   create(details: GroupSetDetails): Promise<GroupSet>
   save(groupSet: GroupSet): Promise<void>
+  delete(groupSet: GroupSet): Promise<void>
 }

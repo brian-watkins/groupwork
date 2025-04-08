@@ -108,6 +108,11 @@ class TestDatabase {
     await groupSetWriter.save(groupSet)
   }
 
+  async deleteGroupSet(groupSet: GroupSet): Promise<void> {
+    const groupSetWriter = new PrismaGroupSetWriter(this.prisma)
+    await groupSetWriter.delete(groupSet)
+  }
+
   async getGroupSetsForCourse(course: Course): Promise<Array<GroupSet>> {
     const courseId = this.createdCourses.get(course.name)
     const groupSetReader = new PrismaGroupSetReader(this.prisma)

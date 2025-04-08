@@ -173,6 +173,20 @@ class DeleteCourseConfirmationElement extends DisplayElement {
   }
 }
 
+class DeleteGroupSetConfirmationElement extends DisplayElement {
+  get message(): DisplayElement {
+    return this.selectDescendant("[data-confirmation-message]")
+  }
+
+  get cancelButton(): DisplayElement {
+    return this.selectDescendant("[data-cancel]")
+  }
+
+  get deleteButton(): DisplayElement {
+    return this.selectDescendant("[data-delete]")
+  }
+}
+
 class CourseElement extends DisplayElement {
   get editButton(): DisplayElement {
     return this.selectDescendant("[data-edit-course-button]")
@@ -214,6 +228,10 @@ class CourseGroupsPageDisplay extends TestDisplay {
 
   get groupSets(): DisplayElementList {
     return this.selectAll("[data-group-set]")
+  }
+
+  get deleteGroupSetConfirmationModal(): DeleteGroupSetConfirmationElement {
+    return new DeleteGroupSetConfirmationElement(this.page.locator("[data-testid='delete-group-set-confirmation']"), this.options)
   }
 
   groupSet(index: number): GroupSetDisplayElement {

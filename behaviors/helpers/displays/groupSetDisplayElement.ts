@@ -14,6 +14,10 @@ export class GroupSetDisplayElement extends DisplayElement {
     return this.selectDescendant("[data-edit-group-set-button]")
   }
 
+  get deleteButton(): DisplayElement {
+    return this.selectDescendant("[data-delete-group-set-button]")
+  }
+
   get groups(): DisplayElementList {
     return this.selectAllDescendants("[data-student-group]")
   }
