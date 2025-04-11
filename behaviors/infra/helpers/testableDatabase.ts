@@ -16,7 +16,7 @@ import { PrismaTeacherAuthorization } from "@/infrastructure/prismaTeacherAuthor
 import { TestPostgresDB, useDatabase } from "./dbContext";
 
 export const testableDatabase: Context<TestDatabase> = useDatabase({
-  init: async ({database}) => {
+  init: async (database) => {
     const db = new TestDatabase(database)
     await db.reset()
     return db

@@ -1,6 +1,6 @@
 import { defineConfig } from "best-behavior/run"
-import { clerkAuthContext } from "./helpers/clerkAuthContext"
 import defaultConfig from "../best.config"
+import { appContext } from "./helpers/appContext"
 
 export default defineConfig({
   ...defaultConfig,
@@ -13,8 +13,5 @@ export default defineConfig({
       storageState: "./behaviors/.browserStorageState/state.json"
     })
   },
-  context: clerkAuthContext({
-    storageStateFile: "./behaviors/.browserStorageState/state.json",
-    refreshTimeMillis: 3 * 24 * 60 * 60 * 1000
-  })
+  context: appContext
 })

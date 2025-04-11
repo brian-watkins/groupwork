@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql";
-import { Context, runContext, useWithContext } from "best-behavior";
+import { Context, globalContext, use } from "best-behavior";
 import { execSync } from "node:child_process";
 
 export function databaseContext(): Context<TestPostgresDB> {
@@ -16,9 +16,9 @@ export function databaseContext(): Context<TestPostgresDB> {
   }
 }
 
-export const useDatabase = useWithContext({
-  database: runContext()
-})
+export function useDatabase<T>(context: Context<T, TestPostgresDB>): Context<T> {
+  return use(globalContext<TestPostgresDB>(), context)
+}
 
 export class TestPostgresDB {
   private container: StartedPostgreSqlContainer | undefined

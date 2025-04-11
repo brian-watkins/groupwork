@@ -7,6 +7,9 @@ export default defineConfig({
   css: {
     postcss: {}
   },
+  optimizeDeps: {
+    exclude: [ "@testcontainers/postgresql" ]
+  },
   plugins: [
     tsconfigPaths(),
     react(),

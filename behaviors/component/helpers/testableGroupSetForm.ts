@@ -1,16 +1,15 @@
 import { Group } from "@/domain/group";
-import { Context, useWithContext } from "best-behavior";
+import { Context, use } from "best-behavior";
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser";
 import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay";
 import { Student } from "@/domain/student";
 import { testCourse } from "../../domain/helpers/testCourse";
-import { useBrowser } from "./useBrowser";
 
 
-export const testableGroupSetForm: Context<TestableGroupSetForm> = useBrowser({
-  init({ browser }) {
+export const testableGroupSetForm: Context<TestableGroupSetForm> = use(browserContext(), {
+  init(browser) {
     return new TestableGroupSetForm(browser)
-  },
+  }
 })
 
 class TestableGroupSetForm {

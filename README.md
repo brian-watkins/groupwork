@@ -8,24 +8,16 @@ Choose groups for fun!
 $ npm install
 ```
 
+You also need Docker to run locally and run the tests.
+
 ## Running the tests
 
 There are several test suites.
 
-Currently, to run the app tests, you need to start the
-application and test database via:
-
-```
-$ npm run local:test
-```
-
-Then you can run the app tests with:
-
-```
-$ npm run test:app
-```
-
-All the other test suites are self-contained.
+- `npm run test:app` - End to end test suite
+- `npm run test:component` - UI component tests
+- `npm run test:domain` - Domain tests
+- `npm run test:infra` - Infra tests (persistence)
 
 ## Running locally
 

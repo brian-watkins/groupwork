@@ -1,10 +1,9 @@
-import { Context } from "best-behavior";
-import { BrowserTestInstrument } from "best-behavior/browser";
+import { Context, use } from "best-behavior";
+import { browserContext, BrowserTestInstrument } from "best-behavior/browser";
 import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay";
-import { useBrowser } from "./useBrowser";
 
-export const testableCourseForm: Context<TestableCourseForm> = useBrowser({
-  init({ browser }) {
+export const testableCourseForm: Context<TestableCourseForm> = use(browserContext(), {
+  init(browser) {
     return new TestableCourseForm(browser)
   },
 })

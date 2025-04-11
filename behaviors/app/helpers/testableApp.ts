@@ -1,6 +1,5 @@
 import { Course } from "@/domain/course"
-import { prisma } from "@/lib/prisma"
-import { Context, useWithContext } from "best-behavior"
+import { Context, contextMap, globalContext, use } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
 import { Page } from "playwright"
 import { DisplayElement, DisplayElementList, TestDisplay } from "../../helpers/displays/display"
@@ -8,39 +7,44 @@ import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay"
 import { GroupSetDisplayElement } from "../../helpers/displays/groupSetDisplayElement"
 import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay"
 import { Teacher } from "@/domain/teacher"
+import { AppContextType } from "../../helpers/appContext"
+import { PrismaClient } from "@prisma/client"
 
-function serverContext(): Context<AppServer> {
-  return {
-    init: async () => {
-      const server = new AppServer()
-      await server.start()
-      return server
-    },
-    teardown(context) {
-      console.log("Teardown server")
-    },
-  }
+export const testableApp: Context<TestApp> = use(contextMap({
+  global: globalContext<AppContextType>(),
+  browser: browserContext()
+}), {
+  init({global, browser}) {
+    return new TestApp(global.database.prisma, browser)
+  },
+})
+
+interface CourseSet {
+  teacher: Teacher
+  courses: Array<Course>
 }
 
-class AppServer {
-  private host = "http://localhost:3000"
+class TestApp {
+  private courseSets: Array<CourseSet> = []
 
-  async start() {
-    console.log("starting next.js")
+  constructor(private prisma: PrismaClient, private browser: BrowserTestInstrument) { }
+
+  withCourses(teacher: Teacher, courses: Array<Course>): TestApp {
+    this.courseSets.push({
+      teacher, courses
+    })
+
+    return this
   }
 
-  urlForPath(path: string): string {
-    return `${this.host}${path}`
+  private async resetDB(): Promise<void> {
+    await this.prisma.course.deleteMany()
   }
 
-  async resetDB(): Promise<void> {
-    await prisma.course.deleteMany()
-  }
-
-  async seedCourses(courseSets: Array<CourseSet>) {
+  private async seedCourses(courseSets: Array<CourseSet>) {
     for (const courseSet of courseSets) {
       for (const course of courseSet.courses) {
-        await prisma.course.create({
+        await this.prisma.course.create({
           data: {
             name: course.name,
             teacherId: courseSet.teacher.id,
@@ -54,36 +58,6 @@ class AppServer {
       }
     }
   }
-}
-
-const useServer = useWithContext({
-  server: serverContext(),
-  browser: browserContext()
-})
-
-export const testableApp: Context<TestApp> = useServer({
-  init({ server, browser }) {
-    return new TestApp(server, browser)
-  },
-})
-
-interface CourseSet {
-  teacher: Teacher
-  courses: Array<Course>
-}
-
-class TestApp {
-  private courseSets: Array<CourseSet> = []
-
-  constructor(private server: AppServer, private browser: BrowserTestInstrument) { }
-
-  withCourses(teacher: Teacher, courses: Array<Course>): TestApp {
-    this.courseSets.push({
-      teacher, courses
-    })
-
-    return this
-  }
 
   async load(path = "/") {
     await this.setupDB()
@@ -95,10 +69,10 @@ class TestApp {
   }
 
   private async setupDB(): Promise<void> {
-    await this.server.resetDB()
+    await this.resetDB()
 
     if (this.courseSets.length > 0) {
-      await this.server.seedCourses(this.courseSets)
+      await this.seedCourses(this.courseSets)
     }
   }
 

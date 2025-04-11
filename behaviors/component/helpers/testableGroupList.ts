@@ -1,14 +1,13 @@
 import { Group } from "@/domain/group";
-import { Context, useWithContext } from "best-behavior";
+import { Context, use } from "best-behavior";
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser";
 import { DisplayElementList, TestDisplay } from "../../helpers/displays/display";
 import { DisplayableGroupSet } from "@/app/courses/[courseId]/groups/components/DisplayableGroupSet";
 import { GroupDisplayElement } from "../../helpers/displays/groupDisplayElement";
 import { GroupSet, GroupSetId } from "@/domain/groupSet";
-import { useBrowser } from "./useBrowser";
 
-export const testableGroupList: Context<TestableGroupList> = useBrowser({
-  init({ browser }) {
+export const testableGroupList: Context<TestableGroupList> = use(browserContext(), {
+  init(browser) {
     return new TestableGroupList(browser)
   },
 })
