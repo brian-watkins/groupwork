@@ -105,17 +105,14 @@ export default behavior("adjusting groups", [
       ],
       observe: [
         effect("the second group has the dragged student", async (context) => {
-          const group2Students = await context.display.group(1).members.texts()
-          console.log('Group 2 students:', group2Students)
-          expect(group2Students, is(arrayWith([
+          await expect(context.display.group(1).members.texts(), resolvesTo(arrayWith([
             equalTo(testStudent(2).name),
             equalTo(testStudent(4).name),
             equalTo(testStudent(5).name)
           ], { withAnyOrder: true })))
         }),
         effect("the first group no longer has the dragged student", async (context) => {
-          const group1Students = await context.display.group(0).members.texts()
-          expect(group1Students, is(arrayWith([
+          await expect(context.display.group(0).members.texts(), resolvesTo(arrayWith([
             equalTo(testStudent(1).name),
             equalTo(testStudent(3).name)
           ], { withAnyOrder: true })))

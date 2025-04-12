@@ -15,7 +15,7 @@
     "test:app": "dotenv -e .env.test -- best --config ./behaviors/best.app.config.ts",
     "test:domain": "best --behaviors './behaviors/domain/**/*.behavior.ts'",
     "test:infra": "best --config ./behaviors/best.infra.config.ts",
-    "test:component": "best --behaviors './behaviors/component/**/*.behavior.ts'",
+    "test:component": "best --config ./behaviors/best.component.config.ts",
     "test": "run-s test:*"
   },
   "keywords": [],
