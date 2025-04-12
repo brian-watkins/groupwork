@@ -11,6 +11,10 @@ export interface ClerkContextOptions {
 export function clerkAuthContext(options: ClerkContextOptions): Context<void> {
   return {
     init: async () => {
+      console.log("Setting up clerk for playwright")
+
+      await clerkSetup()
+
       const timeSinceLastRefresh = await millisSinceLastRefresh(options)
       if (timeSinceLastRefresh < options.refreshTimeMillis) {
         console.log("Skipping Clerk auth because within refresh time.\n")
@@ -24,8 +28,6 @@ export function clerkAuthContext(options: ClerkContextOptions): Context<void> {
       const page = await browser.newPage({
         baseURL: "http://localhost:3000"
       })
-
-      await clerkSetup()
 
       await page.goto('/')
 

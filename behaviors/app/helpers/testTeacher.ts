@@ -6,6 +6,12 @@ export function authenticatedTeacher(): Teacher {
   }
 }
 
+export function altAuthenticatedTeacher(): Teacher {
+  return {
+    id: process.env["E2E_CLERK_ALT_USER_ID"]!
+  }
+}
+
 export function testTeacher(testId: number): TestTeacher {
   return new TestTeacher(testId)
 }

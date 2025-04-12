@@ -9,12 +9,13 @@ import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay"
 import { Teacher } from "@/domain/teacher"
 import { AppContextType } from "../../helpers/appContext"
 import { PrismaClient } from "@prisma/client"
+import { clerk, clerkSetup } from "@clerk/testing/playwright"
 
 export const testableApp: Context<TestApp> = use(contextMap({
   global: globalContext<AppContextType>(),
   browser: browserContext()
 }), {
-  init({global, browser}) {
+  init({ global, browser }) {
     return new TestApp(global.database.prisma, browser)
   },
 })
@@ -61,20 +62,20 @@ export class TestApp {
     }
   }
 
-  async load(path = "/") {
-    return await this.page.goto(path)
-  }
-
-  async loadCourses() {
-    return await this.load("/courses")
-  }
-
   async setupDB(): Promise<void> {
     await this.resetDB()
 
     if (this.courseSets.length > 0) {
       await this.seedCourses(this.courseSets)
     }
+  }
+
+  async load(path = "/") {
+    return await this.page.goto(path)
+  }
+
+  async loadCourses() {
+    return await this.load("/courses")
   }
 
   async loadGroupsForCourse(course: Course) {
@@ -108,6 +109,39 @@ export class TestApp {
 
   async waitForEditCoursePage(): Promise<void> {
     await this.page.waitForURL('**/courses/*/edit')
+  }
+
+  async signOutCurrentTeacher(): Promise<void> {
+    await clerk.signOut({
+      page: this.page
+    })
+  }
+
+  async signInAuthenticatedTeacher(): Promise<void> {
+    await this.signInUser({
+      username: process.env.E2E_CLERK_USER_USERNAME!,
+      password: process.env.E2E_CLERK_USER_PASSWORD!,
+    })
+  }
+
+  async signInAltTeacher(): Promise<void> {
+    await this.signInUser({
+      username: process.env.E2E_CLERK_ALT_USER_USERNAME!,
+      password: process.env.E2E_CLERK_ALT_USER_PASSWORD!
+    })
+  }
+
+  private async signInUser(credentials: { username: string, password: string }): Promise<void> {
+    await this.page.goto("/")
+
+    await clerk.signIn({
+      page: this.page,
+      signInParams: {
+        strategy: 'password',
+        identifier: credentials.username,
+        password: credentials.password
+      }
+    })
   }
 }
 

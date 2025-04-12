@@ -1,4 +1,4 @@
-import { ClerkProvider, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs"
+import { ClerkProvider, SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton, UserButton } from "@clerk/nextjs"
 import "./globals.css"
 import Link from "next/link"
 
@@ -18,6 +18,7 @@ export default function RootLayout({
           <SignedIn>
             <UserButton />
             <Link href="/courses">View Courses</Link>
+            <SignOutButton></SignOutButton>
           </SignedIn>
           {children}
         </ClerkProvider>
