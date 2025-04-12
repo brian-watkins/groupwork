@@ -2,7 +2,7 @@ import { contextMap } from "best-behavior";
 import { databaseContext, TestPostgresDB } from "../infra/helpers/dbContext";
 import { serverContext } from "best-behavior/server";
 import { clerkAuthContext } from "./clerkAuthContext";
-import { consoleLogger } from "best-behavior/run";
+import { consoleLogger, LogLevel } from "best-behavior/run";
 
 export type AppContextType = { database: TestPostgresDB }
 
@@ -13,7 +13,7 @@ export const appContext = contextMap({ database: databaseContext() })
     env: {
       DATABASE_URL: database.getConnectionUri()!
     },
-    // logger: consoleLogger()
+    logger: consoleLogger({ level: LogLevel.Error })
   }))
   .set("auth", () => clerkAuthContext({
     storageStateFile: "./behaviors/.browserStorageState/state.json",
