@@ -6,16 +6,14 @@ import { consoleLogger } from "best-behavior/run";
 
 export type AppContextType = { database: TestPostgresDB }
 
-export const appContext = contextMap({
-  database: databaseContext()
-})
+export const appContext = contextMap({ database: databaseContext() })
   .set("server", ({ database }) => serverContext({
     command: "npm run local:test:app",
     resource: "http://localhost:3000",
     env: {
       DATABASE_URL: database.getConnectionUri()!
     },
-    logger: consoleLogger()
+    // logger: consoleLogger()
   }))
   .set("auth", () => clerkAuthContext({
     storageStateFile: "./behaviors/.browserStorageState/state.json",

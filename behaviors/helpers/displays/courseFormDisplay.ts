@@ -26,6 +26,10 @@ export class CourseFormDisplay extends TestDisplay {
       .map(el => el.selectDescendant("[data-student-name]").text())
   }
 
+  studentByName(name: string): StudentElement {
+    return new StudentElement(this.page.locator(`[data-student]:has-text("${name}")`), this.options)
+  }
+
   student(index: number): StudentElement {
     return new StudentElement(this.page.locator("[data-student]").nth(index), this.options)
   }

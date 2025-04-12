@@ -1,4 +1,4 @@
-import { defineConfig } from "best-behavior/run"
+import { consoleLogger, defineConfig } from "best-behavior/run"
 import defaultConfig from "../best.config"
 import { appContext } from "./helpers/appContext"
 
@@ -13,5 +13,12 @@ export default defineConfig({
       storageState: "./behaviors/.browserStorageState/state.json"
     })
   },
-  context: appContext
+  context: appContext,
+  logger: consoleLogger({
+    ignore: [
+      /Fast Refresh/,
+      /React DevTools/,
+      /Clerk has been loaded with development keys/
+    ]
+  })
 })

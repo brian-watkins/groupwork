@@ -1,4 +1,4 @@
-import { Course } from "@/domain/course"
+import { Course, CourseId } from "@/domain/course"
 import { Context, contextMap, globalContext, use } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
 import { Page } from "playwright"
@@ -24,8 +24,9 @@ interface CourseSet {
   courses: Array<Course>
 }
 
-class TestApp {
+export class TestApp {
   private courseSets: Array<CourseSet> = []
+  private createdCourses: Map<CourseId, CourseId> = new Map()
 
   constructor(private prisma: PrismaClient, private browser: BrowserTestInstrument) { }
 
@@ -44,7 +45,7 @@ class TestApp {
   private async seedCourses(courseSets: Array<CourseSet>) {
     for (const courseSet of courseSets) {
       for (const course of courseSet.courses) {
-        await this.prisma.course.create({
+        const created = await this.prisma.course.create({
           data: {
             name: course.name,
             teacherId: courseSet.teacher.id,
@@ -55,12 +56,12 @@ class TestApp {
             }
           }
         })
+        this.createdCourses.set(course.id, created.id)
       }
     }
   }
 
   async load(path = "/") {
-    await this.setupDB()
     return await this.page.goto(path)
   }
 
@@ -68,7 +69,7 @@ class TestApp {
     return await this.load("/courses")
   }
 
-  private async setupDB(): Promise<void> {
+  async setupDB(): Promise<void> {
     await this.resetDB()
 
     if (this.courseSets.length > 0) {
@@ -76,9 +77,9 @@ class TestApp {
     }
   }
 
-  async loadCourseGroups(index: number) {
-    await this.loadCourses()
-    await this.display.navigateToCourseGroups(index)
+  async loadGroupsForCourse(course: Course) {
+    const courseId = this.createdCourses.get(course.id)
+    return await this.load(`/courses/${courseId}/groups`)
   }
 
   get page(): Page {
@@ -111,6 +112,10 @@ class TestApp {
 }
 
 class MainDisplay extends TestDisplay {
+  async navigateToCourses(): Promise<void> {
+    await this.selectWithText("View Courses").click()
+  }
+
   async navigateToCourseGroups(index: number): Promise<void> {
     await this.course(index).name.click()
     await this.page.waitForURL('**\/courses\/*\/groups')
@@ -122,6 +127,10 @@ class MainDisplay extends TestDisplay {
 
   get courseNames(): DisplayElementList {
     return this.selectAll("[data-course-name]")
+  }
+
+  courseByName(name: string): CourseElement {
+    return new CourseElement(this.page.locator(`[data-course]:has-text("${name}")`), this.options)
   }
 
   course(index: number): CourseElement {
