@@ -27,8 +27,7 @@ Run the local database and the app via:
 $ npm run local
 ```
 
-To migrate the local database, make sure the database is running
-and then:
+To migrate the local database, make sure the database is running and then:
 
 ```
 $ npm run local:db:migrate
