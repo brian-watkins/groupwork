@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/generated-client"
+export type { PrismaClient } from "@prisma/generated-client"
 
 // PrismaClient is attached to the `global` object in development to prevent
 // exhausting your database connection limit during hot reloading.

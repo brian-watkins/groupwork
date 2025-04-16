@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/lib/prisma";
 import { GroupSetReader } from "@/domain/groupSetReader";
 import { CourseId } from "@/domain/course";
 import { GroupSet } from "@/domain/groupSet";

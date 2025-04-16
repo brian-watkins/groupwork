@@ -2,7 +2,7 @@ import { Course } from "@/domain/course";
 import { CourseDetails, CourseWriter } from "@/domain/courseWriter";
 import { Student } from "@/domain/student";
 import { Teacher } from "@/domain/teacher";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/lib/prisma";
 
 export class PrismaCourseWriter implements CourseWriter {
   constructor(private prisma: PrismaClient) { }

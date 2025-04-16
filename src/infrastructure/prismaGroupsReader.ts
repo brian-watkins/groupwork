@@ -1,7 +1,7 @@
 import { CourseId } from "@/domain/course";
 import { Group } from "@/domain/group";
 import { GroupsReader } from "@/domain/groupReader";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/lib/prisma";
 
 export class PrismaGroupsReader implements GroupsReader {
   constructor(private prisma: PrismaClient) {}

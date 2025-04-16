@@ -8,8 +8,8 @@ import { GroupSetDisplayElement } from "../../helpers/displays/groupSetDisplayEl
 import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay"
 import { Teacher } from "@/domain/teacher"
 import { AppContextType } from "../../helpers/appContext"
-import { PrismaClient } from "@prisma/client"
-import { clerk, clerkSetup } from "@clerk/testing/playwright"
+import { PrismaClient } from "@/lib/prisma"
+import { clerk } from "@clerk/testing/playwright"
 
 export const testableApp: Context<TestApp> = use(contextMap({
   global: globalContext<AppContextType>(),

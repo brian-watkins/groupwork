@@ -3,7 +3,7 @@ import { CourseReader, CourseReaderError } from "@/domain/courseReader";
 import { errorResult, okResult, Result } from "@/domain/result";
 import { Student } from "@/domain/student";
 import { Teacher } from "@/domain/teacher";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/lib/prisma";
 
 export class PrismaCourseReader implements CourseReader {
   constructor(private prisma: PrismaClient) { }

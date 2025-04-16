@@ -1,7 +1,7 @@
 import { CourseId } from "@/domain/course";
 import { Teacher } from "@/domain/teacher";
 import { TeacherAuthorization } from "@/domain/teacherReader";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/lib/prisma";
 
 export class PrismaTeacherAuthorization implements TeacherAuthorization {
   

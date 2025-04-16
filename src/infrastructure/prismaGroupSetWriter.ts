@@ -1,6 +1,6 @@
 import { GroupSet } from "@/domain/groupSet";
 import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/lib/prisma";
 import { DateTime } from "luxon";
 
 export class PrismaGroupSetWriter implements GroupSetWriter {

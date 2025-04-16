@@ -7,11 +7,7 @@ node_modules
 next-env.d.ts
 
 prisma/dev
-prisma/test
-prisma/dev.db
-prisma/dev.db-journal
-prisma/test.db
-prisma/test.db-journal
+
 # clerk configuration (can include secrets)
 /.clerk/
 
