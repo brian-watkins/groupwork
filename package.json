@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "local:dev:app": "next dev --turbo",
     "local:dev:db": "./scripts/startDB.sh",
     "local:db:migrate": "prisma migrate reset",
