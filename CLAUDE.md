@@ -66,3 +66,7 @@ located. Look in the "src/domain" directory to understand domain concepts like
 Whenever you make a change to a file, I want you to think hard about how best to
 follow the existing patterns. For example, if you are creating new test file,
 look at other test files in that directory first to understand the pattern.
+
+- Use react-aria components within the react components. If adding react-aria
+  requires converting a server component to a client component then ask to
+  confirm this change before proceeding.
