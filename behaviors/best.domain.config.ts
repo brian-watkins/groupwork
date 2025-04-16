@@ -1,17 +1,15 @@
-import { defineConfig } from "best-behavior/run"
-import { databaseContext } from "./infra/helpers/dbContext"
-import defaultConfig from "../best.config"
 import { MonocartCoverageReporter } from "best-behavior/coverage"
+import { defineConfig } from "best-behavior/run"
+import defaultConfig from "../best.config"
 
 export default defineConfig({
   ...defaultConfig,
   behaviorGlobs: [
-    "./behaviors/infra/**/*.behavior.ts"
+    "./behaviors/domain/**/*.behavior.ts"
   ],
-  context: databaseContext(),
   coverageReporter: new MonocartCoverageReporter({
     reports: [ "raw" ],
-    outputDir: "./coverage-reports/infra",
+    outputDir: "./coverage-reports/domain",
     entryFilter: {
       "/src": true
     }
