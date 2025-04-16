@@ -1,6 +1,5 @@
 'use client';
 
-import { Course } from "@/domain/course";
 import GroupSetForm from "./GroupSetForm";
 import { useEffect, useRef } from "react";
 

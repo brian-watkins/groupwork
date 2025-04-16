@@ -5,7 +5,7 @@ export default function UnauthorizedPage() {
     <div className="flex flex-col items-center justify-center min-h-screen p-5">
       <h1 className="text-4xl font-bold mb-4">401 - Unauthorized</h1>
       <p className="text-lg text-gray-600 mb-6">
-        You can't do that.
+        You can&apos;t do that.
       </p>
       <Link 
         href="/" 

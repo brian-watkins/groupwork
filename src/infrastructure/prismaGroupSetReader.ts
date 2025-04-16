@@ -3,6 +3,7 @@ import { PrismaClient } from "@/lib/prisma";
 import { GroupSetReader } from "@/domain/groupSetReader";
 import { CourseId } from "@/domain/course";
 import { GroupSet } from "@/domain/groupSet";
+import { Prisma } from "@/lib/prisma"
 import { Group } from "@/domain/group";
 import { Student } from "@/domain/student";
 
@@ -27,10 +28,10 @@ export class PrismaGroupSetReader implements GroupSetReader {
     return prismaData.map(groupSet => this.mapToDomainModel(groupSet));
   }
   
-  private mapToDomainModel(prismaGroupSet: any): GroupSet {
-    const groups: Group[] = prismaGroupSet.groups.map((prismaGroup: any) => {
+  private mapToDomainModel(prismaGroupSet: GroupSetWithGroupsWithStudents): GroupSet {
+    const groups: Group[] = prismaGroupSet.groups.map((prismaGroup) => {
       const members = new Set<Student>(
-        prismaGroup.students.map((student: any) => ({
+        prismaGroup.students.map((student) => ({
           id: student.id,
           name: student.name
         }))
@@ -48,3 +49,5 @@ export class PrismaGroupSetReader implements GroupSetReader {
     };
   }
 }
+
+type GroupSetWithGroupsWithStudents = Prisma.GroupSetGetPayload<{ include: { groups: { include: { students: true }} }}>

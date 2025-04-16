@@ -3,7 +3,6 @@
 import { isValidGroupSize } from "@/domain/group";
 import GroupList from "./GroupList";
 import { useEffect, useState } from "react";
-import { Course } from "@/domain/course";
 import { useGroupStore } from "@/app/contexts/GroupStoreContext";
 import { DisplayableGroupSet } from "./DisplayableGroupSet";
 

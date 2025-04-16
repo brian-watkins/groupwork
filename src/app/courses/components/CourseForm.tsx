@@ -2,7 +2,7 @@ import { CourseHeading } from "@/app/courses/components/client/CourseHeading";
 import { useCreateCourseAction, useUpdateCourseAction } from "@/app/contexts/CourseActionsContext";
 import { Course } from "@/domain/course";
 import { Student } from "@/domain/student";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button, Input, Label } from "react-aria-components";
 
 export interface CourseFormProps {
@@ -20,9 +20,7 @@ export function CourseForm({ shouldReturnToMain, courseToEdit }: CourseFormProps
   const updateCourse = useUpdateCourseAction();
 
   useEffect(() => {
-    if (studentError) {
-      setStudentError(null)
-    }
+    setStudentError(null)
   }, [studentName])
 
   const handleSubmit = async () => {
@@ -63,6 +61,7 @@ export function CourseForm({ shouldReturnToMain, courseToEdit }: CourseFormProps
 
     setStudents([{ id: "", name: trimmedName }, ...students]);
     setStudentName('');
+    setStudentError(null)
   };
 
   const removeStudent = (index: number) => {

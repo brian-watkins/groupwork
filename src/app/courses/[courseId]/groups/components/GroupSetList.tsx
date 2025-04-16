@@ -125,7 +125,7 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold mb-4">Delete Group Set</h3>
             <p data-confirmation-message className="mb-6">
-              Are you sure you want to delete the group set "{groupSet.name}"? This action cannot be undone.
+              Are you sure you want to delete the group set &quot;{groupSet.name}&quot;? This action cannot be undone.
             </p>
             <div className="flex justify-end space-x-2">
               <button

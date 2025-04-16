@@ -1,4 +1,3 @@
-import { CourseReader } from "./courseReader";
 import { GroupSet } from "./groupSet";
 import { GroupSetDetails, GroupSetWriter } from "./groupSetWriter";
 import { errorResult, okResult, Result } from "./result";

@@ -10,6 +10,7 @@ import {
   DragEndEvent,
   DragStartEvent,
   DragOverlay,
+  DragOverEvent,
 } from '@dnd-kit/core';
 import { GroupSetId } from "@/domain/groupSet";
 import { useGroupStore } from "@/app/contexts/GroupStoreContext";
@@ -110,7 +111,7 @@ export default function GroupList({ groupSetId, editable = true }: GroupListProp
 
     groups.forEach((group) => {
       const collaborators = workedTogetherAlready(history, group);
-      collaborators.forEach((collaboratorGroup, index) => {
+      collaborators.forEach((collaboratorGroup) => {
         collaboratorGroup.forEach(student => {
           result.set(student.id, true);
         });
@@ -135,7 +136,7 @@ export default function GroupList({ groupSetId, editable = true }: GroupListProp
     });
   }
 
-  function handleDragOver(event: any) {
+  function handleDragOver(event: DragOverEvent) {
     const { over } = event;
     setOverGroupId(over ? over.id as string : null);
   }
