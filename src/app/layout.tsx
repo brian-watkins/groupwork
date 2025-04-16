@@ -1,13 +1,5 @@
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs"
+import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs"
 import "./globals.css"
-import Link from "next/link"
 
 export default function RootLayout({
   children,
@@ -19,21 +11,8 @@ export default function RootLayout({
       <body>
         <ClerkProvider>
           <div className="min-h-screen">
-            <header className="p-4 flex justify-between items-center">
+            <header className="p-4 flex justify-end items-center">
               <div>
-                <SignedIn>
-                  <Link href="/courses" className="font-medium">
-                    View Courses
-                  </Link>
-                </SignedIn>
-              </div>
-              <div>
-                <SignedOut>
-                  <div className="flex gap-4">
-                    <SignInButton />
-                    <SignUpButton />
-                  </div>
-                </SignedOut>
                 <SignedIn>
                   <UserButton showName={true} />
                 </SignedIn>
