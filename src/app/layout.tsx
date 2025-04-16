@@ -3,7 +3,6 @@ import {
   SignedIn,
   SignedOut,
   SignInButton,
-  SignOutButton,
   SignUpButton,
   UserButton,
 } from "@clerk/nextjs"
@@ -19,16 +18,29 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ClerkProvider>
-          <SignedOut>
-            <SignInButton />
-            <SignUpButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-            <Link href="/courses">View Courses</Link>
-            <SignOutButton></SignOutButton>
-          </SignedIn>
-          {children}
+          <div className="min-h-screen">
+            <header className="p-4 flex justify-between items-center">
+              <div>
+                <SignedIn>
+                  <Link href="/courses" className="font-medium">
+                    View Courses
+                  </Link>
+                </SignedIn>
+              </div>
+              <div>
+                <SignedOut>
+                  <div className="flex gap-4">
+                    <SignInButton />
+                    <SignUpButton />
+                  </div>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton showName={true} />
+                </SignedIn>
+              </div>
+            </header>
+            <main>{children}</main>
+          </div>
         </ClerkProvider>
       </body>
     </html>
