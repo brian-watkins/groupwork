@@ -10,7 +10,7 @@ export async function updateCourse(course: Course): Promise<void> {
   const user = await currentUser();
 
   if (!user) {
-    return unauthorized()
+    unauthorized()
   }
 
   try {

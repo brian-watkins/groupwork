@@ -9,7 +9,7 @@ export async function createCourse(name: string, students: Array<string>): Promi
   const user = await currentUser();
 
   if (!user) {
-    return unauthorized()
+    unauthorized()
   }
 
   try {

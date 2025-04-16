@@ -13,7 +13,7 @@ export async function generateGroups(courseId: CourseId, size: number = 2): Prom
   const user = await currentUser()
 
   if (!user) {
-    return unauthorized()
+    unauthorized()
   }
 
   const result = await assignGroups(toTeacher(user),
@@ -23,7 +23,7 @@ export async function generateGroups(courseId: CourseId, size: number = 2): Prom
   )
 
   if (result.type === ResultType.ERROR) {
-    return notFound()
+    notFound()
   }
 
   return result.value

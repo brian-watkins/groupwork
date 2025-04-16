@@ -15,7 +15,7 @@ export async function deleteGroupSetAction(displayableGroupSet: DisplayableGroup
   const user = await currentUser();
 
   if (!user) {
-    return unauthorized();
+    unauthorized()
   }
 
   const groupSet: GroupSet = {

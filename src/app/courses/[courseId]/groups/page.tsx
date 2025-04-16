@@ -17,13 +17,13 @@ export default async function CourseStudentsPage({
   const user = await currentUser();
 
   if (!user) {
-    return unauthorized()
+    unauthorized()
   }
 
   const courseResult = await courseReader.get(toTeacher(user), courseId);
 
   if (courseResult.type === ResultType.ERROR) {
-    return notFound()
+    notFound()
   }
 
   const course = courseResult.value

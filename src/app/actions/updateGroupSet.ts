@@ -17,7 +17,7 @@ export async function updateGroupSet(
   const user = await currentUser();
 
   if (!user) {
-    return unauthorized();
+    unauthorized();
   }
 
   const groupSet: GroupSet = {
@@ -33,7 +33,7 @@ export async function updateGroupSet(
   );
 
   if (updateResult.type === ResultType.ERROR) {
-    return unauthorized();
+    unauthorized();
   }
 
   revalidatePath(`/courses/${groupSet.courseId}`);

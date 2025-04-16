@@ -20,7 +20,7 @@ export async function recordGroupSet(
   const user = await currentUser()
 
   if (!user) {
-    return unauthorized()
+    unauthorized()
   }
 
   const newGroupSetResult = await createGroupSet(teacherAuth, groupSetWriter, toTeacher(user), {
