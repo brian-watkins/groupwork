@@ -15,3 +15,5 @@ behaviors/.browserStorageState
 
 coverage-reports
 .v8-coverage
+
+.context
