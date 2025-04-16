@@ -2,7 +2,11 @@ import { Course, CourseId } from "@/domain/course"
 import { Context, contextMap, globalContext, use } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
 import { Page } from "playwright"
-import { DisplayElement, DisplayElementList, TestDisplay } from "../../helpers/displays/display"
+import {
+  DisplayElement,
+  DisplayElementList,
+  TestDisplay,
+} from "../../helpers/displays/display"
 import { GroupSetFormElement } from "../../helpers/displays/groupSetFormDisplay"
 import { GroupSetDisplayElement } from "../../helpers/displays/groupSetDisplayElement"
 import { CourseFormDisplay } from "../../helpers/displays/courseFormDisplay"
@@ -11,14 +15,17 @@ import { AppContextType } from "../../helpers/appContext"
 import { PrismaClient } from "@/lib/prisma"
 import { clerk } from "@clerk/testing/playwright"
 
-export const testableApp: Context<TestApp> = use(contextMap({
-  global: globalContext<AppContextType>(),
-  browser: browserContext()
-}), {
-  init({ global, browser }) {
-    return new TestApp(global.database.prisma, browser)
+export const testableApp: Context<TestApp> = use(
+  contextMap({
+    global: globalContext<AppContextType>(),
+    browser: browserContext(),
+  }),
+  {
+    init({ global, browser }) {
+      return new TestApp(global.database.prisma, browser)
+    },
   },
-})
+)
 
 interface CourseSet {
   teacher: Teacher
@@ -29,11 +36,15 @@ export class TestApp {
   private courseSets: Array<CourseSet> = []
   private createdCourses: Map<CourseId, CourseId> = new Map()
 
-  constructor(private prisma: PrismaClient, private browser: BrowserTestInstrument) { }
+  constructor(
+    private prisma: PrismaClient,
+    private browser: BrowserTestInstrument,
+  ) {}
 
   withCourses(teacher: Teacher, courses: Array<Course>): TestApp {
     this.courseSets.push({
-      teacher, courses
+      teacher,
+      courses,
     })
 
     return this
@@ -51,11 +62,11 @@ export class TestApp {
             name: course.name,
             teacherId: courseSet.teacher.id,
             students: {
-              create: course.students.map(student => {
+              create: course.students.map((student) => {
                 return { name: student.name }
-              })
-            }
-          }
+              }),
+            },
+          },
         })
         this.createdCourses.set(course.id, created.id)
       }
@@ -104,16 +115,16 @@ export class TestApp {
   }
 
   async waitForCreateCoursePage(): Promise<void> {
-    await this.page.waitForURL('**/courses/create')
+    await this.page.waitForURL("**/courses/create")
   }
 
   async waitForEditCoursePage(): Promise<void> {
-    await this.page.waitForURL('**/courses/*/edit')
+    await this.page.waitForURL("**/courses/*/edit")
   }
 
   async signOutCurrentTeacher(): Promise<void> {
     await clerk.signOut({
-      page: this.page
+      page: this.page,
     })
   }
 
@@ -127,20 +138,23 @@ export class TestApp {
   async signInAltTeacher(): Promise<void> {
     await this.signInUser({
       username: process.env.E2E_CLERK_ALT_USER_USERNAME!,
-      password: process.env.E2E_CLERK_ALT_USER_PASSWORD!
+      password: process.env.E2E_CLERK_ALT_USER_PASSWORD!,
     })
   }
 
-  private async signInUser(credentials: { username: string, password: string }): Promise<void> {
+  private async signInUser(credentials: {
+    username: string
+    password: string
+  }): Promise<void> {
     await this.page.goto("/")
 
     await clerk.signIn({
       page: this.page,
       signInParams: {
-        strategy: 'password',
+        strategy: "password",
         identifier: credentials.username,
-        password: credentials.password
-      }
+        password: credentials.password,
+      },
     })
   }
 }
@@ -152,7 +166,7 @@ class MainDisplay extends TestDisplay {
 
   async navigateToCourseGroups(index: number): Promise<void> {
     await this.course(index).name.click()
-    await this.page.waitForURL('**\/courses\/*\/groups')
+    await this.page.waitForURL("**\/courses\/*\/groups")
   }
 
   get createCourseButton(): DisplayElement {
@@ -164,15 +178,24 @@ class MainDisplay extends TestDisplay {
   }
 
   courseByName(name: string): CourseElement {
-    return new CourseElement(this.page.locator(`[data-course]:has-text("${name}")`), this.options)
+    return new CourseElement(
+      this.page.locator(`[data-course]:has-text("${name}")`),
+      this.options,
+    )
   }
 
   course(index: number): CourseElement {
-    return new CourseElement(this.page.locator("[data-course]").nth(index), this.options)
+    return new CourseElement(
+      this.page.locator("[data-course]").nth(index),
+      this.options,
+    )
   }
 
   get deleteCourseConfirmationModal(): DeleteCourseConfirmationElement {
-    return new DeleteCourseConfirmationElement(this.page.locator("[data-testid='delete-course-confirmation']"), this.options)
+    return new DeleteCourseConfirmationElement(
+      this.page.locator("[data-testid='delete-course-confirmation']"),
+      this.options,
+    )
   }
 }
 
@@ -220,7 +243,10 @@ class CourseElement extends DisplayElement {
 
 class CourseGroupsPageDisplay extends TestDisplay {
   get groupSetForm(): GroupSetFormElement {
-    return new GroupSetFormElement(this.page.locator("[data-group-set-form]"), this.options)
+    return new GroupSetFormElement(
+      this.page.locator("[data-group-set-form]"),
+      this.options,
+    )
   }
 
   get groupSizeInput(): DisplayElement {
@@ -248,10 +274,16 @@ class CourseGroupsPageDisplay extends TestDisplay {
   }
 
   get deleteGroupSetConfirmationModal(): DeleteGroupSetConfirmationElement {
-    return new DeleteGroupSetConfirmationElement(this.page.locator("[data-testid='delete-group-set-confirmation']"), this.options)
+    return new DeleteGroupSetConfirmationElement(
+      this.page.locator("[data-testid='delete-group-set-confirmation']"),
+      this.options,
+    )
   }
 
   groupSet(index: number): GroupSetDisplayElement {
-    return new GroupSetDisplayElement(this.page.locator("[data-group-set]").nth(index), this.options)
+    return new GroupSetDisplayElement(
+      this.page.locator("[data-group-set]").nth(index),
+      this.options,
+    )
   }
 }

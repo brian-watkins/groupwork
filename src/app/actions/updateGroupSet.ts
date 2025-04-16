@@ -1,40 +1,40 @@
-'use server';
+"use server"
 
-import { groupSetWriter, teacherAuth } from "@/app/app-config";
-import { DisplayableGroupSet } from "@/app/courses/[courseId]/groups/components/DisplayableGroupSet";
-import { saveGroupSet } from "@/domain/saveGroupSet";
-import { ResultType } from "@/domain/result";
-import { toTeacher } from "@/lib/domainHelpers";
-import { currentUser } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
-import { unauthorized } from "next/navigation";
-import { DateTime } from "luxon";
-import { GroupSet } from "@/domain/groupSet";
+import { groupSetWriter, teacherAuth } from "@/app/app-config"
+import { DisplayableGroupSet } from "@/app/courses/[courseId]/groups/components/DisplayableGroupSet"
+import { saveGroupSet } from "@/domain/saveGroupSet"
+import { ResultType } from "@/domain/result"
+import { toTeacher } from "@/lib/domainHelpers"
+import { currentUser } from "@clerk/nextjs/server"
+import { revalidatePath } from "next/cache"
+import { unauthorized } from "next/navigation"
+import { DateTime } from "luxon"
+import { GroupSet } from "@/domain/groupSet"
 
 export async function updateGroupSet(
-  displayableGroupSet: DisplayableGroupSet
+  displayableGroupSet: DisplayableGroupSet,
 ): Promise<void> {
-  const user = await currentUser();
+  const user = await currentUser()
 
   if (!user) {
-    unauthorized();
+    unauthorized()
   }
 
   const groupSet: GroupSet = {
     ...displayableGroupSet,
-    createdAt: DateTime.fromISO(displayableGroupSet.createdAt)
-  };
+    createdAt: DateTime.fromISO(displayableGroupSet.createdAt),
+  }
 
   const updateResult = await saveGroupSet(
     teacherAuth,
     groupSetWriter,
     toTeacher(user),
-    groupSet
-  );
+    groupSet,
+  )
 
   if (updateResult.type === ResultType.ERROR) {
-    unauthorized();
+    unauthorized()
   }
 
-  revalidatePath(`/courses/${groupSet.courseId}`);
+  revalidatePath(`/courses/${groupSet.courseId}`)
 }

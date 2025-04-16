@@ -1,14 +1,18 @@
-import { RandomGenerator, unsafeUniformIntDistribution, xoroshiro128plus } from "pure-rand"
-import { CourseId } from "./course";
-import { Group, isValidGroupSize } from "./group";
-import { Student } from "./student";
-import { CourseReader } from "./courseReader";
-import { GroupsReader } from "./groupReader";
-import { Teacher } from "./teacher";
-import { errorResult, okResult, Result, ResultType } from "./result";
+import {
+  RandomGenerator,
+  unsafeUniformIntDistribution,
+  xoroshiro128plus,
+} from "pure-rand"
+import { CourseId } from "./course"
+import { Group, isValidGroupSize } from "./group"
+import { Student } from "./student"
+import { CourseReader } from "./courseReader"
+import { GroupsReader } from "./groupReader"
+import { Teacher } from "./teacher"
+import { errorResult, okResult, Result, ResultType } from "./result"
 
 export interface AssignGroupsCommand {
-  courseId: CourseId,
+  courseId: CourseId
   size: number
 }
 
@@ -18,10 +22,15 @@ interface StudentHistory {
 }
 
 export enum AssignGroupsError {
-  Unauthorized
+  Unauthorized,
 }
 
-export async function assignGroups(teacher: Teacher, courseReader: CourseReader, groupsReader: GroupsReader, command: AssignGroupsCommand): Promise<Result<Group[], AssignGroupsError>> {
+export async function assignGroups(
+  teacher: Teacher,
+  courseReader: CourseReader,
+  groupsReader: GroupsReader,
+  command: AssignGroupsCommand,
+): Promise<Result<Group[], AssignGroupsError>> {
   const courseResult = await courseReader.get(teacher, command.courseId)
 
   if (courseResult.type === ResultType.ERROR) {
@@ -33,24 +42,32 @@ export async function assignGroups(teacher: Teacher, courseReader: CourseReader,
   const history = await groupsReader.get(command.courseId)
 
   if (!isValidGroupSize(command.size, course.students.length)) {
-    throw new Error(`Invalid group size: ${command.size}. Must be between 2 and ${Math.floor(course.students.length / 2)}`);
+    throw new Error(
+      `Invalid group size: ${command.size}. Must be between 2 and ${Math.floor(course.students.length / 2)}`,
+    )
   }
 
   const studentHistories = course.students
-    .map(student => makeStudentHistory(history, student))
+    .map((student) => makeStudentHistory(history, student))
     .sort(byNumberWorkedWithAlready)
 
   return okResult(findGroups(studentHistories, command.size))
 }
 
-function makeStudentHistory(groups: Array<Group>, student: Student): StudentHistory {
+function makeStudentHistory(
+  groups: Array<Group>,
+  student: Student,
+): StudentHistory {
   return {
     student,
-    history: workedWith(groups, student)
+    history: workedWith(groups, student),
   }
 }
 
-function findGroups(histories: Array<StudentHistory>, size: number): Array<Group> {
+function findGroups(
+  histories: Array<StudentHistory>,
+  size: number,
+): Array<Group> {
   const numberGroups = numberOfGroups(histories, size)
 
   const picker = new IndexPicker()
@@ -62,12 +79,18 @@ function findGroups(histories: Array<StudentHistory>, size: number): Array<Group
   for (const record of histories) {
     let availableGroups: Array<Group> = []
     for (const group of groups) {
-      if (group.members.size < size && !containsAnyOverlappingStudents(Array.from(group.members), record.history)) {
+      if (
+        group.members.size < size &&
+        !containsAnyOverlappingStudents(
+          Array.from(group.members),
+          record.history,
+        )
+      ) {
         availableGroups.push(group)
       }
     }
     if (availableGroups.length === 0) {
-      availableGroups = groups.filter(group => group.members.size < size)
+      availableGroups = groups.filter((group) => group.members.size < size)
     }
     if (availableGroups.length === 0) {
       availableGroups = groups
@@ -79,13 +102,19 @@ function findGroups(histories: Array<StudentHistory>, size: number): Array<Group
   return groups
 }
 
-function numberOfGroups(histories: Array<StudentHistory>, size: number): number {
+function numberOfGroups(
+  histories: Array<StudentHistory>,
+  size: number,
+): number {
   const remainder = histories.length % size
   const baseGroups = Math.floor(histories.length / size)
   return remainder <= 1 ? baseGroups : baseGroups + 1
 }
 
-function byNumberWorkedWithAlready(a: StudentHistory, b: StudentHistory): number {
+function byNumberWorkedWithAlready(
+  a: StudentHistory,
+  b: StudentHistory,
+): number {
   if (a.history.length < b.history.length) {
     return -1
   } else if (a.history.length > b.history.length) {
@@ -94,8 +123,11 @@ function byNumberWorkedWithAlready(a: StudentHistory, b: StudentHistory): number
   return 0
 }
 
-function containsAnyOverlappingStudents(group: Array<Student>, history: Array<Student>): boolean {
-  const ids = group.map(s => s.id)
+function containsAnyOverlappingStudents(
+  group: Array<Student>,
+  history: Array<Student>,
+): boolean {
+  const ids = group.map((s) => s.id)
   for (const historyItem of history) {
     if (ids.includes(historyItem.id)) {
       return true
@@ -107,14 +139,14 @@ function containsAnyOverlappingStudents(group: Array<Student>, history: Array<St
 function workedWith(history: Array<Group>, student: Student): Array<Student> {
   const partners = history.reduce((acc, cur) => {
     const members = Array.from(cur.members)
-    if (members.map(m => m.id).includes(student.id)) {
+    if (members.map((m) => m.id).includes(student.id)) {
       return acc.union(cur.members)
     } else {
       return acc
     }
   }, new Set<Student>())
 
-  return Array.from(partners).filter(s => s.id !== student.id)
+  return Array.from(partners).filter((s) => s.id !== student.id)
 }
 
 class IndexPicker {

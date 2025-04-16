@@ -5,15 +5,13 @@ import { MonocartCoverageReporter } from "best-behavior/coverage"
 
 export default defineConfig({
   ...defaultConfig,
-  behaviorGlobs: [
-    "./behaviors/infra/**/*.behavior.ts"
-  ],
+  behaviorGlobs: ["./behaviors/infra/**/*.behavior.ts"],
   context: databaseContext(),
   coverageReporter: new MonocartCoverageReporter({
-    reports: [ "raw" ],
+    reports: ["raw"],
     outputDir: "./coverage-reports/infra",
     entryFilter: {
-      "/src": true
-    }
-  })
+      "/src": true,
+    },
+  }),
 })

@@ -1,32 +1,32 @@
-import { Course, CourseId } from "@/domain/course";
-import { Group } from "@/domain/group";
-import { GroupSet } from "@/domain/groupSet";
-import { GroupSetDetails } from "@/domain/groupSetWriter";
-import { PrismaCourseReader } from "@/infrastructure/prismaCourseReader";
-import { PrismaGroupSetReader } from "@/infrastructure/prismaGroupSetReader";
-import { PrismaGroupsReader } from "@/infrastructure/prismaGroupsReader";
-import { PrismaGroupSetWriter } from "@/infrastructure/prismaGroupSetWriter";
-import { Context } from "best-behavior";
-import { CourseDetails } from "@/domain/courseWriter";
-import { PrismaCourseWriter } from "@/infrastructure/prismaCourseWriter";
-import { Teacher } from "@/domain/teacher";
-import { CourseReaderError } from "@/domain/courseReader";
-import { Result, ResultType } from "@/domain/result";
-import { PrismaTeacherAuthorization } from "@/infrastructure/prismaTeacherAuthorization";
-import { TestPostgresDB, useDatabase } from "./dbContext";
+import { Course, CourseId } from "@/domain/course"
+import { Group } from "@/domain/group"
+import { GroupSet } from "@/domain/groupSet"
+import { GroupSetDetails } from "@/domain/groupSetWriter"
+import { PrismaCourseReader } from "@/infrastructure/prismaCourseReader"
+import { PrismaGroupSetReader } from "@/infrastructure/prismaGroupSetReader"
+import { PrismaGroupsReader } from "@/infrastructure/prismaGroupsReader"
+import { PrismaGroupSetWriter } from "@/infrastructure/prismaGroupSetWriter"
+import { Context } from "best-behavior"
+import { CourseDetails } from "@/domain/courseWriter"
+import { PrismaCourseWriter } from "@/infrastructure/prismaCourseWriter"
+import { Teacher } from "@/domain/teacher"
+import { CourseReaderError } from "@/domain/courseReader"
+import { Result, ResultType } from "@/domain/result"
+import { PrismaTeacherAuthorization } from "@/infrastructure/prismaTeacherAuthorization"
+import { TestPostgresDB, useDatabase } from "./dbContext"
 
 export const testableDatabase: Context<TestDatabase> = useDatabase({
   init: async (database) => {
     const db = new TestDatabase(database)
     await db.reset()
     return db
-  }
+  },
 })
 
 class TestDatabase {
   private createdCourses: Map<string, CourseId> = new Map()
 
-  constructor(private database: TestPostgresDB) { }
+  constructor(private database: TestPostgresDB) {}
 
   async reset(): Promise<void> {
     await this.database.prisma.course.deleteMany()
@@ -43,14 +43,14 @@ class TestDatabase {
         teacherId: teacher.id,
         students: {
           createMany: {
-            data: course.students.map(student => {
+            data: course.students.map((student) => {
               return {
-                name: student.name
+                name: student.name,
               }
-            })
-          }
-        }
-      }
+            }),
+          },
+        },
+      },
     })
     this.createdCourses.set(created.name, created.id)
   }
@@ -63,12 +63,18 @@ class TestDatabase {
     return result.value
   }
 
-  async getCourse(teacher: Teacher, course: Course): Promise<Result<Course, CourseReaderError>> {
+  async getCourse(
+    teacher: Teacher,
+    course: Course,
+  ): Promise<Result<Course, CourseReaderError>> {
     const courseId = this.createdCourses.get(course.name)
     return this.getCourseById(teacher, courseId!)
   }
 
-  async getCourseById(teacher: Teacher, courseId: CourseId): Promise<Result<Course, CourseReaderError>> {
+  async getCourseById(
+    teacher: Teacher,
+    courseId: CourseId,
+  ): Promise<Result<Course, CourseReaderError>> {
     const courseReader = new PrismaCourseReader(this.database.prisma)
     return courseReader.get(teacher, courseId)
   }

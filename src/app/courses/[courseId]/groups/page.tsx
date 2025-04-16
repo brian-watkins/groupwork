@@ -1,26 +1,26 @@
-import { courseReader, groupSetReader } from "@/app/app-config";
-import { CourseId } from "@/domain/course";
-import { notFound, unauthorized } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
-import { toDisplayableGroupSets } from "./components/DisplayableGroupSet";
-import GroupsContent from "./components/GroupsContent";
-import { toTeacher } from "@/lib/domainHelpers";
-import { ResultType } from "@/domain/result";
+import { courseReader, groupSetReader } from "@/app/app-config"
+import { CourseId } from "@/domain/course"
+import { notFound, unauthorized } from "next/navigation"
+import { currentUser } from "@clerk/nextjs/server"
+import { toDisplayableGroupSets } from "./components/DisplayableGroupSet"
+import GroupsContent from "./components/GroupsContent"
+import { toTeacher } from "@/lib/domainHelpers"
+import { ResultType } from "@/domain/result"
 
 export default async function CourseStudentsPage({
-  params
+  params,
 }: {
   params: Promise<{ courseId: CourseId }>
 }) {
-  const { courseId } = await params;
+  const { courseId } = await params
 
-  const user = await currentUser();
+  const user = await currentUser()
 
   if (!user) {
     unauthorized()
   }
 
-  const courseResult = await courseReader.get(toTeacher(user), courseId);
+  const courseResult = await courseReader.get(toTeacher(user), courseId)
 
   if (courseResult.type === ResultType.ERROR) {
     notFound()
@@ -37,7 +37,7 @@ export default async function CourseStudentsPage({
     )
   }
 
-  const groupSets = await groupSetReader.getByCourse(courseId);
+  const groupSets = await groupSetReader.getByCourse(courseId)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -48,5 +48,5 @@ export default async function CourseStudentsPage({
         groupSets={toDisplayableGroupSets(groupSets)}
       />
     </div>
-  );
+  )
 }

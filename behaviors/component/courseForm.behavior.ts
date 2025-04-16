@@ -1,72 +1,91 @@
-import { behavior, example, fact, effect, step } from "best-behavior";
-import { arrayWith, arrayWithLength, assignedWith, equalTo, expect, objectWith, resolvesTo } from "great-expectations";
-import { testableCourseForm } from "./helpers/testableCourseForm";
-import { Keys } from "../helpers/displays/display";
-import { testStudent } from "../domain/helpers/testStudent";
+import { behavior, example, fact, effect, step } from "best-behavior"
+import {
+  arrayWith,
+  arrayWithLength,
+  assignedWith,
+  equalTo,
+  expect,
+  objectWith,
+  resolvesTo,
+} from "great-expectations"
+import { testableCourseForm } from "./helpers/testableCourseForm"
+import { Keys } from "../helpers/displays/display"
+import { testStudent } from "../domain/helpers/testStudent"
 
 export default behavior("Course Form component", [
-
   example(testableCourseForm)
     .description("adding a student by pressing Enter key")
     .script({
       suppose: [
         fact("the form is rendered", async (context) => {
-          await context.render();
-        })
+          await context.render()
+        }),
       ],
       perform: [
         step("enter a student name in the input field", async (context) => {
-          await context.display.studentNameInput.type(testStudent(1).name);
+          await context.display.studentNameInput.type(testStudent(1).name)
         }),
         step("press Enter key in the student name input", async (context) => {
           await context.display.studentNameInput.press(Keys.Enter)
-        })
+        }),
       ],
       observe: [
         effect("the student is added to the students list", async (context) => {
-          await expect(context.display.studentNames(), resolvesTo([
-            testStudent(1).name
-          ]))
+          await expect(
+            context.display.studentNames(),
+            resolvesTo([testStudent(1).name]),
+          )
         }),
         effect("the student name input is cleared", async (context) => {
-          await expect(context.display.studentNameInput.inputValue(), resolvesTo(""));
-        })
-      ]
-    }).andThen({
+          await expect(
+            context.display.studentNameInput.inputValue(),
+            resolvesTo(""),
+          )
+        }),
+      ],
+    })
+    .andThen({
       perform: [
         step("add another student", async (context) => {
-          await context.display.studentNameInput.type(testStudent(2).name);
+          await context.display.studentNameInput.type(testStudent(2).name)
         }),
         step("press Enter key in the student name input", async (context) => {
           await context.display.studentNameInput.press(Keys.Enter)
-        })
+        }),
       ],
       observe: [
-        effect("the second student is added to the top of the list", async (context) => {
-          await expect(context.display.studentNames(), resolvesTo([
-            testStudent(2).name,
-            testStudent(1).name
-          ]))
-        }),
-      ]
-    }).andThen({
+        effect(
+          "the second student is added to the top of the list",
+          async (context) => {
+            await expect(
+              context.display.studentNames(),
+              resolvesTo([testStudent(2).name, testStudent(1).name]),
+            )
+          },
+        ),
+      ],
+    })
+    .andThen({
       perform: [
         step("add another student", async (context) => {
-          await context.display.studentNameInput.type(testStudent(3).name);
+          await context.display.studentNameInput.type(testStudent(3).name)
           await context.display.addStudentButton.click()
         }),
         step("remove the second student", async (context) => {
           await context.display.student(1).removeButton.click()
-        })
+        }),
       ],
       observe: [
-        effect("the second student is removed from the list", async (context) => {
-          await expect(context.display.studentNames(), resolvesTo([
-            testStudent(3).name,
-            testStudent(1).name
-          ]))
-        })
-      ]
+        effect(
+          "the second student is removed from the list",
+          async (context) => {
+            await expect(
+              context.display.studentNames(),
+              resolvesTo([testStudent(3).name, testStudent(1).name]),
+            )
+          },
+        ),
+      ],
     }),
 
   example(testableCourseForm)
@@ -74,19 +93,25 @@ export default behavior("Course Form component", [
     .script({
       suppose: [
         fact("the form is rendered", async (context) => {
-          await context.render();
-        })
+          await context.render()
+        }),
       ],
       perform: [
-        step("press Enter key with empty student name input", async (context) => {
-          await context.display.studentNameInput.press(Keys.Enter)
-        })
+        step(
+          "press Enter key with empty student name input",
+          async (context) => {
+            await context.display.studentNameInput.press(Keys.Enter)
+          },
+        ),
       ],
       observe: [
         effect("the students list remains empty", async (context) => {
-          await expect(context.display.studentNames(), resolvesTo(arrayWithLength(0)));
-        })
-      ]
+          await expect(
+            context.display.studentNames(),
+            resolvesTo(arrayWithLength(0)),
+          )
+        }),
+      ],
     }),
 
   example(testableCourseForm)
@@ -95,47 +120,62 @@ export default behavior("Course Form component", [
       suppose: [
         fact("the form is rendered", async (context) => {
           await context.render()
-        })
+        }),
       ],
       observe: [
         effect("the save button is disabled", async (context) => {
-          await expect(context.display.saveCourseButton.isEnabled(), resolvesTo(false))
-        })
-      ]
-    }).andThen({
+          await expect(
+            context.display.saveCourseButton.isEnabled(),
+            resolvesTo(false),
+          )
+        }),
+      ],
+    })
+    .andThen({
       perform: [
         step("provide a name for the course", async (context) => {
           await context.display.courseNameInput.type("Fun Course")
-        })
+        }),
       ],
       observe: [
         effect("the save button is still disabled", async (context) => {
-          await expect(context.display.saveCourseButton.isEnabled(), resolvesTo(false))
-        })
-      ]
-    }).andThen({
+          await expect(
+            context.display.saveCourseButton.isEnabled(),
+            resolvesTo(false),
+          )
+        }),
+      ],
+    })
+    .andThen({
       perform: [
         step("add a student", async (context) => {
           await context.display.studentNameInput.type("Fun Student")
           await context.display.studentNameInput.press(Keys.Enter)
-        })
+        }),
       ],
       observe: [
         effect("the save button is enabled", async (context) => {
-          await expect(context.display.saveCourseButton.isEnabled(), resolvesTo(true))
-        })
-      ]
-    }).andThen({
+          await expect(
+            context.display.saveCourseButton.isEnabled(),
+            resolvesTo(true),
+          )
+        }),
+      ],
+    })
+    .andThen({
       perform: [
         step("remove the student", async (context) => {
           await context.display.student(0).removeButton.click()
-        })
+        }),
       ],
       observe: [
         effect("the save button is disabled again", async (context) => {
-          await expect(context.display.saveCourseButton.isEnabled(), resolvesTo(false))
-        })
-      ]
+          await expect(
+            context.display.saveCourseButton.isEnabled(),
+            resolvesTo(false),
+          )
+        }),
+      ],
     }),
 
   example(testableCourseForm)
@@ -144,7 +184,7 @@ export default behavior("Course Form component", [
       suppose: [
         fact("the course form is rendered", async (context) => {
           await context.render()
-        })
+        }),
       ],
       perform: [
         step("provide a name for the course", async (context) => {
@@ -160,22 +200,29 @@ export default behavior("Course Form component", [
         }),
         step("save the course", async (context) => {
           await context.display.saveCourseButton.click()
-        })
+        }),
       ],
       observe: [
         effect("the course details are saved", async (context) => {
-          await expect(context.getCreateCourseDetails(), resolvesTo(assignedWith(objectWith({
-            name: equalTo("Fun Course"),
-            students: arrayWith([
-              equalTo("Awesome Student"),
-              equalTo("Fun Student")
-            ], { withAnyOrder: true })
-          }))))
+          await expect(
+            context.getCreateCourseDetails(),
+            resolvesTo(
+              assignedWith(
+                objectWith({
+                  name: equalTo("Fun Course"),
+                  students: arrayWith(
+                    [equalTo("Awesome Student"), equalTo("Fun Student")],
+                    { withAnyOrder: true },
+                  ),
+                }),
+              ),
+            ),
+          )
         }),
         effect("the app returns to the main page", async (context) => {
           await expect(context.getReturnToMainCalls(), resolvesTo(1))
-        })
-      ]
+        }),
+      ],
     }),
 
   example(testableCourseForm)
@@ -184,18 +231,18 @@ export default behavior("Course Form component", [
       suppose: [
         fact("the course form is rendered", async (context) => {
           await context.render()
-        })
+        }),
       ],
       perform: [
         step("the cancel button is pressed", async (context) => {
           await context.display.cancelButton.click()
-        })
+        }),
       ],
       observe: [
         effect("the app returns to the main page", async (context) => {
           await expect(context.getReturnToMainCalls(), resolvesTo(1))
-        })
-      ]
+        }),
+      ],
     }),
 
   example(testableCourseForm)
@@ -203,61 +250,89 @@ export default behavior("Course Form component", [
     .script({
       suppose: [
         fact("the form is rendered", async (context) => {
-          await context.render();
+          await context.render()
         }),
         fact("a student has been added", async (context) => {
-          await context.display.studentNameInput.type(testStudent(1).name);
-          await context.display.studentNameInput.press(Keys.Enter);
-        })
+          await context.display.studentNameInput.type(testStudent(1).name)
+          await context.display.studentNameInput.press(Keys.Enter)
+        }),
       ],
       perform: [
         step("attempt to add a student with the same name", async (context) => {
-          await context.display.studentNameInput.type(testStudent(1).name);
-          await context.display.studentNameInput.press(Keys.Enter);
-        })
+          await context.display.studentNameInput.type(testStudent(1).name)
+          await context.display.studentNameInput.press(Keys.Enter)
+        }),
       ],
       observe: [
-        effect("the duplicate student is not added to the list", async (context) => {
-          await expect(context.display.studentNames(), resolvesTo(arrayWithLength(1)));
-          await expect(context.display.studentNames(), resolvesTo([testStudent(1).name]));
-        }),
+        effect(
+          "the duplicate student is not added to the list",
+          async (context) => {
+            await expect(
+              context.display.studentNames(),
+              resolvesTo(arrayWithLength(1)),
+            )
+            await expect(
+              context.display.studentNames(),
+              resolvesTo([testStudent(1).name]),
+            )
+          },
+        ),
         effect("the input field shows an error state", async (context) => {
-          await expect(context.display.studentNameInput.attribute("aria-invalid"), resolvesTo("true"));
+          await expect(
+            context.display.studentNameInput.attribute("aria-invalid"),
+            resolvesTo("true"),
+          )
         }),
         effect("an error message is displayed", async (context) => {
-          const errorMessage = context.display.select("[data-student-error-message]");
-          await expect(errorMessage.isVisible(), resolvesTo(true));
-        })
-      ]
-    }).andThen({
+          const errorMessage = context.display.select(
+            "[data-student-error-message]",
+          )
+          await expect(errorMessage.isVisible(), resolvesTo(true))
+        }),
+      ],
+    })
+    .andThen({
       perform: [
         step("type a different student name", async (context) => {
-          await context.display.studentNameInput.type(testStudent(2).name);
-        })
+          await context.display.studentNameInput.type(testStudent(2).name)
+        }),
       ],
       observe: [
         effect("the error message disappears", async (context) => {
-          const errorMessage = context.display.select("[data-student-error-message]");
-          await expect(errorMessage.isHidden(), resolvesTo(true));
+          const errorMessage = context.display.select(
+            "[data-student-error-message]",
+          )
+          await expect(errorMessage.isHidden(), resolvesTo(true))
         }),
-        effect("the input field no longer shows an error state", async (context) => {
-          await expect(context.display.studentNameInput.attribute("aria-invalid"), resolvesTo(""));
-        })
-      ]
-    }).andThen({
+        effect(
+          "the input field no longer shows an error state",
+          async (context) => {
+            await expect(
+              context.display.studentNameInput.attribute("aria-invalid"),
+              resolvesTo(""),
+            )
+          },
+        ),
+      ],
+    })
+    .andThen({
       perform: [
         step("add the student with a different name", async (context) => {
-          await context.display.studentNameInput.press(Keys.Enter);
-        })
+          await context.display.studentNameInput.press(Keys.Enter)
+        }),
       ],
       observe: [
         effect("the new student is added to the list", async (context) => {
-          await expect(context.display.studentNames(), resolvesTo(arrayWith([
-            equalTo(testStudent(2).name),
-            equalTo(testStudent(1).name)
-          ])));
-        })
-      ]
-    })
-
+          await expect(
+            context.display.studentNames(),
+            resolvesTo(
+              arrayWith([
+                equalTo(testStudent(2).name),
+                equalTo(testStudent(1).name),
+              ]),
+            ),
+          )
+        }),
+      ],
+    }),
 ])

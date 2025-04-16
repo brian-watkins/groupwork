@@ -1,20 +1,23 @@
-import { GroupSet } from "./groupSet";
-import { GroupSetDetails, GroupSetWriter } from "./groupSetWriter";
-import { errorResult, okResult, Result } from "./result";
-import { Teacher } from "./teacher";
-import { TeacherAuthorization } from "./teacherReader";
+import { GroupSet } from "./groupSet"
+import { GroupSetDetails, GroupSetWriter } from "./groupSetWriter"
+import { errorResult, okResult, Result } from "./result"
+import { Teacher } from "./teacher"
+import { TeacherAuthorization } from "./teacherReader"
 
 export enum GroupSetError {
-  Unauthorized
+  Unauthorized,
 }
 
 export async function createGroupSet(
   teacherAuth: TeacherAuthorization,
   groupSetWriter: GroupSetWriter,
   teacher: Teacher,
-  details: GroupSetDetails
+  details: GroupSetDetails,
 ): Promise<Result<GroupSet, GroupSetError>> {
-  const canManageCourse = await teacherAuth.canManageCourse(teacher, details.courseId)
+  const canManageCourse = await teacherAuth.canManageCourse(
+    teacher,
+    details.courseId,
+  )
 
   if (!canManageCourse) {
     return errorResult(GroupSetError.Unauthorized)

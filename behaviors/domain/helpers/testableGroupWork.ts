@@ -1,22 +1,22 @@
-import { Context } from "best-behavior";
-import { CourseReader, CourseReaderError } from "@/domain/courseReader";
-import { GroupsReader } from "@/domain/groupReader";
-import { Group, workedTogetherAlready } from "@/domain/group";
-import { Course, CourseId } from "@/domain/course";
-import { assignGroups, AssignGroupsError } from "@/domain/assignGroups";
-import { Student } from "@/domain/student";
-import { Teacher, TeacherId } from "@/domain/teacher";
-import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter";
-import { GroupSet } from "@/domain/groupSet";
-import { createGroupSet, GroupSetError } from "@/domain/createGroupSet";
-import { errorResult, okResult, Result } from "@/domain/result";
-import { DateTime } from "luxon";
-import { TeacherAuthorization } from "@/domain/teacherReader";
-import { saveGroupSet, UpdateGroupSetError } from "@/domain/saveGroupSet";
-import { deleteGroupSet, DeleteGroupSetError } from "@/domain/deleteGroupSet";
+import { Context } from "best-behavior"
+import { CourseReader, CourseReaderError } from "@/domain/courseReader"
+import { GroupsReader } from "@/domain/groupReader"
+import { Group, workedTogetherAlready } from "@/domain/group"
+import { Course, CourseId } from "@/domain/course"
+import { assignGroups, AssignGroupsError } from "@/domain/assignGroups"
+import { Student } from "@/domain/student"
+import { Teacher, TeacherId } from "@/domain/teacher"
+import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter"
+import { GroupSet } from "@/domain/groupSet"
+import { createGroupSet, GroupSetError } from "@/domain/createGroupSet"
+import { errorResult, okResult, Result } from "@/domain/result"
+import { DateTime } from "luxon"
+import { TeacherAuthorization } from "@/domain/teacherReader"
+import { saveGroupSet, UpdateGroupSetError } from "@/domain/saveGroupSet"
+import { deleteGroupSet, DeleteGroupSetError } from "@/domain/deleteGroupSet"
 
 export const testableGroupWorkDomain: Context<TestableGroupWork> = {
-  init: () => new TestableGroupWork()
+  init: () => new TestableGroupWork(),
 }
 
 class TestableGroupWork {
@@ -38,7 +38,12 @@ class TestableGroupWork {
   }
 
   async chooseGroupsOf(teacher: Teacher, size: number): Promise<void> {
-    this.currentGroups = await assignGroups(teacher, this.courseReader!, this.groupsReader!, { courseId: "some-id", size })
+    this.currentGroups = await assignGroups(
+      teacher,
+      this.courseReader!,
+      this.groupsReader!,
+      { courseId: "some-id", size },
+    )
   }
 
   getCurrentCollaborators(group: Group): Array<Array<Student>> {
@@ -53,26 +58,40 @@ class TestableGroupWork {
     return this.currentGroups
   }
 
-  async createGroupSet(teacher: Teacher, details: GroupSetDetails): Promise<Result<GroupSet, GroupSetError>> {
+  async createGroupSet(
+    teacher: Teacher,
+    details: GroupSetDetails,
+  ): Promise<Result<GroupSet, GroupSetError>> {
     return createGroupSet(
       this.teacherAuth,
       this.groupSetWriter,
       teacher,
-      details
+      details,
     )
   }
 
-  async updateGroupSet(teacher: Teacher, groupSet: GroupSet): Promise<Result<GroupSet, UpdateGroupSetError>> {
-    return saveGroupSet(this.teacherAuth, this.groupSetWriter, teacher, groupSet)
+  async updateGroupSet(
+    teacher: Teacher,
+    groupSet: GroupSet,
+  ): Promise<Result<GroupSet, UpdateGroupSetError>> {
+    return saveGroupSet(
+      this.teacherAuth,
+      this.groupSetWriter,
+      teacher,
+      groupSet,
+    )
   }
 
-  async deleteGroupSet(teacher: Teacher, groupSet: GroupSet): Promise<Result<boolean, DeleteGroupSetError>> {
+  async deleteGroupSet(
+    teacher: Teacher,
+    groupSet: GroupSet,
+  ): Promise<Result<boolean, DeleteGroupSetError>> {
     return deleteGroupSet(
       this.teacherAuth,
       this.groupSetWriter,
       teacher,
-      groupSet
-    );
+      groupSet,
+    )
   }
 
   get createdGroupSets(): GroupSetDetails[] {
@@ -92,19 +111,28 @@ class TestTeacherAuthorization implements TeacherAuthorization {
     return courses.push(course.id)
   }
 
-  async canManageCourse(teacher: Teacher, courseId: CourseId): Promise<boolean> {
-    return this.courses.get(teacher.id)?.some(id => id === courseId) ?? false
+  async canManageCourse(
+    teacher: Teacher,
+    courseId: CourseId,
+  ): Promise<boolean> {
+    return this.courses.get(teacher.id)?.some((id) => id === courseId) ?? false
   }
 }
 
 class TestCourseReader implements CourseReader {
-  constructor(private teacher: Teacher, private course: Course) { }
+  constructor(
+    private teacher: Teacher,
+    private course: Course,
+  ) {}
 
   getAll(teacher: Teacher): Promise<Array<Course>> {
-    throw new Error("Method not implemented.");
+    throw new Error("Method not implemented.")
   }
 
-  async get(teacher: Teacher, courseId: CourseId): Promise<Result<Course, CourseReaderError>> {
+  async get(
+    teacher: Teacher,
+    courseId: CourseId,
+  ): Promise<Result<Course, CourseReaderError>> {
     if (teacher.id !== this.teacher.id) {
       return errorResult(CourseReaderError.NotFound)
     }
@@ -114,7 +142,7 @@ class TestCourseReader implements CourseReader {
 }
 
 class TestGroupsReader implements GroupsReader {
-  constructor(readonly groups: Array<Group>) { }
+  constructor(readonly groups: Array<Group>) {}
 
   async get(courseId: CourseId): Promise<Array<Group>> {
     return this.groups
@@ -131,11 +159,11 @@ class TestGroupSetWriter implements GroupSetWriter {
       name: details.name,
       courseId: details.courseId,
       createdAt: DateTime.now(),
-      groups: details.groups
+      groups: details.groups,
     }
   }
 
-  async save(groupSet: GroupSet): Promise<void> { }
+  async save(groupSet: GroupSet): Promise<void> {}
 
-  async delete(groupSet: GroupSet): Promise<void> { }
+  async delete(groupSet: GroupSet): Promise<void> {}
 }

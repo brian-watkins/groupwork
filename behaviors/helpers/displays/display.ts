@@ -5,13 +5,16 @@ export interface TestDisplayOptions {
 }
 
 export class TestDisplay {
-  constructor(protected page: Page, protected options: TestDisplayOptions) { }
+  constructor(
+    protected page: Page,
+    protected options: TestDisplayOptions,
+  ) {}
 
   async pause(millis?: number): Promise<void> {
     if (millis === undefined) {
       return this.page.pause()
     } else {
-      await new Promise(resolve => setTimeout(resolve, millis))
+      await new Promise((resolve) => setTimeout(resolve, millis))
     }
   }
 
@@ -36,7 +39,7 @@ export interface BoundingRect {
 }
 
 export enum Keys {
-  Enter = "Enter"
+  Enter = "Enter",
 }
 
 export interface DragPosition {
@@ -45,7 +48,10 @@ export interface DragPosition {
 }
 
 export class DisplayElement {
-  constructor(public locator: Locator, protected options: TestDisplayOptions) { }
+  constructor(
+    public locator: Locator,
+    protected options: TestDisplayOptions,
+  ) {}
 
   async boundingRect(): Promise<BoundingRect> {
     const box = await this.locator.boundingBox()
@@ -77,7 +83,7 @@ export class DisplayElement {
   }
 
   async type(text: string): Promise<void> {
-    await this.locator.fill(text, { timeout: this.options.timeout });
+    await this.locator.fill(text, { timeout: this.options.timeout })
   }
 
   async press(key: Keys): Promise<void> {
@@ -93,20 +99,32 @@ export class DisplayElement {
   }
 
   async waitForVisible(): Promise<void> {
-    await this.locator.waitFor({ state: "visible", timeout: this.options.timeout })
+    await this.locator.waitFor({
+      state: "visible",
+      timeout: this.options.timeout,
+    })
   }
 
   async waitForHidden(): Promise<void> {
-    await this.locator.waitFor({ state: "hidden", timeout: this.options.timeout })
+    await this.locator.waitFor({
+      state: "hidden",
+      timeout: this.options.timeout,
+    })
   }
 
   async isVisible(): Promise<boolean> {
-    await this.locator.waitFor({ state: "visible", timeout: this.options.timeout })
+    await this.locator.waitFor({
+      state: "visible",
+      timeout: this.options.timeout,
+    })
     return true
   }
 
   async isHidden(): Promise<boolean> {
-    await this.locator.waitFor({ state: "hidden", timeout: this.options.timeout })
+    await this.locator.waitFor({
+      state: "hidden",
+      timeout: this.options.timeout,
+    })
     return true
   }
 
@@ -122,11 +140,11 @@ export class DisplayElement {
     const elementBox = await element.boundingRect()
     const start = {
       x: box.x + box.width / 2,
-      y: box.y + box.height / 2
+      y: box.y + box.height / 2,
     }
     const end = {
       x: elementBox.x + elementBox.width / 2,
-      y: elementBox.y + elementBox.height / 2
+      y: elementBox.y + elementBox.height / 2,
     }
     await this.drag(start, end)
   }
@@ -144,24 +162,31 @@ export class DisplayElement {
   }
 
   async attribute(name: string): Promise<string> {
-    const value = await this.locator.getAttribute(name, { timeout: this.options.timeout })
+    const value = await this.locator.getAttribute(name, {
+      timeout: this.options.timeout,
+    })
     return value ?? ""
   }
 }
 
 export class DisplayElementList {
-  constructor(protected locator: Locator, protected options: TestDisplayOptions) { }
+  constructor(
+    protected locator: Locator,
+    protected options: TestDisplayOptions,
+  ) {}
 
   atIndex(index: number): DisplayElement {
     return new DisplayElement(this.locator.nth(index), this.options)
   }
 
-  async map<T>(mapper: (element: DisplayElement) => Promise<T>): Promise<Array<T>> {
+  async map<T>(
+    mapper: (element: DisplayElement) => Promise<T>,
+  ): Promise<Array<T>> {
     const locators = await this.locator.all()
     return Promise.all(
       locators
-        .map(locator => new DisplayElement(locator, this.options))
-        .map(mapper)
+        .map((locator) => new DisplayElement(locator, this.options))
+        .map(mapper),
     )
   }
 
@@ -171,7 +196,9 @@ export class DisplayElementList {
 
   async isVisible(): Promise<boolean> {
     try {
-      await this.locator.first().waitFor({ state: "visible", timeout: this.options.timeout })
+      await this.locator
+        .first()
+        .waitFor({ state: "visible", timeout: this.options.timeout })
       return true
     } catch {
       return false
@@ -179,7 +206,9 @@ export class DisplayElementList {
   }
 
   async count(): Promise<number> {
-    await this.locator.first().waitFor({ state: "visible", timeout: this.options.timeout })
+    await this.locator
+      .first()
+      .waitFor({ state: "visible", timeout: this.options.timeout })
     return this.locator.count()
   }
 }

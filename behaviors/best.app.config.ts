@@ -4,13 +4,11 @@ import { appContext } from "./helpers/appContext"
 
 export default defineConfig({
   ...defaultConfig,
-  behaviorGlobs: [
-    "./behaviors/app/**/*.behavior.ts"
-  ],
+  behaviorGlobs: ["./behaviors/app/**/*.behavior.ts"],
   browserContext: async (browser) => {
     return browser.newContext({
       baseURL: "http://localhost:3000",
-      storageState: "./behaviors/.browserStorageState/state.json"
+      storageState: "./behaviors/.browserStorageState/state.json",
     })
   },
   context: appContext(),
@@ -18,7 +16,7 @@ export default defineConfig({
     ignore: [
       /Fast Refresh/,
       /React DevTools/,
-      /Clerk has been loaded with development keys/
-    ]
-  })
+      /Clerk has been loaded with development keys/,
+    ],
+  }),
 })

@@ -1,7 +1,7 @@
-import { DateTime } from "luxon";
-import { CourseId } from "./course";
-import { Group } from "./group";
-import { GroupSet } from "./groupSet";
+import { DateTime } from "luxon"
+import { CourseId } from "./course"
+import { Group } from "./group"
+import { GroupSet } from "./groupSet"
 
 export interface GroupSetDetails {
   courseId: CourseId

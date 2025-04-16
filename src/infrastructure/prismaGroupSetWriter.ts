@@ -1,10 +1,10 @@
-import { GroupSet } from "@/domain/groupSet";
-import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter";
-import { PrismaClient } from "@/lib/prisma";
-import { DateTime } from "luxon";
+import { GroupSet } from "@/domain/groupSet"
+import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter"
+import { PrismaClient } from "@/lib/prisma"
+import { DateTime } from "luxon"
 
 export class PrismaGroupSetWriter implements GroupSetWriter {
-  constructor(private prisma: PrismaClient) { }
+  constructor(private prisma: PrismaClient) {}
 
   async create(details: GroupSetDetails): Promise<GroupSet> {
     const createdGroupSet = await this.prisma.groupSet.create({
@@ -13,22 +13,22 @@ export class PrismaGroupSetWriter implements GroupSetWriter {
         courseId: details.courseId,
         createdAt: getCreatedAtDate(details.createdAt),
         groups: {
-          create: details.groups.map(group => ({
+          create: details.groups.map((group) => ({
             students: {
-              connect: Array.from(group.members).map(student => ({
-                id: student.id
-              }))
-            }
-          }))
-        }
+              connect: Array.from(group.members).map((student) => ({
+                id: student.id,
+              })),
+            },
+          })),
+        },
       },
       include: {
         groups: {
           include: {
-            students: true
-          }
-        }
-      }
+            students: true,
+          },
+        },
+      },
     })
 
     return {
@@ -36,46 +36,48 @@ export class PrismaGroupSetWriter implements GroupSetWriter {
       name: createdGroupSet!.name,
       courseId: createdGroupSet!.courseId,
       createdAt: DateTime.fromJSDate(createdGroupSet!.createdAt),
-      groups: createdGroupSet!.groups.map(group => ({
-        members: new Set(group.students.map(student => ({
-          id: student.id,
-          name: student.name
-        })))
-      }))
+      groups: createdGroupSet!.groups.map((group) => ({
+        members: new Set(
+          group.students.map((student) => ({
+            id: student.id,
+            name: student.name,
+          })),
+        ),
+      })),
     }
   }
 
   async save(groupSet: GroupSet): Promise<void> {
     await this.prisma.group.deleteMany({
       where: {
-        groupSetId: groupSet.id
-      }
-    });
+        groupSetId: groupSet.id,
+      },
+    })
 
     await this.prisma.groupSet.update({
       where: {
-        id: groupSet.id
+        id: groupSet.id,
       },
       data: {
         name: groupSet.name,
         groups: {
-          create: groupSet.groups.map(group => ({
+          create: groupSet.groups.map((group) => ({
             students: {
-              connect: Array.from(group.members).map(student => ({
-                id: student.id
-              }))
-            }
-          }))
-        }
-      }
+              connect: Array.from(group.members).map((student) => ({
+                id: student.id,
+              })),
+            },
+          })),
+        },
+      },
     })
   }
 
   async delete(groupSet: GroupSet): Promise<void> {
     await this.prisma.groupSet.delete({
       where: {
-        id: groupSet.id
-      }
+        id: groupSet.id,
+      },
     })
   }
 }

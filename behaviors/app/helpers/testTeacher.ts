@@ -1,14 +1,14 @@
-import { Teacher } from "@/domain/teacher";
+import { Teacher } from "@/domain/teacher"
 
 export function authenticatedTeacher(): Teacher {
   return {
-    id: process.env["E2E_CLERK_USER_ID"]!
+    id: process.env["E2E_CLERK_USER_ID"]!,
   }
 }
 
 export function altAuthenticatedTeacher(): Teacher {
   return {
-    id: process.env["E2E_CLERK_ALT_USER_ID"]!
+    id: process.env["E2E_CLERK_ALT_USER_ID"]!,
   }
 }
 
@@ -17,7 +17,7 @@ export function testTeacher(testId: number): TestTeacher {
 }
 
 export class TestTeacher implements Teacher {
-  id: string;
+  id: string
 
   constructor(testId: number) {
     this.id = `teacher-${testId}`

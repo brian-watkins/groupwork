@@ -4,24 +4,21 @@ import { appContext } from "./helpers/appContext"
 import { MonocartCoverageReporter } from "best-behavior/coverage"
 import { ServerCoverageProvider } from "./helpers/serverCoverageProvider"
 
-
 export default defineConfig({
   ...appConfig,
   context: appContext({ withCoverage: true }),
   collectCoverage: true,
   coverageProvider: new ServerCoverageProvider({ cdpPort: 9230 }),
   coverageReporter: new MonocartCoverageReporter({
-    reports: [
-      "raw"
-    ],
+    reports: ["raw"],
 
     outputDir: "./coverage-reports/app",
-    
+
     entryFilter: (entry) => {
       if (entry.source?.includes("sourceMappingURL") === false) {
         return false
       }
-  
+
       if (entry.source?.includes("rsc://React/Client")) {
         return false
       }
@@ -33,7 +30,7 @@ export default defineConfig({
       if (entry.url.includes("next/static/")) {
         return true
       }
-  
+
       if (entry.url.includes("next/server/edge")) {
         return false
       }
@@ -47,10 +44,10 @@ export default defineConfig({
       ) {
         return true
       }
-  
+
       return false
     },
-  
+
     sourceFilter: (sourcePath) => {
       return (
         !sourcePath.includes("node_modules/") &&
@@ -60,6 +57,6 @@ export default defineConfig({
         !sourcePath.startsWith(".next-internal/server") &&
         !sourcePath.endsWith(".tsx/proxy.mjs")
       )
-    }
-  })
+    },
+  }),
 })

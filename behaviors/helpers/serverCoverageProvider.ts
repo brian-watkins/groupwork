@@ -1,6 +1,10 @@
-import { CoverageContext, CoverageProvider, V8CoverageData } from "best-behavior/coverage"
-import { CDPClient } from 'monocart-coverage-reports';
-import { fileURLToPath } from "node:url";
+import {
+  CoverageContext,
+  CoverageProvider,
+  V8CoverageData,
+} from "best-behavior/coverage"
+import { CDPClient } from "monocart-coverage-reports"
+import { fileURLToPath } from "node:url"
 import fs from "node:fs"
 import path from "node:path"
 
@@ -11,7 +15,7 @@ export interface ServerCoverageProviderOptions {
 export class ServerCoverageProvider implements CoverageProvider {
   private coverageContext: CoverageContext | undefined
 
-  constructor(private options: ServerCoverageProviderOptions) { }
+  constructor(private options: ServerCoverageProviderOptions) {}
 
   async prepareForCoverage(context: CoverageContext): Promise<void> {
     this.coverageContext = context
@@ -19,7 +23,7 @@ export class ServerCoverageProvider implements CoverageProvider {
 
   async finishCoverage(): Promise<void> {
     const client = await CDPClient({
-      port: this.options.cdpPort
+      port: this.options.cdpPort,
     })
 
     if (client === undefined) {
@@ -27,22 +31,24 @@ export class ServerCoverageProvider implements CoverageProvider {
       return
     }
 
-    const dir = await client.writeCoverage();
-    await client.close();
+    const dir = await client.writeCoverage()
+    await client.close()
 
     if (!fs.existsSync(dir)) {
       console.log("No coverage dir!??!!", dir)
-      return;
+      return
     }
 
-    const files = fs.readdirSync(dir);
+    const files = fs.readdirSync(dir)
     for (const filename of files) {
-      const content = fs.readFileSync(path.resolve(dir, filename)).toString('utf-8');
-      const json = JSON.parse(content);
-      let coverageList: Array<V8CoverageData> = json.result;
+      const content = fs
+        .readFileSync(path.resolve(dir, filename))
+        .toString("utf-8")
+      const json = JSON.parse(content)
+      let coverageList: Array<V8CoverageData> = json.result
 
       coverageList = coverageList
-        .filter((entry) => entry.url && entry.url.startsWith('file:'))
+        .filter((entry) => entry.url && entry.url.startsWith("file:"))
         .filter((entry) => !entry.url.includes("node_modules"))
         .filter((entry) => !entry.url.includes(".volta"))
 
@@ -51,9 +57,9 @@ export class ServerCoverageProvider implements CoverageProvider {
       }
 
       coverageList.forEach((entry) => {
-        const filePath = fileURLToPath(entry.url);
+        const filePath = fileURLToPath(entry.url)
         if (fs.existsSync(filePath)) {
-          entry.source = fs.readFileSync(filePath).toString('utf8');
+          entry.source = fs.readFileSync(filePath).toString("utf8")
         }
       })
 

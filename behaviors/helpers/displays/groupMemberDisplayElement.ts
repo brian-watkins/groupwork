@@ -1,4 +1,4 @@
-import { DisplayElement } from "./display";
+import { DisplayElement } from "./display"
 
 export class GroupMemberDisplayElement extends DisplayElement {
   get partneredIndicator(): DisplayElement {

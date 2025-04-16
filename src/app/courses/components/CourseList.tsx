@@ -1,32 +1,32 @@
-"use client";
+"use client"
 
-import { Course } from "@/domain/course";
-import Link from "next/link";
-import { Heading, Button } from "react-aria-components";
-import { useState } from "react";
-import { DeleteCourseConfirmation } from "./DeleteCourseConfirmation";
+import { Course } from "@/domain/course"
+import Link from "next/link"
+import { Heading, Button } from "react-aria-components"
+import { useState } from "react"
+import { DeleteCourseConfirmation } from "./DeleteCourseConfirmation"
 
 interface CourseListProps {
-  courses: Course[];
+  courses: Course[]
 }
 
 export function CourseList({ courses }: CourseListProps) {
-  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
 
   const handleDeleteClick = (course: Course) => {
-    setCourseToDelete(course);
-  };
+    setCourseToDelete(course)
+  }
 
   const handleCloseModal = () => {
-    setCourseToDelete(null);
-  };
+    setCourseToDelete(null)
+  }
 
   if (courses.length === 0) {
     return (
       <div className="text-center py-10">
         <p className="text-gray-500">No courses available.</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -46,11 +46,15 @@ export function CourseList({ courses }: CourseListProps) {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {courses.map(course => (
+          {courses.map((course) => (
             <tr data-course key={course.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">
                 <Link href={`/courses/${course.id}/groups`}>
-                  <Heading level={3} className="text-lg font-medium text-gray-900 hover:text-sky-600" data-course-name>
+                  <Heading
+                    level={3}
+                    className="text-lg font-medium text-gray-900 hover:text-sky-600"
+                    data-course-name
+                  >
                     {course.name}
                   </Heading>
                 </Link>
@@ -93,5 +97,5 @@ export function CourseList({ courses }: CourseListProps) {
         />
       )}
     </div>
-  );
+  )
 }

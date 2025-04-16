@@ -21,20 +21,23 @@ export function clerkAuthContext(options: ClerkContextOptions): Context<void> {
         return
       }
 
-      console.log("Initializing Clerk auth for test user", process.env.E2E_CLERK_USER_USERNAME)
+      console.log(
+        "Initializing Clerk auth for test user",
+        process.env.E2E_CLERK_USER_USERNAME,
+      )
       console.log()
 
       const browser = await chromium.launch({ headless: true })
       const page = await browser.newPage({
-        baseURL: "http://localhost:3000"
+        baseURL: "http://localhost:3000",
       })
 
-      await page.goto('/')
+      await page.goto("/")
 
       await clerk.signIn({
         page,
         signInParams: {
-          strategy: 'password',
+          strategy: "password",
           identifier: process.env.E2E_CLERK_USER_USERNAME!,
           password: process.env.E2E_CLERK_USER_PASSWORD!,
         },
@@ -44,11 +47,13 @@ export function clerkAuthContext(options: ClerkContextOptions): Context<void> {
 
       await page.close()
       await browser.close()
-    }
+    },
   }
 }
 
-async function millisSinceLastRefresh(options: ClerkContextOptions): Promise<number> {
+async function millisSinceLastRefresh(
+  options: ClerkContextOptions,
+): Promise<number> {
   try {
     const stats = await fs.stat(options.storageStateFile)
     return Date.now() - stats.mtime.getTime()

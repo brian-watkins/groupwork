@@ -3,7 +3,9 @@ import { GroupDisplayElement } from "./groupDisplayElement"
 
 export class GroupSetFormElement extends DisplayElement {
   async waitForGroups(count: number): Promise<void> {
-    await this.selectAllDescendants(`[data-student-group]`).atIndex(count - 1).waitForVisible()
+    await this.selectAllDescendants(`[data-student-group]`)
+      .atIndex(count - 1)
+      .waitForVisible()
   }
 
   get recordGroupsButton(): DisplayElement {
@@ -27,6 +29,9 @@ export class GroupSetFormElement extends DisplayElement {
   }
 
   group(index: number): GroupDisplayElement {
-    return new GroupDisplayElement(this.locator.locator("[data-student-group]").nth(index), this.options)
+    return new GroupDisplayElement(
+      this.locator.locator("[data-student-group]").nth(index),
+      this.options,
+    )
   }
 }

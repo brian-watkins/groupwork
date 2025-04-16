@@ -1,5 +1,5 @@
-import { DisplayElement, DisplayElementList } from "./display";
-import { GroupMemberDisplayElement } from "./groupMemberDisplayElement";
+import { DisplayElement, DisplayElementList } from "./display"
+import { GroupMemberDisplayElement } from "./groupMemberDisplayElement"
 
 export class GroupDisplayElement extends DisplayElement {
   get members(): DisplayElementList {
@@ -7,6 +7,9 @@ export class GroupDisplayElement extends DisplayElement {
   }
 
   member(index: number): GroupMemberDisplayElement {
-    return new GroupMemberDisplayElement(this.locator.locator("[data-group-member]").nth(index), this.options)
+    return new GroupMemberDisplayElement(
+      this.locator.locator("[data-group-member]").nth(index),
+      this.options,
+    )
   }
 }

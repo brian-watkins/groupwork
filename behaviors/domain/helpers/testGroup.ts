@@ -1,5 +1,5 @@
-import { Group } from "../../../src/domain/group";
-import { Student } from "../../../src/domain/student";
+import { Group } from "../../../src/domain/group"
+import { Student } from "../../../src/domain/student"
 
 export function testGroup(...members: Array<Student>): TestGroup {
   return new TestGroup(members)

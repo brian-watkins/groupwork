@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { Button } from "react-aria-components";
-import { useRouter } from "next/navigation";
+import { Button } from "react-aria-components"
+import { useRouter } from "next/navigation"
 
 export function CreateCourseButton() {
-  const router = useRouter();
+  const router = useRouter()
 
   const handleCreateCourse = () => {
-    router.push("/courses/create");
-  };
+    router.push("/courses/create")
+  }
 
   return (
     <Button
@@ -18,5 +18,5 @@ export function CreateCourseButton() {
     >
       Create Course
     </Button>
-  );
+  )
 }

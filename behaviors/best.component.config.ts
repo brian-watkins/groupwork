@@ -4,21 +4,15 @@ import { MonocartCoverageReporter } from "best-behavior/coverage"
 
 export default defineConfig({
   ...defaultConfig,
-  behaviorGlobs: [
-    "./behaviors/component/**/*.behavior.ts"
-  ],
+  behaviorGlobs: ["./behaviors/component/**/*.behavior.ts"],
   logger: consoleLogger({
-    ignore: [
-      /React DevTools/,
-    ]
+    ignore: [/React DevTools/],
   }),
   coverageReporter: new MonocartCoverageReporter({
-    reports: [
-      "raw"
-    ],
+    reports: ["raw"],
     outputDir: "./coverage-reports/component",
     entryFilter: {
-      "node_modules": false,
+      node_modules: false,
       "globals.css": false,
       "/src": true,
     },
@@ -28,6 +22,6 @@ export default defineConfig({
       } else {
         return filePath
       }
-    }
-  })
+    },
+  }),
 })

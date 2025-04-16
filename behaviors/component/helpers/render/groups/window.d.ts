@@ -1,5 +1,3 @@
-
-
 interface Window {
   resolveRecordGroups: () => {}
   resolveAssignGroups: (groups: Array<Group>) => void

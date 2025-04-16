@@ -1,4 +1,4 @@
-import { Student } from "../../../src/domain/student";
+import { Student } from "../../../src/domain/student"
 
 export function testStudent(testId: number): TestStudent {
   return new TestStudent(testId)
@@ -8,7 +8,10 @@ export interface StudentOptions {
   startingIndex?: number
 }
 
-export function testStudents(size: number, options: StudentOptions = {}): Array<TestStudent> {
+export function testStudents(
+  size: number,
+  options: StudentOptions = {},
+): Array<TestStudent> {
   const start = options.startingIndex ?? 1
   let students: Array<TestStudent> = []
   for (let i = start; i < size + start; i++) {
@@ -18,8 +21,8 @@ export function testStudents(size: number, options: StudentOptions = {}): Array<
 }
 
 export class TestStudent implements Student {
-  id: string;
-  name: string;
+  id: string
+  name: string
 
   constructor(testId: number) {
     this.id = `student-${testId}`

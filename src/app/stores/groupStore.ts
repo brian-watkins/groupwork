@@ -1,20 +1,23 @@
-'use client';
+"use client"
 
-import { create } from 'zustand'
-import { Group } from '../../domain/group'
-import { Course } from '@/domain/course'
-import { DisplayableGroupSet } from '../courses/[courseId]/groups/components/DisplayableGroupSet'
-import { generateGroups } from '../actions/generateGroups';
-import { recordGroupSet } from '../actions/recordGroupSet';
-import { updateGroupSet as updateGroupSetAction } from '../actions/updateGroupSet';
-import { deleteGroupSetAction } from '../actions/deleteGroupSet';
-import { GroupSetId } from '@/domain/groupSet';
+import { create } from "zustand"
+import { Group } from "../../domain/group"
+import { Course } from "@/domain/course"
+import { DisplayableGroupSet } from "../courses/[courseId]/groups/components/DisplayableGroupSet"
+import { generateGroups } from "../actions/generateGroups"
+import { recordGroupSet } from "../actions/recordGroupSet"
+import { updateGroupSet as updateGroupSetAction } from "../actions/updateGroupSet"
+import { deleteGroupSetAction } from "../actions/deleteGroupSet"
+import { GroupSetId } from "@/domain/groupSet"
 
 export interface GroupStoreState {
   course: Course
   newGroups: Group[]
   groupSets: DisplayableGroupSet[]
-  setGroupsForGroupSet: (groupSetId: GroupSetId | undefined, groups: Array<Group>) => void
+  setGroupsForGroupSet: (
+    groupSetId: GroupSetId | undefined,
+    groups: Array<Group>,
+  ) => void
   courseSize: number
 }
 
@@ -27,7 +30,9 @@ interface GroupActions {
 
 export type GroupStore = GroupStoreState & GroupActions
 
-export const createGroupStore = (initialState: Partial<GroupStoreState> & { course: Course }) => {
+export const createGroupStore = (
+  initialState: Partial<GroupStoreState> & { course: Course },
+) => {
   return create<GroupStore>((set, get) => ({
     newGroups: [],
     groupSets: [],
@@ -35,16 +40,19 @@ export const createGroupStore = (initialState: Partial<GroupStoreState> & { cour
 
     courseSize: initialState.course.students.length,
 
-    setGroupsForGroupSet: (groupSetId: GroupSetId | undefined, groups: Array<Group>) => {
+    setGroupsForGroupSet: (
+      groupSetId: GroupSetId | undefined,
+      groups: Array<Group>,
+    ) => {
       if (groupSetId !== undefined) {
         set({
-          groupSets: get().groupSets.map(set => {
+          groupSets: get().groupSets.map((set) => {
             if (set.id === groupSetId) {
               return { ...set, groups }
             } else {
               return set
             }
-          })
+          }),
         })
       } else {
         set({ newGroups: groups })
@@ -62,11 +70,15 @@ export const createGroupStore = (initialState: Partial<GroupStoreState> & { cour
 
     recordGroups: async (name: string) => {
       try {
-        const newGroupSet = await recordGroupSet(get().course.id, name, get().newGroups)
+        const newGroupSet = await recordGroupSet(
+          get().course.id,
+          name,
+          get().newGroups,
+        )
         set((store) => {
           return {
             newGroups: [],
-            groupSets: [newGroupSet, ...store.groupSets]
+            groupSets: [newGroupSet, ...store.groupSets],
           }
         })
       } catch (error) {
@@ -76,34 +88,34 @@ export const createGroupStore = (initialState: Partial<GroupStoreState> & { cour
 
     updateGroupSet: async (groupSet: DisplayableGroupSet) => {
       try {
-        await updateGroupSetAction(groupSet);
+        await updateGroupSetAction(groupSet)
 
         set((store) => {
-          const groupSets = store.groupSets
-            .map(gs => gs.id === groupSet.id ? groupSet : gs)
+          const groupSets = store.groupSets.map((gs) =>
+            gs.id === groupSet.id ? groupSet : gs,
+          )
 
           return {
-            groupSets
+            groupSets,
           }
-        });
+        })
       } catch (error) {
-        console.log("Error updating group set", error);
+        console.log("Error updating group set", error)
       }
     },
 
     deleteGroupSet: async (groupSet: DisplayableGroupSet) => {
       try {
-        await deleteGroupSetAction(groupSet);
+        await deleteGroupSetAction(groupSet)
 
         set((store) => {
           return {
-            groupSets: store.groupSets.filter(gs => gs.id !== groupSet.id)
+            groupSets: store.groupSets.filter((gs) => gs.id !== groupSet.id),
           }
-        });
+        })
       } catch (error) {
-        console.log("Error deleting group set", error);
+        console.log("Error deleting group set", error)
       }
-    }
+    },
   }))
-
 }

@@ -5,7 +5,9 @@ import { create } from "zustand"
 
 window.calledRecordGroups = 0
 
-export function createTestStore(overrides: Partial<GroupStoreState> & { course: Course }) {
+export function createTestStore(
+  overrides: Partial<GroupStoreState> & { course: Course },
+) {
   return create<GroupStore>((set, get) => ({
     newGroups: [],
     groupSets: [],
@@ -15,7 +17,7 @@ export function createTestStore(overrides: Partial<GroupStoreState> & { course: 
       set({ newGroups: groups })
     },
     async assignGroups(groupSize) {
-      return new Promise<void>(resolve => {
+      return new Promise<void>((resolve) => {
         window.resolveAssignGroups = (groups: Array<Group>) => {
           set({ newGroups: groups })
           resolve()
@@ -24,11 +26,11 @@ export function createTestStore(overrides: Partial<GroupStoreState> & { course: 
     },
     async recordGroups(name) {
       window.calledRecordGroups++
-      return new Promise<void>(resolve => {
+      return new Promise<void>((resolve) => {
         window.resolveRecordGroups = resolve as () => {}
       })
     },
-    async updateGroupSet(groupSet) { },
-    async deleteGroupSet(groupSet) { },
+    async updateGroupSet(groupSet) {},
+    async deleteGroupSet(groupSet) {},
   }))
 }

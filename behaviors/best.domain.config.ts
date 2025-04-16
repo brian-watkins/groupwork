@@ -4,14 +4,12 @@ import defaultConfig from "../best.config"
 
 export default defineConfig({
   ...defaultConfig,
-  behaviorGlobs: [
-    "./behaviors/domain/**/*.behavior.ts"
-  ],
+  behaviorGlobs: ["./behaviors/domain/**/*.behavior.ts"],
   coverageReporter: new MonocartCoverageReporter({
-    reports: [ "raw" ],
+    reports: ["raw"],
     outputDir: "./coverage-reports/domain",
     entryFilter: {
-      "/src": true
-    }
-  })
+      "/src": true,
+    },
+  }),
 })

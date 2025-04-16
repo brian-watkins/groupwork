@@ -1,6 +1,6 @@
-
 export enum ResultType {
-  OK, ERROR
+  OK,
+  ERROR,
 }
 
 export interface Ok<T, E> {
@@ -33,7 +33,7 @@ export function okResult<T, E = void>(value: T): Result<T, E> {
     },
     valueOr() {
       return value
-    }
+    },
   }
 }
 
