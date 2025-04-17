@@ -32,7 +32,9 @@ export default async function CourseStudentsPage({
   if (course.students.length == 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <CourseBreadcrumbs course={course} />
+        <div className="flex justify-between items-center mb-6">
+          <CourseBreadcrumbs course={course} />
+        </div>
         <div data-no-students>There are no students in the course!</div>
       </div>
     )
@@ -42,8 +44,6 @@ export default async function CourseStudentsPage({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <CourseBreadcrumbs course={course} />
-
       <GroupsContent
         course={course}
         groupSets={toDisplayableGroupSets(groupSets)}

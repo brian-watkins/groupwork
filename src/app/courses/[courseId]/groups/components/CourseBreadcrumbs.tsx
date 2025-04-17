@@ -10,15 +10,19 @@ interface CourseBreadcrumbsProps {
 
 export default function CourseBreadcrumbs({ course }: CourseBreadcrumbsProps) {
   return (
-    <Breadcrumbs className="flex items-center mb-6 gap-2 text-2xl font-bold">
+    <Breadcrumbs className="flex items-center gap-2 text-2xl font-bold">
       <Breadcrumb id="courses" className="flex items-center gap-2">
         <Link href="/courses" className="hover:underline">
           Courses
         </Link>
         <ChevronRight className="text-gray-800" />
       </Breadcrumb>
-      <Breadcrumb id="course" className="text-gray-800">
-        {course.name}
+      <Breadcrumb id="course" className="flex items-center gap-2">
+        <span>{course.name}</span>
+        <ChevronRight className="text-gray-800" />
+      </Breadcrumb>
+      <Breadcrumb id="groups" className="text-gray-800">
+        Groups
       </Breadcrumb>
     </Breadcrumbs>
   )

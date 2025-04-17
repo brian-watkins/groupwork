@@ -7,6 +7,8 @@ import { createGroupStore } from "@/app/stores/groupStore"
 import GroupSetList from "./GroupSetList"
 import { useState } from "react"
 import GroupSetFormModal from "./GroupSetFormModal"
+import { Button } from "react-aria-components"
+import CourseBreadcrumbs from "./CourseBreadcrumbs"
 
 interface GroupsContentProps {
   course: Course
@@ -29,14 +31,14 @@ export default function GroupsContent({
     >
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Group Sets</h2>
-          <button
+          <CourseBreadcrumbs course={course} />
+          <Button
             data-create-new-groups-button
-            onClick={() => setShowGroupSetForm(true)}
+            onPress={() => setShowGroupSetForm(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm"
           >
             Create New Groups
-          </button>
+          </Button>
         </div>
 
         {showGroupSetForm && (
