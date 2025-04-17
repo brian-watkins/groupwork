@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "prisma generate",
     "local:dev:app": "next dev --turbo",
     "local:dev:db": "./scripts/startDB.sh",
     "local:db:migrate": "prisma migrate reset",
@@ -54,6 +53,7 @@
     "playwright": "^1.51.1",
     "postcss": "^8.5.3",
     "prettier": "3.5.3",
+    "prisma": "^6.6.0",
     "tailwindcss": "^4.0.17",
     "testcontainers": "^10.24.0",
     "tsx": "^4.19.3",
@@ -69,7 +69,6 @@
     "@prisma/client": "^6.6.0",
     "luxon": "^3.6.1",
     "next": "^15.2.4",
-    "prisma": "^6.5.0",
     "pure-rand": "^7.0.1",
     "react": "^19.1.0",
     "react-aria-components": "^1.7.1",
