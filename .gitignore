@@ -6,7 +6,7 @@ node_modules
 .next
 next-env.d.ts
 
-src/generated
+generated
 prisma/dev
 
 # clerk configuration (can include secrets)
