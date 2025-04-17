@@ -75,6 +75,9 @@
     "react-dom": "^19.1.0",
     "zustand": "^5.0.3"
   },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "^1.29.2"
+  },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   }
