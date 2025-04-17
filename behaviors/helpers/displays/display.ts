@@ -98,6 +98,10 @@ export class DisplayElement {
     await this.locator.hover({ timeout: this.options.timeout })
   }
 
+  async focus(): Promise<void> {
+    await this.locator.focus({ timeout: this.options.timeout })
+  }
+
   isEnabled(): Promise<boolean> {
     return this.locator.isEnabled({ timeout: this.options.timeout })
   }

@@ -225,24 +225,44 @@ export default behavior("adjusting groups", [
             )
           },
         ),
-        effect(
-          "the names of students previously worked with are displayed on hover",
+      ],
+    })
+    .andThen({
+      perform: [
+        step(
+          "trigger the tooltip on a partnered indicator",
           async (context) => {
-            await context.display.group(0).member(0).partneredIndicator.hover()
+            await context.display.group(0).member(0).partneredIndicator.focus()
             await context.display.previousCollaborators.waitForVisible()
+          },
+        ),
+      ],
+      observe: [
+        effect(
+          "the names of students previously worked with are displayed",
+          async (context) => {
             await expect(
               context.display.previousCollaborators.text(),
               resolvesTo("Worked with: Fun Student 2, Fun Student 4"),
             )
-
-            await context.display.group(0).member(1).partneredIndicator.hover()
-            await context.display.previousCollaborators.waitForVisible()
-            await expect(
-              context.display.previousCollaborators.text(),
-              resolvesTo("Worked with: Fun Student 1"),
-            )
           },
         ),
+      ],
+    })
+    .andThen({
+      perform: [
+        step("focus a different partnered indicator", async (context) => {
+          await context.display.group(0).member(1).partneredIndicator.focus()
+          await context.display.previousCollaborators.waitForVisible()
+        }),
+      ],
+      observe: [
+        effect("it shows the students worked with", async (context) => {
+          await expect(
+            context.display.previousCollaborators.text(),
+            resolvesTo("Worked with: Fun Student 1"),
+          )
+        }),
       ],
     }),
 

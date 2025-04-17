@@ -2,7 +2,7 @@
 
 import { Group, workedTogetherAlready } from "@/domain/group"
 import { Student } from "@/domain/student"
-import { useState, useRef, useEffect } from "react"
+import { useState } from "react"
 import {
   DndContext,
   useDraggable,
@@ -16,6 +16,7 @@ import { GroupSetId } from "@/domain/groupSet"
 import { useGroupStore } from "@/app/contexts/GroupStoreContext"
 import { getGroups } from "@/app/stores/selectors"
 import { DisplayableGroupSet } from "./DisplayableGroupSet"
+import { Button, Tooltip, TooltipTrigger } from "react-aria-components"
 
 interface GroupListProps {
   groupSetId?: GroupSetId
@@ -61,92 +62,47 @@ function DraggableStudent({
     disabled: isDraggingDisabled,
   })
 
-  // Create refs and state for tooltip positioning
-  const badgeRef = useRef<HTMLDivElement>(null)
-  const [showTooltip, setShowTooltip] = useState(false)
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 })
-
-  // Calculate tooltip position when component mounts and when window resizes
-  const updateTooltipPosition = () => {
-    if (badgeRef.current) {
-      const rect = badgeRef.current.getBoundingClientRect()
-      setTooltipPosition({
-        top: window.scrollY + rect.bottom + 8, // 8px below the badge
-        left: window.scrollX + rect.left, // Aligned with left edge
-      })
-    }
-  }
-
-  // Update position on window resize
-  useEffect(() => {
-    if (showTooltip) {
-      window.addEventListener("resize", updateTooltipPosition)
-      return () => window.removeEventListener("resize", updateTooltipPosition)
-    }
-  }, [showTooltip])
-
-  // Handle mouse events
-  const handleMouseEnter = () => {
-    updateTooltipPosition()
-    setShowTooltip(true)
-  }
-
-  const handleMouseLeave = () => {
-    setShowTooltip(false)
-  }
-
   return (
-    <>
-      <li
-        ref={setNodeRef}
-        {...attributes}
-        {...listeners}
-        data-group-member
-        className={`py-3 ${isDraggingDisabled ? "cursor-default" : "cursor-grab"} ${isDragging ? "opacity-30 bg-gray-100" : ""}`}
-        style={{
-          touchAction: "none",
-          transform: isDragging ? "scale(1.02)" : undefined,
-          boxShadow: isDragging ? "0 0 8px rgba(0, 0, 0, 0.1)" : undefined,
-          position: "relative",
-          zIndex: isDragging ? 1000 : 1,
-        }}
-      >
-        <div className="flex items-center">
-          <div data-student-name className="font-medium">
-            {student.name}
-          </div>
-          {collaborationCount > 0 && (
-            <div
-              ref={badgeRef}
-              data-partnered-indicator
-              className="ml-2 text-xs font-medium bg-orange-100 text-orange-800 rounded-full px-1.5 py-0.5 cursor-pointer"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              {collaborationCount}
-            </div>
+    <li
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      data-group-member
+      className={`py-3 ${isDraggingDisabled ? "cursor-default" : "cursor-grab"} ${isDragging ? "opacity-30 bg-gray-100" : ""}`}
+      style={{
+        touchAction: "none",
+        transform: isDragging ? "scale(1.02)" : undefined,
+        boxShadow: isDragging ? "0 0 8px rgba(0, 0, 0, 0.1)" : undefined,
+        position: "relative",
+        zIndex: isDragging ? 1000 : 1,
+      }}
+    >
+      <div className="flex items-center">
+        <div data-student-name className="font-medium">
+          {student.name}
+        </div>
+        {collaborationCount > 0 &&
+          collaborators &&
+          collaborators.length > 0 && (
+            <TooltipTrigger delay={500}>
+              <Button
+                data-partnered-indicator
+                className="ml-2 text-xs font-medium bg-orange-100 text-orange-800 rounded-full px-1.5 py-0.5 cursor-pointer"
+              >
+                {collaborationCount}
+              </Button>
+              <Tooltip
+                data-previous-collaborators
+                placement="right"
+                offset={10}
+                className="p-2 bg-gray-800 max-w-3xs text-wrap text-white text-xs rounded shadow-lg"
+              >
+                Worked with: {collaborators.map((c) => c.name).join(", ")}
+              </Tooltip>
+            </TooltipTrigger>
           )}
-        </div>
-      </li>
-
-      {/* Tooltip rendered at document level with fixed positioning */}
-      {collaborators && collaborators.length > 0 && showTooltip && (
-        <div
-          data-previous-collaborators
-          role="tooltip"
-          className="fixed p-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap"
-          style={{
-            top: `${tooltipPosition.top}px`,
-            left: `${tooltipPosition.left}px`,
-            zIndex: 10000, // Very high z-index
-            pointerEvents: "none",
-            filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))",
-          }}
-        >
-          Worked with: {collaborators.map((c) => c.name).join(", ")}
-        </div>
-      )}
-    </>
+      </div>
+    </li>
   )
 }
 
