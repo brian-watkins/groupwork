@@ -1,6 +1,5 @@
 "use client"
 
-import { Course } from "@/domain/course"
 import {
   Dialog,
   Button,
@@ -9,33 +8,37 @@ import {
   Heading,
 } from "react-aria-components"
 import { useState } from "react"
-import { deleteCourse } from "../../actions/deleteCourse"
-import { useRouter } from "next/navigation"
 
-interface DeleteCourseConfirmationProps {
-  course: Course
+interface ConfirmationModalProps {
+  title: string
+  message: React.ReactNode
+  confirmButtonText: string
   isOpen: boolean
   onClose: () => void
+  onConfirm: () => Promise<void>
+  testId?: string
 }
 
-export function DeleteCourseConfirmation({
-  course,
+export function ConfirmationModal({
+  title,
+  message,
+  confirmButtonText,
   isOpen,
   onClose,
-}: DeleteCourseConfirmationProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
-  const router = useRouter()
+  onConfirm,
+  testId,
+}: ConfirmationModalProps) {
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleDelete = async () => {
+  const handleConfirm = async () => {
     try {
-      setIsDeleting(true)
-      await deleteCourse(course)
+      setIsProcessing(true)
+      await onConfirm()
       onClose()
-      router.refresh()
     } catch (error) {
-      console.error("Error deleting course:", error)
+      console.error(`Error during confirmation action:`, error)
     } finally {
-      setIsDeleting(false)
+      setIsProcessing(false)
     }
   }
 
@@ -48,34 +51,33 @@ export function DeleteCourseConfirmation({
       }}
     >
       <Modal
-        data-testid="delete-course-confirmation"
+        data-testid={testId}
         className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-lg"
       >
         <Dialog className="outline-none">
           <Heading slot="title" className="text-lg font-semibold mb-4">
-            Delete Course
+            {title}
           </Heading>
           <div className="space-y-4">
-            <p data-confirmation-message className="text-gray-600">
-              Are you sure you want to delete <strong>{course.name}</strong>?
-              This action cannot be undone.
-            </p>
+            <div data-confirmation-message className="text-gray-600">
+              {message}
+            </div>
             <div className="flex justify-end space-x-2 pt-4">
               <Button
                 data-cancel
                 className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
                 onPress={onClose}
-                isDisabled={isDeleting}
+                isDisabled={isProcessing}
               >
                 Cancel
               </Button>
               <Button
                 data-delete
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                onPress={handleDelete}
-                isDisabled={isDeleting}
+                onPress={handleConfirm}
+                isDisabled={isProcessing}
               >
-                {isDeleting ? "Deleting..." : "Delete Course"}
+                {isProcessing ? "Processing..." : confirmButtonText}
               </Button>
             </div>
           </div>

@@ -4,7 +4,9 @@ import { Course } from "@/domain/course"
 import Link from "next/link"
 import { Heading, Button } from "react-aria-components"
 import { useState } from "react"
-import { DeleteCourseConfirmation } from "./DeleteCourseConfirmation"
+import { useRouter } from "next/navigation"
+import { ConfirmationModal } from "@/app/components/ConfirmationModal"
+import { deleteCourse } from "../../actions/deleteCourse"
 
 interface CourseListProps {
   courses: Course[]
@@ -12,6 +14,7 @@ interface CourseListProps {
 
 export function CourseList({ courses }: CourseListProps) {
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
+  const router = useRouter()
 
   const handleDeleteClick = (course: Course) => {
     setCourseToDelete(course)
@@ -19,6 +22,13 @@ export function CourseList({ courses }: CourseListProps) {
 
   const handleCloseModal = () => {
     setCourseToDelete(null)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (courseToDelete) {
+      await deleteCourse(courseToDelete)
+      router.refresh()
+    }
   }
 
   if (courses.length === 0) {
@@ -90,10 +100,20 @@ export function CourseList({ courses }: CourseListProps) {
         </tbody>
       </table>
       {courseToDelete && (
-        <DeleteCourseConfirmation
-          course={courseToDelete}
+        <ConfirmationModal
+          testId="delete-course-confirmation"
+          title="Delete Course"
+          message={
+            <>
+              Are you sure you want to delete{" "}
+              <strong>{courseToDelete.name}</strong>? This action cannot be
+              undone.
+            </>
+          }
+          confirmButtonText="Delete Course"
           isOpen={true}
           onClose={handleCloseModal}
+          onConfirm={handleConfirmDelete}
         />
       )}
     </div>

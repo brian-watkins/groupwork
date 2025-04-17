@@ -8,6 +8,7 @@ import { useGroupStore } from "@/app/contexts/GroupStoreContext"
 import GroupSetForm from "./GroupSetForm"
 import { PanelBottomClose, PanelBottomOpen } from "lucide-react"
 import { Button } from "react-aria-components"
+import { ConfirmationModal } from "@/app/components/ConfirmationModal"
 
 interface GroupSetProps {
   groupSet: DisplayableGroupSet
@@ -126,34 +127,20 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
       )}
 
       {showDeleteConfirmation && (
-        <div
-          data-testid="delete-group-set-confirmation"
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        >
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4">Delete Group Set</h3>
-            <p data-confirmation-message className="mb-6">
+        <ConfirmationModal
+          testId="delete-group-set-confirmation"
+          title="Delete Group Set"
+          message={
+            <>
               Are you sure you want to delete the group set &quot;
               {groupSet.name}&quot;? This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-2">
-              <button
-                data-cancel
-                onClick={handleCancelDelete}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                data-delete
-                onClick={handleConfirmDelete}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+          confirmButtonText="Delete"
+          isOpen={showDeleteConfirmation}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+        />
       )}
     </div>
   )
