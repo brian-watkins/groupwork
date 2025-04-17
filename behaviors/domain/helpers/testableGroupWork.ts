@@ -4,7 +4,7 @@ import { GroupsReader } from "@/domain/groupReader"
 import { Group, workedTogetherAlready } from "@/domain/group"
 import { Course, CourseId } from "@/domain/course"
 import { assignGroups, AssignGroupsError } from "@/domain/assignGroups"
-import { Student } from "@/domain/student"
+import { Student, StudentId } from "@/domain/student"
 import { Teacher, TeacherId } from "@/domain/teacher"
 import { GroupSetDetails, GroupSetWriter } from "@/domain/groupSetWriter"
 import { GroupSet } from "@/domain/groupSet"
@@ -46,7 +46,7 @@ class TestableGroupWork {
     )
   }
 
-  getCurrentCollaborators(group: Group): Array<Array<Student>> {
+  getCurrentCollaborators(group: Group): Map<StudentId, Student[]> {
     return workedTogetherAlready(this.groupsReader.groups, group)
   }
 

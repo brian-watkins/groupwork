@@ -147,6 +147,106 @@ export default behavior("adjusting groups", [
     }),
 
   example(testableGroupList)
+    .description(
+      "shows the count and names of past collaborators for each student",
+    )
+    .script({
+      suppose: [
+        fact(
+          "there are previous group sets with complex collaboration history",
+          async (context) => {
+            await context
+              .withGroupSets([
+                testGroupSet(1).withGroups([
+                  testGroup(testStudent(1), testStudent(2), testStudent(3)),
+                  testGroup(testStudent(4), testStudent(5), testStudent(6)),
+                  testGroup(testStudent(7), testStudent(8), testStudent(9)),
+                ]),
+                testGroupSet(2).withGroups([
+                  testGroup(testStudent(1), testStudent(4), testStudent(7)),
+                  testGroup(testStudent(2), testStudent(5), testStudent(8)),
+                  testGroup(testStudent(3), testStudent(6), testStudent(9)),
+                ]),
+              ])
+              .withGroups([
+                testGroup(testStudent(1), testStudent(2), testStudent(4)),
+                testGroup(testStudent(3), testStudent(5), testStudent(7)),
+                testGroup(testStudent(6), testStudent(8), testStudent(9)),
+              ])
+              .render()
+          },
+        ),
+      ],
+      observe: [
+        effect(
+          "students show the number of collaborators in their current group",
+          async (context) => {
+            await expect(
+              context.display.group(0).member(0).partneredIndicator.text(),
+              resolvesTo("2"),
+            )
+            await expect(
+              context.display.group(0).member(1).partneredIndicator.text(),
+              resolvesTo("1"),
+            )
+            await expect(
+              context.display.group(0).member(2).partneredIndicator.text(),
+              resolvesTo("1"),
+            )
+
+            await expect(
+              context.display.group(2).member(0).partneredIndicator.text(),
+              resolvesTo("1"),
+            )
+            await expect(
+              context.display.group(2).member(1).partneredIndicator.text(),
+              resolvesTo("1"),
+            )
+            await expect(
+              context.display.group(2).member(2).partneredIndicator.text(),
+              resolvesTo("2"),
+            )
+          },
+        ),
+        effect(
+          "students who haven't worked with anyone in their group don't show a count",
+          async (context) => {
+            await expect(
+              context.display.group(1).member(0).partneredIndicator.isHidden(),
+              resolvesTo(true),
+            )
+            await expect(
+              context.display.group(1).member(1).partneredIndicator.isHidden(),
+              resolvesTo(true),
+            )
+            await expect(
+              context.display.group(1).member(2).partneredIndicator.isHidden(),
+              resolvesTo(true),
+            )
+          },
+        ),
+        effect(
+          "the names of students previously worked with are displayed on hover",
+          async (context) => {
+            await context.display.group(0).member(0).partneredIndicator.hover()
+            await context.display.previousCollaborators.waitForVisible()
+            await expect(
+              context.display.previousCollaborators.text(),
+              resolvesTo("Worked with: Fun Student 2, Fun Student 4"),
+            )
+
+            await context.display.group(0).member(1).partneredIndicator.hover()
+            await context.display.previousCollaborators.waitForVisible()
+            await expect(
+              context.display.previousCollaborators.text(),
+              resolvesTo("Worked with: Fun Student 1"),
+            )
+          },
+        ),
+      ],
+    }),
+
+  example(testableGroupList)
     .description("move one student to another group")
     .script({
       suppose: [

@@ -1,4 +1,4 @@
-import { Student } from "./student"
+import { Student, StudentId } from "./student"
 
 export interface Group {
   readonly members: Set<Student>
@@ -11,36 +11,27 @@ export function isValidGroupSize(size: number, studentCount: number): boolean {
 export function workedTogetherAlready(
   history: Array<Group>,
   group: Group,
-): Array<Array<Student>> {
-  const collaborators: Array<Array<Student>> = []
-  const groupIds = Array.from(group.members).map((g) => g.id)
-  for (const student of group.members) {
-    const groupIdsWithoutStudent = groupIds.filter((i) => i !== student.id)
-    const studentsWhoHaveBeenInAGroupWithThisStudent = history
-      .filter((g) =>
-        Array.from(g.members)
-          .map((m) => m.id)
-          .includes(student.id),
-      )
-      .filter((g) =>
-        Array.from(g.members).some((s) =>
-          groupIdsWithoutStudent.includes(s.id),
-        ),
-      )
-      .map((g) => Array.from(g.members).filter((m) => groupIds.includes(m.id)))
+): Map<StudentId, Student[]> {
+  const collaborationMap = new Map<StudentId, Student[]>()
 
-    for (const studentSet of studentsWhoHaveBeenInAGroupWithThisStudent) {
-      const studentSetIdSet = new Set(studentSet.map((s) => s.id))
-      const hasCollab = collaborators.some(
-        (collab) =>
-          new Set(collab.map((c) => c.id)).intersection(studentSetIdSet)
-            .size === studentSetIdSet.size,
-      )
-      if (!hasCollab) {
-        collaborators.push(studentSet)
-      }
-    }
+  for (const student of group.members) {
+    const pastGroupsWithStudent = history.filter((pastGroup) =>
+      Array.from(pastGroup.members).some((member) => member.id === student.id),
+    )
+
+    const studentsWorkedWith: Set<Student> = pastGroupsWithStudent.reduce(
+      (acc, cur) => {
+        Array.from(cur.members)
+          .filter((s) => s.id !== student.id)
+          .filter((s) => Array.from(group.members).some((m) => m.id === s.id))
+          .forEach((s) => acc.add(s))
+        return acc
+      },
+      new Set<Student>(),
+    )
+
+    collaborationMap.set(student.id, Array.from(studentsWorkedWith))
   }
 
-  return collaborators
+  return collaborationMap
 }

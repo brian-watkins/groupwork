@@ -1,7 +1,11 @@
 import { Group } from "@/domain/group"
 import { Context, use } from "best-behavior"
 import { browserContext, BrowserTestInstrument } from "best-behavior/browser"
-import { DisplayElementList, TestDisplay } from "../../helpers/displays/display"
+import {
+  DisplayElement,
+  DisplayElementList,
+  TestDisplay,
+} from "../../helpers/displays/display"
 import { DisplayableGroupSet } from "@/app/courses/[courseId]/groups/components/DisplayableGroupSet"
 import { GroupDisplayElement } from "../../helpers/displays/groupDisplayElement"
 import { GroupSet, GroupSetId } from "@/domain/groupSet"
@@ -94,5 +98,9 @@ class GroupListDisplay extends TestDisplay {
       this.page.locator("[data-student-group]").nth(index),
       this.options,
     )
+  }
+
+  get previousCollaborators(): DisplayElement {
+    return this.select("[data-previous-collaborators]")
   }
 }

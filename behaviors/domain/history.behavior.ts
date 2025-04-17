@@ -10,8 +10,11 @@ import {
   equalTo,
   expect,
   is,
+  mapContaining,
+  mapWith,
   objectWithProperty,
   setContaining,
+  setWith,
   setWithSize,
 } from "great-expectations"
 import {
@@ -23,6 +26,7 @@ import {
 } from "./helpers/matchers"
 import { workedTogetherAlready } from "@/domain/group"
 import { testTeacher } from "../app/helpers/testTeacher"
+import { Student } from "@/domain/student"
 
 export default behavior("choosing groups based on history", [
   example(testableGroupWorkDomain)
@@ -141,15 +145,24 @@ export default behavior("choosing groups based on history", [
             is(okResultWith(groupSetWithStudents(students(4)))),
           )
         }),
-        effect("there is only one previous collaboration", (context) => {
-          const groups = context.getCurrentGroups().valueOr(() => [])
-          const group1Collaborators = context.getCurrentCollaborators(groups[0])
-          const group2Collaborators = context.getCurrentCollaborators(groups[1])
-          expect(
-            [group1Collaborators, group2Collaborators],
-            is(arrayContaining(arrayWithLength(1), { times: 1 })),
-          )
-        }),
+        effect(
+          "two of the students have a previous collaborator -- each other",
+          (context) => {
+            const groups = context.getCurrentGroups().valueOr(() => [])
+
+            expect(
+              groups.map((group) =>
+                Array.from(context.getCurrentCollaborators(group).values()),
+              ),
+              is(
+                arrayContaining(
+                  arrayContaining(arrayWithLength(1), { times: 2 }),
+                  { times: 1 },
+                ),
+              ),
+            )
+          },
+        ),
       ],
     }),
 
@@ -162,22 +175,34 @@ export default behavior("choosing groups based on history", [
             testGroup(testStudent(1), testStudent(2), testStudent(4)),
             testGroup(testStudent(1), testStudent(3), testStudent(4)),
           ]
+
           const current = testGroup(
             testStudent(1),
             testStudent(2),
             testStudent(3),
           )
-          const students = workedTogetherAlready(groups, current)
+
+          const collaborationMap = workedTogetherAlready(groups, current)
+
           expect(
-            students,
+            collaborationMap,
             is(
-              arrayWith(
-                [
-                  arrayWith([student(1), student(3)], { withAnyOrder: true }),
-                  arrayWith([student(1), student(2)], { withAnyOrder: true }),
-                ],
-                { withAnyOrder: true },
-              ),
+              mapWith([
+                {
+                  key: equalTo(testStudent(1).id),
+                  value: arrayWith([student(2), student(3)], {
+                    withAnyOrder: true,
+                  }),
+                },
+                {
+                  key: equalTo(testStudent(2).id),
+                  value: arrayWith([student(1)]),
+                },
+                {
+                  key: equalTo(testStudent(3).id),
+                  value: arrayWith([student(1)]),
+                },
+              ]),
             ),
           )
         }),
@@ -189,8 +214,23 @@ export default behavior("choosing groups based on history", [
             testGroup(testStudent(2), testStudent(3)),
           ]
           const current = testGroup(testStudent(1), testStudent(4))
-          const students = workedTogetherAlready(groups, current)
-          expect(students, is(arrayWithLength(0)))
+          const collaborationMap = workedTogetherAlready(groups, current)
+
+          expect(
+            collaborationMap,
+            is(
+              mapWith([
+                {
+                  key: equalTo(testStudent(1).id),
+                  value: arrayWithLength(0),
+                },
+                {
+                  key: equalTo(testStudent(4).id),
+                  value: arrayWithLength(0),
+                },
+              ]),
+            ),
+          )
         }),
       ],
     }),

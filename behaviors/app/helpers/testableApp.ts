@@ -161,7 +161,9 @@ export class TestApp {
 
 class MainDisplay extends TestDisplay {
   async navigateToCourses(): Promise<void> {
-    await this.selectWithText("View Courses").click()
+    // NOTE: This does not exist any more! We need some breadcrumbs ...
+    // await this.selectWithText("View Courses").click()
+    await this.page.goto("/courses")
   }
 
   async navigateToCourseGroups(index: number): Promise<void> {
