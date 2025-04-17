@@ -6,7 +6,8 @@ import GroupList from "./GroupList"
 import { DateTime } from "luxon"
 import { useGroupStore } from "@/app/contexts/GroupStoreContext"
 import GroupSetForm from "./GroupSetForm"
-import { Pencil, Trash2, PanelBottomClose, PanelBottomOpen } from "lucide-react"
+import { PanelBottomClose, PanelBottomOpen } from "lucide-react"
+import { Button } from "react-aria-components"
 
 interface GroupSetProps {
   groupSet: DisplayableGroupSet
@@ -70,41 +71,43 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
       className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm transition-shadow"
     >
       <div className="flex justify-between items-center">
-        <div className="cursor-pointer flex-grow" onClick={toggleExpand}>
-          <h3 data-group-set-name className="text-lg font-semibold">
-            {groupSet.name}
-          </h3>
-          <p data-group-set-created-at className="text-sm text-gray-500">
-            {formatDate(groupSet.createdAt)}
-          </p>
-        </div>
-        <div className="flex items-center">
-          <button
-            data-edit-group-set-button
-            onClick={handleEdit}
-            className="mr-2 text-blue-600 hover:text-blue-800"
-            aria-label="Edit group set"
-          >
-            <Pencil className="w-5 h-5" />
-          </button>
-          <button
-            data-delete-group-set-button
-            onClick={handleDeleteClick}
-            className="mr-2 text-red-600 hover:text-red-800"
-            aria-label="Delete group set"
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
-          <div
-            className="text-blue-600 cursor-pointer hover:text-blue-800"
-            onClick={toggleExpand}
-          >
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={toggleExpand}
+        >
+          <div className="text-blue-600 mr-3 hover:text-blue-800 flex items-center">
             {isExpanded ? (
-              <PanelBottomOpen className="w-5 h-5" />
+              <PanelBottomOpen className="w-8 h-8" strokeWidth={1} />
             ) : (
-              <PanelBottomClose className="w-5 h-5" />
+              <PanelBottomClose className="w-8 h-8" strokeWidth={1} />
             )}
           </div>
+          <div>
+            <h3 data-group-set-name className="text-lg font-semibold">
+              {groupSet.name}
+            </h3>
+            <p data-group-set-created-at className="text-sm text-gray-500">
+              {formatDate(groupSet.createdAt)}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Button
+            data-edit-group-set-button
+            onPress={handleEdit}
+            className="px-3 py-1.5 text-blue-600 border border-blue-600 hover:text-white hover:bg-blue-600 rounded-md transition-colors"
+            aria-label="Edit group set"
+          >
+            Edit
+          </Button>
+          <Button
+            data-delete-group-set-button
+            onPress={handleDeleteClick}
+            className="px-3 py-1.5 text-red-600 border border-red-600 hover:text-white hover:bg-red-600 rounded-md transition-colors"
+            aria-label="Delete group set"
+          >
+            Delete
+          </Button>
         </div>
       </div>
 
