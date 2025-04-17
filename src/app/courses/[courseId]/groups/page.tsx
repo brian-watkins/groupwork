@@ -6,6 +6,7 @@ import { toDisplayableGroupSets } from "./components/DisplayableGroupSet"
 import GroupsContent from "./components/GroupsContent"
 import { toTeacher } from "@/lib/domainHelpers"
 import { ResultType } from "@/domain/result"
+import CourseBreadcrumbs from "./components/CourseBreadcrumbs"
 
 export default async function CourseStudentsPage({
   params,
@@ -31,7 +32,7 @@ export default async function CourseStudentsPage({
   if (course.students.length == 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">{course.name}</h1>
+        <CourseBreadcrumbs course={course} />
         <div data-no-students>There are no students in the course!</div>
       </div>
     )
@@ -41,7 +42,7 @@ export default async function CourseStudentsPage({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">{course.name}</h1>
+      <CourseBreadcrumbs course={course} />
 
       <GroupsContent
         course={course}
