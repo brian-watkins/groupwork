@@ -9,7 +9,7 @@
     "local:db:migrate": "prisma migrate reset",
     "local": "run-p -l local:dev:*",
     "local:test:app": "dotenv -e .env.test -- next dev --turbo",
-    "build": "prisma generate && cp ./generated/prisma/*.node . && next build",
+    "build": "prisma generate && next build --turbo",
     "start": "next start",
     "lint": "next lint",
     "format:check": "prettier . --check",
