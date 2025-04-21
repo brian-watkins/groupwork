@@ -67,6 +67,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@prisma/client": "^6.6.0",
+    "@vercel/speed-insights": "^1.2.0",
     "luxon": "^3.6.1",
     "next": "^15.2.4",
     "pure-rand": "^7.0.1",
