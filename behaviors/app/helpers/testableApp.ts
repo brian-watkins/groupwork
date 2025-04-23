@@ -193,7 +193,7 @@ class MainDisplay extends TestDisplay {
 
   get deleteCourseConfirmationModal(): DeleteCourseConfirmationElement {
     return new DeleteCourseConfirmationElement(
-      this.page.locator("[data-testid='delete-course-confirmation']"),
+      this.page.locator("[data-delete-course-confirmation]"),
       this.options,
     )
   }
@@ -275,7 +275,7 @@ class CourseGroupsPageDisplay extends TestDisplay {
 
   get deleteGroupSetConfirmationModal(): DeleteGroupSetConfirmationElement {
     return new DeleteGroupSetConfirmationElement(
-      this.page.locator("[data-testid='delete-group-set-confirmation']"),
+      this.page.locator("[data-delete-group-set-confirmation]"),
       this.options,
     )
   }

@@ -7,8 +7,13 @@ import { DateTime } from "luxon"
 import { useGroupStore } from "@/app/contexts/GroupStoreContext"
 import GroupSetForm from "./GroupSetForm"
 import { PanelBottomClose, PanelBottomOpen } from "lucide-react"
-import { Button } from "react-aria-components"
-import { ConfirmationModal } from "@/app/components/ConfirmationModal"
+import { Button, DialogTrigger } from "react-aria-components"
+import {
+  ConfirmationDialog,
+  ConfirmationDialogAction,
+  ConfirmationDialogHeader,
+  ConfirmationDialogMessage,
+} from "@/app/components/ConfirmationDialog"
 
 interface GroupSetProps {
   groupSet: DisplayableGroupSet
@@ -34,7 +39,6 @@ export default function GroupSetList() {
 function GroupSet({ groupSet, expanded }: GroupSetProps) {
   const [isExpanded, setIsExpanded] = useState(expanded)
   const [isEditing, setIsEditing] = useState(false)
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
   const deleteGroupSet = useGroupStore((store) => store.deleteGroupSet)
 
   const toggleExpand = () => {
@@ -49,17 +53,8 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
     setIsEditing(false)
   }
 
-  const handleDeleteClick = () => {
-    setShowDeleteConfirmation(true)
-  }
-
-  const handleCancelDelete = () => {
-    setShowDeleteConfirmation(false)
-  }
-
   const handleConfirmDelete = async () => {
     await deleteGroupSet(groupSet)
-    setShowDeleteConfirmation(false)
   }
 
   const formatDate = (date: string) => {
@@ -101,14 +96,27 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
           >
             Edit
           </Button>
-          <Button
-            data-delete-group-set-button
-            onPress={handleDeleteClick}
-            className="px-3 py-1.5 text-red-600 border border-red-600 hover:text-white hover:bg-red-600 rounded-md transition-colors"
-            aria-label="Delete group set"
-          >
-            Delete
-          </Button>
+          <DialogTrigger>
+            <Button
+              data-delete-group-set-button
+              className="px-3 py-1.5 text-red-600 border border-red-600 hover:text-white hover:bg-red-600 rounded-md transition-colors"
+              aria-label="Delete group set"
+            >
+              Delete
+            </Button>
+            <ConfirmationDialog data-delete-group-set-confirmation>
+              <ConfirmationDialogHeader>
+                Delete Group Set
+              </ConfirmationDialogHeader>
+              <ConfirmationDialogMessage>
+                Are you sure you want to delete the group set &quot;
+                {groupSet.name}&quot;? This action cannot be undone.
+              </ConfirmationDialogMessage>
+              <ConfirmationDialogAction onConfirm={handleConfirmDelete}>
+                Delete
+              </ConfirmationDialogAction>
+            </ConfirmationDialog>
+          </DialogTrigger>
         </div>
       </div>
 
@@ -124,23 +132,6 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
             <GroupSetForm onClose={handleCloseForm} groupSetToEdit={groupSet} />
           </div>
         </div>
-      )}
-
-      {showDeleteConfirmation && (
-        <ConfirmationModal
-          testId="delete-group-set-confirmation"
-          title="Delete Group Set"
-          message={
-            <>
-              Are you sure you want to delete the group set &quot;
-              {groupSet.name}&quot;? This action cannot be undone.
-            </>
-          }
-          confirmButtonText="Delete"
-          isOpen={showDeleteConfirmation}
-          onClose={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
-        />
       )}
     </div>
   )

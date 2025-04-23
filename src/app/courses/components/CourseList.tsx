@@ -2,33 +2,26 @@
 
 import { Course } from "@/domain/course"
 import Link from "next/link"
-import { Heading, Button } from "react-aria-components"
-import { useState } from "react"
+import { Heading, Button, DialogTrigger } from "react-aria-components"
 import { useRouter } from "next/navigation"
-import { ConfirmationModal } from "@/app/components/ConfirmationModal"
 import { deleteCourse } from "../../actions/deleteCourse"
+import {
+  ConfirmationDialog,
+  ConfirmationDialogAction,
+  ConfirmationDialogHeader,
+  ConfirmationDialogMessage,
+} from "@/app/components/ConfirmationDialog"
 
 interface CourseListProps {
   courses: Course[]
 }
 
 export function CourseList({ courses }: CourseListProps) {
-  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
   const router = useRouter()
 
-  const handleDeleteClick = (course: Course) => {
-    setCourseToDelete(course)
-  }
-
-  const handleCloseModal = () => {
-    setCourseToDelete(null)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (courseToDelete) {
-      await deleteCourse(courseToDelete)
-      router.refresh()
-    }
+  const handleConfirmDelete = async (course: Course) => {
+    await deleteCourse(course)
+    router.refresh()
   }
 
   if (courses.length === 0) {
@@ -87,35 +80,34 @@ export function CourseList({ courses }: CourseListProps) {
                 >
                   View Groups
                 </Link>
-                <Button
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                  onPress={() => handleDeleteClick(course)}
-                  data-delete-course-button
-                >
-                  Delete
-                </Button>
+                <DialogTrigger>
+                  <Button
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                    data-delete-course-button
+                  >
+                    Delete
+                  </Button>
+                  <ConfirmationDialog data-delete-course-confirmation>
+                    <ConfirmationDialogHeader>
+                      Delete Course
+                    </ConfirmationDialogHeader>
+                    <ConfirmationDialogMessage>
+                      Are you sure you want to delete&nbsp;
+                      <strong>{course.name}</strong>? This action cannot be
+                      undone.
+                    </ConfirmationDialogMessage>
+                    <ConfirmationDialogAction
+                      onConfirm={() => handleConfirmDelete(course)}
+                    >
+                      Delete course
+                    </ConfirmationDialogAction>
+                  </ConfirmationDialog>
+                </DialogTrigger>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {courseToDelete && (
-        <ConfirmationModal
-          testId="delete-course-confirmation"
-          title="Delete Course"
-          message={
-            <>
-              Are you sure you want to delete{" "}
-              <strong>{courseToDelete.name}</strong>? This action cannot be
-              undone.
-            </>
-          }
-          confirmButtonText="Delete Course"
-          isOpen={true}
-          onClose={handleCloseModal}
-          onConfirm={handleConfirmDelete}
-        />
-      )}
     </div>
   )
 }

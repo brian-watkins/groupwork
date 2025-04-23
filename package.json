@@ -55,6 +55,8 @@
     "prettier": "3.5.3",
     "prisma": "^6.6.0",
     "tailwindcss": "^4.0.17",
+    "tailwindcss-animate": "^1.0.7",
+    "tailwindcss-react-aria-components": "^2.0.0",
     "testcontainers": "^10.24.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
