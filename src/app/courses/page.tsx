@@ -1,10 +1,22 @@
 import { unauthorized } from "next/navigation"
-import { courseReader } from "../app-config"
-import { CourseList } from "./components/CourseList"
 import { CourseHeading } from "./components/client/CourseHeading"
 import { CreateCourseButton } from "./components/client/CreateCourseButton"
 import { currentUser } from "@clerk/nextjs/server"
 import { toTeacher } from "@/lib/domainHelpers"
+import { Suspense } from "react"
+import { courseReader } from "../app-config"
+import { Teacher } from "@/domain/teacher"
+import { CourseList } from "./components/CourseList"
+
+function CourseListSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-10 bg-gray-200 rounded mb-4 w-full"></div>
+      <div className="h-10 bg-gray-200 rounded mb-4 w-full"></div>
+      <div className="h-10 bg-gray-200 rounded mb-4 w-full"></div>
+    </div>
+  )
+}
 
 export default async function Page() {
   const user = await currentUser()
@@ -12,8 +24,6 @@ export default async function Page() {
   if (!user) {
     unauthorized()
   }
-
-  const courses = await courseReader.getAll(toTeacher(user))
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -32,7 +42,14 @@ export default async function Page() {
         <CreateCourseButton />
       </div>
 
-      <CourseList courses={courses} />
+      <Suspense fallback={<CourseListSkeleton />}>
+        <CourseListContent teacher={toTeacher(user)} />
+      </Suspense>
     </main>
   )
+}
+
+async function CourseListContent({ teacher }: { teacher: Teacher }) {
+  const courses = await courseReader.getAll(teacher)
+  return <CourseList courses={courses} />
 }

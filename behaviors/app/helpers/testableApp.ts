@@ -110,8 +110,9 @@ export class TestApp {
     return new CourseGroupsPageDisplay(this.page, { timeout: 2000 })
   }
 
-  waitForCoursesPage(): Promise<void> {
-    return this.page.waitForURL(`**/courses`)
+  async waitForCoursesPage(): Promise<void> {
+    await this.page.waitForURL(`**/courses`)
+    await this.display.course(0).waitForVisible()
   }
 
   async waitForCreateCoursePage(): Promise<void> {
