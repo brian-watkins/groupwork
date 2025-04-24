@@ -22,7 +22,7 @@ export function appContext(options: AppContextOptions = {}) {
   }
 
   return contextMap(base)
-    .set("server", ({ database }) => {
+    .thenSet("server", ({ database }) => {
       const env: Record<string, string> = {
         DATABASE_URL: database.getConnectionUri()!,
       }
@@ -39,7 +39,7 @@ export function appContext(options: AppContextOptions = {}) {
         logger: consoleLogger({ level: LogLevel.Error }),
       })
     })
-    .set("auth", () =>
+    .thenSet("auth", () =>
       clerkAuthContext({
         storageStateFile: "./behaviors/.browserStorageState/state.json",
         refreshTimeMillis: 3 * 24 * 60 * 60 * 1000,

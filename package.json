@@ -40,7 +40,7 @@
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
-    "best-behavior": "^0.16.7",
+    "best-behavior": "^0.16.8",
     "dotenv-cli": "^8.0.0",
     "eslint": "9.24.0",
     "eslint-config-next": "15.3.0",
