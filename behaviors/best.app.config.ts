@@ -17,6 +17,7 @@ export default defineConfig({
       /Fast Refresh/,
       /React DevTools/,
       /Clerk has been loaded with development keys/,
+      /Vercel Speed Insights/,
     ],
   }),
 })
