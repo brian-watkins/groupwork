@@ -14,6 +14,7 @@ import {
   ConfirmationDialogHeader,
   ConfirmationDialogMessage,
 } from "@/app/components/ConfirmationDialog"
+import PDFExportButton from "./PDFExportButton"
 
 interface GroupSetProps {
   groupSet: DisplayableGroupSet
@@ -88,6 +89,11 @@ function GroupSet({ groupSet, expanded }: GroupSetProps) {
           </div>
         </div>
         <div className="flex items-center space-x-4">
+          <PDFExportButton
+            groupSet={groupSet}
+            className="px-3 py-1.5 text-green-600 border border-green-600 hover:text-white hover:bg-green-600 rounded-md transition-colors disabled:opacity-50"
+            aria-label="Export group set to PDF"
+          />
           <Button
             data-edit-group-set-button
             onPress={handleEdit}
