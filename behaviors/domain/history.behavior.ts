@@ -24,9 +24,8 @@ import {
   student,
   students,
 } from "./helpers/matchers"
-import { workedTogetherAlready } from "@/domain/group"
+import { workedTogetherAlready, previousCollaborators } from "@/domain/group"
 import { testTeacher } from "../app/helpers/testTeacher"
-import { Student } from "@/domain/student"
 
 export default behavior("choosing groups based on history", [
   example(testableGroupWorkDomain)
@@ -228,6 +227,77 @@ export default behavior("choosing groups based on history", [
                   key: equalTo(testStudent(4).id),
                   value: arrayWithLength(0),
                 },
+              ]),
+            ),
+          )
+        }),
+      ],
+    }),
+
+  example()
+    .description("previousCollaborators")
+    .script({
+      observe: [
+        effect("returns all students who worked with the given student", () => {
+          const groups = [
+            testGroup(testStudent(1), testStudent(2), testStudent(3)),
+            testGroup(testStudent(1), testStudent(4)),
+            testGroup(testStudent(2), testStudent(5)),
+          ]
+
+          const collaborators = previousCollaborators(groups, testStudent(1))
+
+          expect(
+            collaborators,
+            is(
+              setWith([
+                equalTo(testStudent(2).id),
+                equalTo(testStudent(3).id),
+                equalTo(testStudent(4).id),
+              ]),
+            ),
+          )
+        }),
+        effect("returns empty set when student has no history", () => {
+          const groups = [
+            testGroup(testStudent(1), testStudent(2)),
+            testGroup(testStudent(3), testStudent(4)),
+          ]
+
+          const collaborators = previousCollaborators(groups, testStudent(5))
+
+          expect(collaborators, is(setWithSize(0)))
+        }),
+        effect("does not include the student themselves", () => {
+          const groups = [
+            testGroup(testStudent(1), testStudent(2), testStudent(3)),
+          ]
+
+          const collaborators = previousCollaborators(groups, testStudent(1))
+
+          expect(
+            collaborators,
+            is(
+              setWith([equalTo(testStudent(2).id), equalTo(testStudent(3).id)]),
+            ),
+          )
+        }),
+        effect("handles multiple group sets with the same student", () => {
+          const groups = [
+            testGroup(testStudent(1), testStudent(2)),
+            testGroup(testStudent(1), testStudent(2), testStudent(3)),
+            testGroup(testStudent(1), testStudent(4)),
+          ]
+
+          const collaborators = previousCollaborators(groups, testStudent(1))
+
+          expect(
+            collaborators,
+            is(
+              setWith([
+                equalTo(testStudent(2).id),
+                equalTo(testStudent(3).id),
+                equalTo(testStudent(4).id),
               ]),
             ),
           )

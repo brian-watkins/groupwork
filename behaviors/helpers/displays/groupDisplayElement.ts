@@ -12,4 +12,9 @@ export class GroupDisplayElement extends DisplayElement {
       this.options,
     )
   }
+
+  async isDarkened(): Promise<boolean> {
+    const darkened = await this.attribute("data-darkened")
+    return darkened === "true"
+  }
 }

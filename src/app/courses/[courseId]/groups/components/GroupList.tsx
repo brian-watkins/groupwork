@@ -1,6 +1,10 @@
 "use client"
 
-import { Group, workedTogetherAlready } from "@/domain/group"
+import {
+  Group,
+  workedTogetherAlready,
+  previousCollaborators,
+} from "@/domain/group"
 import { Student } from "@/domain/student"
 import { useState } from "react"
 import {
@@ -111,11 +115,13 @@ function DroppableGroup({
   index,
   children,
   isOver,
+  darkened = false,
 }: {
   id: string
   index: number
   children: React.ReactNode
   isOver?: boolean
+  darkened?: boolean
 }) {
   const { setNodeRef, isOver: dropIsOver } = useDroppable({
     id: id,
@@ -127,10 +133,11 @@ function DroppableGroup({
     <div
       ref={setNodeRef}
       data-student-group
-      className={`bg-white shadow rounded-lg p-4 border ${isActiveTarget ? "border-blue-400 bg-blue-50" : "border-gray-200"} transition-colors duration-200`}
+      data-darkened={darkened}
+      className={`${darkened ? "bg-orange-100" : "bg-white"} shadow rounded-lg p-4 border ${isActiveTarget ? "border-blue-400 bg-blue-50" : "border-gray-300"} transition-colors duration-200`}
     >
       <h3 className="font-medium text-lg mb-2">Group {index + 1}</h3>
-      <ul className="divide-y divide-gray-200">{children}</ul>
+      <ul className="divide-y divide-solid divide-gray-300">{children}</ul>
     </div>
   )
 }
@@ -203,6 +210,10 @@ export default function GroupList({
     }
   }
 
+  const draggedStudentCollaborators = dragState
+    ? previousCollaborators(history, dragState.student)
+    : new Set()
+
   return (
     <DndContext
       onDragStart={editable ? handleDragStart : undefined}
@@ -212,12 +223,16 @@ export default function GroupList({
       <div data-groups className="grid grid-cols-3 gap-4">
         {groups.map((group, groupIndex) => {
           const collaborationSet = workedTogetherAlready(history, group)
+          const groupContainsCollaborator = Array.from(group.members).some(
+            (student) => draggedStudentCollaborators.has(student.id),
+          )
           return (
             <DroppableGroup
               key={`group-${groupIndex}`}
               id={`${groupIndex}`}
               index={groupIndex}
               isOver={overGroupId === `${groupIndex}`}
+              darkened={dragState !== null && groupContainsCollaborator}
             >
               {Array.from(group.members).map((student) => {
                 const collaborators = collaborationSet.get(student.id)!

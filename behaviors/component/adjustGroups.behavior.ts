@@ -7,146 +7,6 @@ import { testGroupSet } from "./helpers/testGroupSet"
 
 export default behavior("adjusting groups", [
   example(testableGroupList)
-    .description("indicates when students have worked together before")
-    .script({
-      suppose: [
-        fact(
-          "there are previous group sets with students who worked together",
-          async (context) => {
-            await context
-              .withGroupSets([
-                testGroupSet(1).withGroups([
-                  testGroup(testStudent(1), testStudent(2)),
-                  testGroup(testStudent(3), testStudent(5)),
-                  testGroup(testStudent(4)),
-                ]),
-              ])
-              .withGroups([
-                testGroup(testStudent(3), testStudent(5)),
-                testGroup(testStudent(1), testStudent(4)),
-                testGroup(testStudent(2)),
-              ])
-              .render()
-          },
-        ),
-      ],
-      observe: [
-        effect(
-          "students who have worked together have a collaboration indicator",
-          async (context) => {
-            await expect(
-              context.display.group(0).member(0).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(0).member(1).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-          },
-        ),
-        effect(
-          "students who haven't worked together don't have indicators",
-          async (context) => {
-            await expect(
-              context.display.group(1).member(0).partneredIndicator.isHidden(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(1).member(1).partneredIndicator.isHidden(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(2).member(0).partneredIndicator.isHidden(),
-              resolvesTo(true),
-            )
-          },
-        ),
-      ],
-    }),
-
-  example(testableGroupList)
-    .description(
-      "when students have worked with several people in the group before",
-    )
-    .script({
-      suppose: [
-        fact(
-          "there are previous group sets with students who worked together",
-          async (context) => {
-            await context
-              .withGroupSets([
-                testGroupSet(1).withGroups([
-                  testGroup(testStudent(1), testStudent(2), testStudent(3)),
-                  testGroup(testStudent(4), testStudent(5), testStudent(6)),
-                  testGroup(testStudent(7), testStudent(8), testStudent(9)),
-                ]),
-                testGroupSet(1).withGroups([
-                  testGroup(testStudent(4), testStudent(8), testStudent(3)),
-                  testGroup(testStudent(7), testStudent(2), testStudent(6)),
-                  testGroup(testStudent(1), testStudent(5), testStudent(9)),
-                ]),
-              ])
-              .withGroups([
-                testGroup(testStudent(1), testStudent(5), testStudent(3)),
-                testGroup(testStudent(2), testStudent(9), testStudent(4)),
-                testGroup(testStudent(6), testStudent(7), testStudent(8)),
-              ])
-              .render()
-          },
-        ),
-      ],
-      observe: [
-        effect(
-          "students who have worked together have a collaboration indicator",
-          async (context) => {
-            await expect(
-              context.display.group(0).member(0).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(0).member(1).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(0).member(2).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-
-            await expect(
-              context.display.group(2).member(0).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(2).member(1).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(2).member(2).partneredIndicator.isVisible(),
-              resolvesTo(true),
-            )
-          },
-        ),
-        effect(
-          "students who haven't worked together don't have indicators",
-          async (context) => {
-            await expect(
-              context.display.group(1).member(0).partneredIndicator.isHidden(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(1).member(1).partneredIndicator.isHidden(),
-              resolvesTo(true),
-            )
-            await expect(
-              context.display.group(1).member(2).partneredIndicator.isHidden(),
-              resolvesTo(true),
-            )
-          },
-        ),
-      ],
-    }),
-
-  example(testableGroupList)
     .description(
       "shows the count and names of past collaborators for each student",
     )
@@ -376,6 +236,71 @@ export default behavior("adjusting groups", [
                   { withAnyOrder: true },
                 ),
               ),
+            )
+          },
+        ),
+      ],
+    }),
+
+  example(testableGroupList)
+    .description(
+      "when dragging a student, groups with previous collaborators are darkened",
+    )
+    .script({
+      suppose: [
+        fact(
+          "there are previous group sets where students have worked together",
+          async (context) => {
+            await context
+              .withGroupSets([
+                testGroupSet(1).withGroups([
+                  testGroup(testStudent(1), testStudent(2)),
+                  testGroup(testStudent(3), testStudent(4)),
+                ]),
+                testGroupSet(2).withGroups([
+                  testGroup(testStudent(1), testStudent(3)),
+                  testGroup(testStudent(2), testStudent(4)),
+                ]),
+              ])
+              .withGroups([
+                testGroup(testStudent(1), testStudent(5)),
+                testGroup(testStudent(2), testStudent(6)),
+                testGroup(testStudent(3), testStudent(7)),
+                testGroup(testStudent(4), testStudent(8)),
+              ])
+              .render()
+          },
+        ),
+      ],
+      perform: [
+        step("begin dragging student 1", async (context) => {
+          await context.display.group(0).member(0).startDrag()
+        }),
+      ],
+      observe: [
+        effect(
+          "groups containing previous collaborators are darkened",
+          async (context) => {
+            await expect(
+              context.display.group(1).isDarkened(),
+              resolvesTo(true),
+            )
+            await expect(
+              context.display.group(2).isDarkened(),
+              resolvesTo(true),
+            )
+          },
+        ),
+        effect(
+          "groups without previous collaborators are not darkened",
+          async (context) => {
+            await expect(
+              context.display.group(0).isDarkened(),
+              resolvesTo(false),
+            )
+            await expect(
+              context.display.group(3).isDarkened(),
+              resolvesTo(false),
             )
           },
         ),

@@ -8,6 +8,28 @@ export function isValidGroupSize(size: number, studentCount: number): boolean {
   return size >= 2 && size <= Math.floor(studentCount / 2)
 }
 
+export function previousCollaborators(
+  history: Array<Group>,
+  student: Student,
+): Set<StudentId> {
+  const collaborators = new Set<StudentId>()
+
+  for (const group of history) {
+    const groupMembers = Array.from(group.members)
+    const studentInGroup = groupMembers.some(
+      (member) => member.id === student.id,
+    )
+
+    if (studentInGroup) {
+      groupMembers
+        .filter((s) => s.id !== student.id)
+        .forEach((s) => collaborators.add(s.id))
+    }
+  }
+
+  return collaborators
+}
+
 export function workedTogetherAlready(
   history: Array<Group>,
   group: Group,
