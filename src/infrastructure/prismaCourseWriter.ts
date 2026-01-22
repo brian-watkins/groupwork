@@ -75,8 +75,7 @@ export class PrismaCourseWriter implements CourseWriter {
       await this.prisma.course.delete({
         where: { id: course.id, teacherId: teacher.id },
       })
-    } catch (error) {
-      console.log("Error deleting course", error)
+    } catch {
       throw new Error(`Course with id ${course.id} not found`)
     }
   }

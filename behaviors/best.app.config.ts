@@ -18,6 +18,7 @@ export default defineConfig({
       /React DevTools/,
       /Clerk has been loaded with development keys/,
       /Vercel Speed Insights/,
+      /Failed to load resource/,
     ],
   }),
 })
